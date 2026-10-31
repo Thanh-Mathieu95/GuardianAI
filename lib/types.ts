@@ -193,6 +193,7 @@ export type Incident = {
   evidenceShare?: { at: string; reason: string; hash: string; to: string[] };
   // Audio of the user's voice conversation (mic + AI), stored as files and hashed into the dossier.
   recordings?: { session: string; mime: string; startedAt: string; updatedAt: string; chunks: number; bytes: number; sha256: string }[];
+  recordingsDeletedAt?: string;
   showcase?: {
     status: "RUNNING" | "WAITING_APPROVAL" | "COMPLETED" | "STOPPED" | "FAILED";
     step: number;

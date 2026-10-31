@@ -10,7 +10,7 @@ const hash = (previous: string, payload: string) =>
 export class Store {
   db: DatabaseSync;
   constructor(
-    filename = process.env.GUARDIAN_DB_PATH || "./data/guardian.sqlite",
+    filename = process.env.GUARDIAN_POSTGRES_URL ? ":memory:" : process.env.GUARDIAN_DB_PATH || "./data/guardian.sqlite",
   ) {
     if (filename !== ":memory:")
       mkdirSync(
@@ -133,5 +133,8 @@ export class Store {
   }
   deleteReportHistory(id: string) {
     this.db.prepare("DELETE FROM report_revisions WHERE incident_id=?").run(id);
+  }
+  deleteSnapshots(id: string) {
+    this.db.prepare("DELETE FROM event_snapshots WHERE incident_id=?").run(id);
   }
 }

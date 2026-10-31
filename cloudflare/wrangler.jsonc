@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "guardianai-web",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-31",
+  "workers_dev": true,
+  "vars": { "BACKEND_ORIGIN": "https://guardianai-demo.onrender.com" },
+  "observability": { "enabled": false }
+}

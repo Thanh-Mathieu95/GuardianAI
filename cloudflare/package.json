@@ -1,0 +1,14 @@
+{
+  "name": "guardianai-cloudflare-proxy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "check": "wrangler deploy --dry-run --outdir ../work/cloudflare-build",
+    "deploy": "wrangler deploy",
+    "test": "node --test proxy.test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.156.0"
+  }
+}

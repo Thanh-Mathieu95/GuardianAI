@@ -1,3 +1,12 @@
+# Kiểm chứng persistence Supabase
+
+- TypeScript và 119 unit tests sau khi ghép main: PASS.
+- PostgreSQL thật: transaction incident/event/report, owner isolation, revision conflict và hash chain: PASS.
+- Hai tiến trình độc lập: phục hồi incident, network, token người nhận đã mã hóa, settings và recording private: PASS.
+- HTTP/SSE API integration trên QA riêng dùng PostgreSQL/Storage thật, AI OFF, gateway tắt: PASS.
+- Production build: PASS; còn cảnh báo tracing filesystem của recording cache.
+- Cloud HTTPS và browser: chờ kiểm chứng deployment. Không dùng kết quả local để tuyên bố đã deploy.
+
 # Kết quả kiểm chứng tại máy phát triển
 
 ## Local source import verification · 31/10/2026

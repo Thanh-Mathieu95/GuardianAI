@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, existsSync } from "node:fs";
+import { mkdtempSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { createHash } from "node:crypto";
@@ -37,4 +37,18 @@ test("Recording chunks are appended in order, retries are ignored, and the file 
   assert.equal(readRecording(i, "session-0001"), undefined);
   assert.equal(existsSync(path.join(process.env.GUARDIAN_RECORDINGS_DIR!, i.id)), false);
   e.close(i, true); e.store.db.close();
+});
+
+test("An uncommitted cache file is replaced and deleted recordings cannot be revived by delayed chunks", () => {
+  const e = new GuardianEngine(new Store(":memory:"), 1, new AIService(() => null));
+  const i = e.create("recording-recovery-qa");
+  const directory = path.join(process.env.GUARDIAN_RECORDINGS_DIR!,i.id);
+  mkdirSync(directory,{ recursive: true });
+  writeFileSync(path.join(directory,"session-0003.webm"),"orphan from interrupted upload");
+  e.addRecording(i,"session-0003",0,"audio/webm",Buffer.from("committed chunk"));
+  assert.equal(readRecording(i,"session-0003")?.data.toString(),"committed chunk");
+  deleteRecordings(i);
+  assert.throws(() => e.addRecording(i,"session-0003",0,"audio/webm",Buffer.from("late chunk")),/đã được xóa/);
+  assert.equal(existsSync(directory),false);
+  e.close(i,true);e.store.db.close();
 });

@@ -76,7 +76,10 @@ Sao chép `.env.example` thành `.env.local`, nhập cấu hình tại máy và 
 
 | Biến | Vai trò |
 | --- | --- |
-| `GUARDIAN_DB_PATH` | Đường dẫn SQLite; mặc định `./data/guardian.sqlite` |
+| `GUARDIAN_DB_PATH` | Đường dẫn SQLite local; mặc định `./data/guardian.sqlite` |
+| `GUARDIAN_POSTGRES_URL` | Kết nối PostgreSQL session pooler cho bản host, dùng schema riêng `guardian_ai` |
+| `GUARDIAN_SESSION_SECRET` | Khóa phiên ổn định; bản PostgreSQL cũng dùng để bảo vệ token người nhận khi lưu |
+| `GUARDIAN_SUPABASE_URL`, `GUARDIAN_SUPABASE_SERVICE_KEY` | Cấu hình server để truy cập bucket ghi âm riêng tư |
 | `AI_PROVIDER` | `OPENAI` để dùng AI khi có khóa; `OFF` để tắt model |
 | `OPENAI_API_KEY` | Khóa OpenAI phía server |
 | `AI_MODEL`, `AI_REALTIME_MODEL` | Model phân tích/hội thoại và model giọng nói |
@@ -93,7 +96,7 @@ Microphone và vị trí trên điện thoại cần quyền trình duyệt và 
 
 ## Kiến trúc mã nguồn
 
-Ứng dụng dùng Next.js App Router, React, TypeScript, Zod, MapLibre và SQLite. Backend là một tiến trình Node.js giữ engine, timer giám sát và kênh sự kiện.
+Ứng dụng dùng Next.js App Router, React, TypeScript, Zod và MapLibre. Backend là một tiến trình Node.js giữ engine, timer giám sát và kênh sự kiện. Bản local mặc định dùng SQLite; khi có `GUARDIAN_POSTGRES_URL`, PostgreSQL giữ dữ liệu bền vững, còn SQLite trong RAM là bộ nhớ làm việc được phục hồi từ database.
 
 | Thành phần | Trách nhiệm |
 | --- | --- |
@@ -105,6 +108,8 @@ Microphone và vị trí trên điện thoại cần quyền trình duyệt và 
 | `lib/city.ts`, `lib/route-agent.ts` | Đồ thị đường đi, lựa chọn tuyến và đánh giá lại |
 | `lib/network.ts`, `lib/receiver.ts` | Người hỗ trợ và dữ liệu được phép xem |
 | `lib/store.ts`, `lib/recordings.ts`, `lib/evidence.ts` | Lưu trữ, ghi âm và xuất hồ sơ |
+| `lib/database.ts`, `lib/persistent-store.ts`, `lib/runtime-persistence.ts` | Transaction PostgreSQL, kiểm tra revision, phục hồi và xác nhận ghi trước khi trả HTTP/SSE |
+| `lib/remote-recordings.ts`, `supabase/` | Chunk ghi âm riêng tư, migration và chứng chỉ CA công khai |
 | `lib/showcase.ts` | Điều khiển demo qua các quyết định của engine |
 | `tests/` | Kiểm thử nghiệp vụ, quyền truy cập và API |
 
@@ -140,14 +145,14 @@ Chỉ chạy bộ kiểm thử này với dữ liệu QA. Kết quả mock khôn
 ## Dữ liệu và giới hạn vận hành
 
 - Khóa dài hạn ở server; vị trí, transcript và ghi âm được kiểm soát theo quyền phiên và người nhận.
-- SQLite và ghi âm được lưu cục bộ. Hồ sơ không tự hết hạn sau một khoảng thời gian cố định; thao tác xóa phải đi qua cơ chế được phép.
+- Khi chạy local không có PostgreSQL, SQLite và ghi âm được lưu cục bộ. Bản host có thể lưu sự cố, mạng lưới và lịch sử trong PostgreSQL, các đoạn ghi âm trong Supabase Storage riêng tư. Hồ sơ không tự hết hạn sau một khoảng thời gian cố định.
 - Người nhận cần giữ trang mở để nhận chuông trong app. Bản web không bảo đảm cuộc gọi nền như ứng dụng điện thoại native.
 - Gọi P2P phụ thuộc kết nối mạng; cấu hình hiện có chưa cung cấp TURN cho mọi trường hợp.
 - Bản đồ và tuyến mô phỏng không xác nhận tình trạng đường hay mức an toàn ngoài thực tế.
 - Ứng dụng không tự quay số khẩn cấp. Liên kết 113/115 để người dùng chủ động mở trình quay số.
-- Runtime một tiến trình, SQLite và timer cục bộ chưa đáp ứng triển khai nhiều instance hoặc lưu hồ sơ bền vững trên serverless.
+- Runtime vẫn dùng một tiến trình Node và timer cục bộ. PostgreSQL có khóa để tránh hai backend cùng chạy engine; chưa hỗ trợ autoscaling hoặc job runner nhiều instance. Cuộc gọi đang chạy khi backend dừng được đánh dấu gián đoạn, không tự quay số lại.
 
-Kiến trúc cloud dự kiến dùng **Vercel cho frontend, backend Node.js chạy liên tục và Supabase Postgres/Storage**. Đây là hướng triển khai trong tài liệu; mã nguồn hiện vẫn dùng SQLite và file cục bộ. Cần hoàn tất migration, xử lý tác vụ nền và kiểm chứng HTTPS trước khi vận hành thực tế.
+Hướng hosting được chọn là **Cloudflare làm điểm truy cập HTTPS, Render chạy Next.js/API và Supabase giữ dữ liệu/ghi âm**. Worker chuyển tiếp về cùng backend để giữ cookie, link mời và API cùng origin. Gói Render miễn phí có thể ngủ hoặc gián đoạn; đây là bản demo, chưa có bảo đảm giám sát liên tục cho tình huống thực tế. Xem [cấu hình hosting](docs/HOSTING.md).
 
 ## Tài liệu dự án
 

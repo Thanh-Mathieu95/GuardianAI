@@ -1,6 +1,8 @@
-# Guardian AI — hợp đồng Vercel, Node backend và Supabase
+# Guardian AI — Cloudflare, Node backend và Supabase
 
 ## Trạng thái và lựa chọn
+
+Runtime có adapter PostgreSQL/Storage trong `lib/runtime-persistence.ts` và `lib/remote-recordings.ts`; xem `HOSTING.md` cho hợp đồng đang được kiểm chứng. Cloudflare thay Vercel làm điểm truy cập theo lựa chọn người dùng. SQLite chỉ là cache RAM khi bật PostgreSQL. Các phần bên dưới về job runner/lease nhiều công việc và mở rộng nhiều instance vẫn là thiết kế tiếp theo, chưa được coi là đã triển khai.
 
 Thiết kế đích, chưa nối database/bucket hoặc triển khai cloud trong đợt này. User đã chọn Supabase và cho biết đã có API key. Không tạo tài khoản/gói trả phí, không đọc/in key từ `.env.local`, không yêu cầu gửi key vào chat.
 

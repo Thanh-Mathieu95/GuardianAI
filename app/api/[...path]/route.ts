@@ -12,10 +12,11 @@ import { aiPublicConfig, type AIAnalysis } from "@/lib/ai";
 import { findPlaces } from "@/lib/adapters";
 import { cityAnchor, cityPlaces, safetyReport, storeById } from "@/lib/city";
 import { dossier, dossierHtml } from "@/lib/evidence";
-import { deleteRecordings, readRecording } from "@/lib/recordings";
+import { addDurableRecording, deleteDurableRecordings, readDurableRecording } from "@/lib/remote-recordings";
 import { demoCases, emptyNeeds, needsSchema } from "@/lib/support";
 import { runShowcase, acknowledgeShowcase } from "@/lib/showcase";
 import { verifiedPublicUrl } from "@/lib/links";
+import { durableRequest } from "@/lib/runtime-persistence";
 import {
   contactInstructions,
   contactTools,
@@ -121,8 +122,8 @@ const signalSchema = z
     sdp: z.string().max(20000).optional(),
   })
   .strict();
-function audioResponse(i: Incident, session: string) {
-  const found = readRecording(i, session);
+async function audioResponse(i: Incident, session: string) {
+  const found = await readDurableRecording(i, session);
   if (!found) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return new Response(new Uint8Array(found.data), {
     headers: { "Content-Type": found.recording.mime, "Cache-Control": "no-store", "Content-Length": String(found.data.length) },
@@ -464,7 +465,14 @@ async function publicUrl() {
   } catch { /* No tunnel registered. */ }
   return verifiedPublicUrl(candidate, instanceId);
 }
-export async function GET(req: NextRequest, { params }: Context) {
+export async function GET(req: NextRequest, context: Context) {
+  if (new URL(req.url).pathname === "/api/health") return handleGET(req, context);
+  if (new URL(req.url).pathname === "/api/readiness") return durableRequest(async () =>
+    Response.json({ ready: true, persistence: process.env.GUARDIAN_POSTGRES_URL ? "postgres" : "sqlite" },
+      { headers: { "Cache-Control": "no-store" } }));
+  return durableRequest(() => handleGET(req, context));
+}
+async function handleGET(req: NextRequest, { params }: Context) {
   try {
     const { path } = await params,
       engine = getEngine();
@@ -574,7 +582,10 @@ export async function GET(req: NextRequest, { params }: Context) {
     return errorResponse(e);
   }
 }
-export async function POST(req: NextRequest, { params }: Context) {
+export async function POST(req: NextRequest, context: Context) {
+  return durableRequest(() => handlePOST(req, context));
+}
+async function handlePOST(req: NextRequest, { params }: Context) {
   try {
     const origin = req.headers.get("origin");
     // Next can canonicalize nextUrl to localhost even when the browser uses
@@ -600,7 +611,7 @@ export async function POST(req: NextRequest, { params }: Context) {
         session = req.nextUrl.searchParams.get("session") ?? "",
         seq = z.coerce.number().int().min(0).max(5000).parse(req.nextUrl.searchParams.get("seq")),
         mime = (req.headers.get("content-type") ?? "").split(";")[0].trim();
-      const r = engine.addRecording(i, session, seq, mime, Buffer.from(await req.arrayBuffer()));
+      const r = await addDurableRecording(engine, i, session, seq, mime, Buffer.from(await req.arrayBuffer()));
       return NextResponse.json({ ok: true, chunks: r.chunks, bytes: r.bytes });
     }
     const body = await req.json();
@@ -1067,8 +1078,8 @@ export async function POST(req: NextRequest, { params }: Context) {
     } else if (action === "transcript/delete") {
       if (!["CLOSED", "USER_CANCELLED"].includes(i.status))
         throw new Error("Kết thúc incident trước khi xóa transcript");
+      await deleteDurableRecordings(i);
       i.transcript = [];
-      deleteRecordings(i);
       i.routeDecisions = [];
       i.plans.forEach(p => { p.reasons = ["Nội dung đã xóa theo yêu cầu"]; p.comparisons = []; p.evidenceRefs = []; p.supportSignature = undefined; p.routeDecisionId = undefined; });
       i.calls.forEach((c) => { c.transcript = []; c.support = undefined; c.checks = []; c.questions = []; });
@@ -1092,9 +1103,7 @@ export async function POST(req: NextRequest, { params }: Context) {
         )
           e.summary = "Nội dung đã xóa theo yêu cầu";
       });
-      engine.store.db
-        .prepare("DELETE FROM event_snapshots WHERE incident_id=?")
-        .run(i.id);
+      engine.store.deleteSnapshots(i.id);
       engine.store.deleteReportHistory(i.id);
       engine.event(
         i,
