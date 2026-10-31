@@ -1,17 +1,33 @@
-export type LiveUpdateOptions = { key?: string; interrupt?: boolean };
+const MAX_QUEUED_UPDATES = 16;
+
+export type LiveUpdateOptions = {
+  key?: string;
+  interrupt?: boolean;
+};
+
+type QueuedLiveUpdate = {
+  text: string;
+  key?: string;
+};
 
 // A queued plan snapshot is replaceable. Do not read obsolete plans after a long reply.
 export class LiveUpdates {
-  private items: { text: string; key?: string }[] = [];
-  add(text: string, key?: string) {
-    if (key) this.items = this.items.filter(item => item.key !== key);
+  private items: QueuedLiveUpdate[] = [];
+
+  add(text: string, key?: string): void {
+    // A replacement moves to the end, preserving the order of other notices.
+    if (key) this.items = this.items.filter((item) => item.key !== key);
     this.items.push({ text, key });
-    if (this.items.length > 16) this.items.shift();
+    if (this.items.length > MAX_QUEUED_UPDATES) this.items.shift();
   }
-  get size() { return this.items.length; }
-  drain() {
-    const result = this.items.map(item => item.text).join(" | ");
+
+  get size(): number {
+    return this.items.length;
+  }
+
+  drain(): string {
+    const combinedText = this.items.map((item) => item.text).join(" | ");
     this.items = [];
-    return result;
+    return combinedText;
   }
 }

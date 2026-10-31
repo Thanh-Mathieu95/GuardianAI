@@ -202,7 +202,8 @@ export default function NetworkPanel({
               <Share2 size={14} /> Gửi
             </button>
             <button
-              aria-label="Sao chép link mời"
+              aria-label={`Sao chép link mời của ${m.name}`}
+              title={`Sao chép link mời của ${m.name}`}
               onClick={() =>
                 void navigator.clipboard
                   .writeText(link(m))
@@ -213,7 +214,8 @@ export default function NetworkPanel({
               <Copy size={14} />
             </button>
             <button
-              aria-label="Xóa thành viên"
+              aria-label={`Xóa thành viên ${m.name}`}
+              title={`Xóa thành viên ${m.name}`}
               onClick={() => void run(() => post("/api/network/members/delete", { id: m.id }))}
             >
               <Trash2 size={14} />

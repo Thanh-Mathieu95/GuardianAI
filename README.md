@@ -115,6 +115,8 @@ Microphone và vị trí trên điện thoại cần quyền trình duyệt và 
 
 ## Kiểm tra khi phát triển
 
+Trước khi mở pull request, chạy lần lượt các kiểm tra sau để xác nhận thay đổi không làm thay đổi hành vi hoặc giao diện hiện có:
+
 ```sh
 npm run typecheck
 npm test
