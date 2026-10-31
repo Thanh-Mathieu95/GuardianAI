@@ -179,6 +179,8 @@ The interface keeps the need, original human replies, proposed action and user a
 
 This record describes the implemented system in `app/command.css`, `components/workspace.tsx`, `components/guardian-map.tsx` and the command, call, recipient and place components, including inherited rules from `app/globals.css`. The map discovery, call coordination and LIVE setup additions extend the existing world. The command stylesheet loads after the global stylesheet. Its tokens are scoped to the workspace, not the root. The landing page retains its header and existing paper presentation; the recipient page retains its light paper presentation with a scoped dark in-app call panel, while loading and covert screens retain their existing styles. Frontmatter describes the command system, not an asserted global conversion.
 
+The TEAM support-profile extension reuses the incumbent semantic roles and component structure. Its documentation below does not approve a visual-world replacement. The current stylesheet has broader palette and font-family drift from the frontmatter; those pre-existing differences remain outside this extension and have not been promoted into new tokens.
+
 Browser captures and functional checks are separate evidence; this source extraction asserts no visual-review verdict. Sidecar ramps are generated swatch previews, not additional runtime tokens. This document describes presentation and does not certify deployment or transport capabilities.
 
 **Key Characteristics:**
@@ -186,6 +188,7 @@ Browser captures and functional checks are separate evidence; this source extrac
 - Map-centered operational grid and a fixed bottom dock.
 - Eight-pixel command controls, ten-pixel panels and a physical phone frame.
 - Explicit provenance, original quotes and acceptance states.
+- Support profiles distinguish real teammate replies from simulated roleplay locations.
 
 ## Colors
 
@@ -215,6 +218,8 @@ The map uses a solid cyan active route at 5px over a 10px white casing, a dashed
 
 **The Call Is Not Consent Rule.** Show conversing and completed calls in blue with a phone icon. Reserve acceptance treatments for sourced commitments; answering or ending a call does not confirm help.
 
+**The Roleplay Provenance Rule.** Label TEAM as simulated locations with participant-authored replies. A ready support profile means available for an in-app call, not acceptance of an incident.
+
 ## Typography
 
 The workspace explicitly uses Arial, followed by Segoe UI and sans-serif, with 14px body text. This is the selected operational face; the separately styled landing page continues to load Be Vietnam Pro through the app layout. There is no oversized display role in the command workspace.
@@ -225,19 +230,21 @@ Do not infer that every inherited heading has been normalized: more specific set
 
 ## Layout
 
-The workspace has no rendered top header. It starts with source status, a scenario director in demo mode, and collapsible exploration/activity tools. The desktop journey grid is **380px / flexible map / 320px**, with 12px gaps. Outer padding is 14px by 18px, with 88px reserved below for the dock. Panels use 20px padding. The map's normal height is `clamp(450px, 68vh, 820px)` and its region remains sticky at a 12px top offset on wide layouts.
+The workspace has no rendered landing header. It starts with source status and mode navigation. DEMO adds its scenario director and an explanation that its named people are scripted; TEAM adds Support profiles. The existing exploration/activity tools remain collapsible. The desktop journey grid is **380px / flexible map / 320px**, with 12px gaps. Outer padding is 14px by 18px, with 88px reserved below for the dock. Panels use 20px padding. The map's normal height is `clamp(450px, 68vh, 820px)` and its region remains sticky at a 12px top offset on wide layouts.
 
 At 1100px and above the three-column layout remains. From 761px through 1099px, the grid becomes a 320px companion plus flexible map, followed by a full-width coordination region using three columns. At 760px and below, it stacks with 10px outer gutters and places the map first. The map becomes 380px tall. The dedicated phone mode caps its workspace at 520px, hides the map, coordination, director and command tools at every breakpoint, and keeps the companion visible.
 
 The bottom dock is 64px high. Navigation occupies 355px on desktop and the footer occupies the remaining width; both are fixed at the bottom with z-index 50. On small screens, navigation gets the width minus 100px, with an icon presentation, and the language footer occupies the last 100px. The source JSX retains text inside the navigation buttons. The dedicated phone route hides this external dock and footer; its own bottom navigation remains inside the device frame.
 
-LIVE setup uses an 8px/6px voice-hero inset, a 72px microphone and a 17px heading, with supporting hero copy hidden. The AI explanation is a disclosure, while GPS status/actions and the existing consent controls remain available. This compact arrangement keeps the manual SOS action before the phone navigation. DEMO retains its scenario controls. New session is available in the phone strip and command controls, retains the current mode and returns to the companion view; DEMO and LIVE are independent session scopes.
+LIVE setup uses an 8px/6px voice-hero inset, a 72px microphone and a 17px heading, with supporting hero copy hidden. The AI explanation is a disclosure, while GPS status/actions and the existing consent controls remain available. This compact arrangement keeps the manual SOS action before the phone navigation. DEMO retains its scenario controls. New session is available in the phone strip and command controls, retains the current mode and returns to the companion view. TEAM, DEMO and LIVE are independent session scopes: TEAM uses participant-authored replies with simulated locations, DEMO uses scripted participants, and LIVE uses actual readiness and GPS.
 
 The phone shell is 380px wide at most and 780px high on desktop, with 8px frame padding and an isolated stacking context. Its 46px status bar, 86px by 22px camera island, hardware details, 52px app navigation and home indicator frame an independently scrolling screen. The screen height is `calc(100% - 122px)`, with horizontal overflow hidden and contained overscroll. At tablet widths the shell caps at 320px; on small command layouts it caps at 370px and uses a 760px height. The dedicated small-screen phone route uses `calc(100dvh - 24px)` with a 620px minimum height. Its app navigation stays outside the scrolling screen.
 
 Panel toggles collapse the left or right grid column. Map-only mode removes surrounding director and tool regions and uses a map height based on the viewport. A 0.35s grid-column transition supports these changes and is disabled for reduced motion. Catalog content uses an auto-fitting grid with a 270px minimum card width, a 400px maximum scroll region and 10px gaps.
 
 Synthetic road warnings and discovered venue details are map-local overlays. The legend sits 104px above the map bottom, or 145px when a plan overlay is present. Venue details start 103px from the top, use a maximum width of 330px within the map and scroll independently when needed. A call list caps its height at 580px with its own scrollbar; individual recipient conversations remain native expandable rows.
+
+Support profiles appear in the main TEAM command view and inside the existing people tab, with that tab now labeled ?H? s? h? tr?? / ?Support profiles.? The invitation form wraps with 12px gaps and 220px flex bases for its labels. Link rows wrap with 10px gaps and a 260px flex basis for the link field. The readiness roster uses three columns for name, role and status; at 760px and below it becomes two columns with status on its own full-width row. The containing panel uses 20px padding, reduced to 16px on small screens.
 
 ## Elevation & Depth
 
@@ -279,11 +286,13 @@ Workspace fields use background fill, pale text, the field border and 8px corner
 
 ### Navigation
 
-The bottom dock contains companion, people and record controls with SVG icons and explicit pressed state. The selected item uses cyan text, dock-active fill and dock-rule border. The footer contains VI/EN switching, route links and an explicit AI-result state. The selected language now uses cyan fill, dark primary ink and a cyan border.
+The bottom dock contains companion, Support profiles and record controls with SVG icons and explicit pressed state. The selected item uses cyan text, dock-active fill and dock-rule border. The footer contains VI/EN switching, route links and an explicit AI-result state. The selected language now uses cyan fill, dark primary ink and a cyan border.
+
+Mode navigation uses wrapping outlined links with 8px gaps, 8px corners, 13px text and 44px minimum height. The current mode uses the existing active surface and cyan text, while hover uses panel 2. The phone-only layout hides this external mode row. The DEMO notice explicitly directs own-team invitations to TEAM; its actual invite controls are hidden rather than offered beside scripted people.
 
 ### Phone Simulator
 
-The device is an interactive surface, not a static mockup. A shared sticky strip at the top of its screen keeps Guardian AI, New session and VI/EN controls available across companion, contact and record views. The internal navigation uses SVG icons, localized accessible names and explicit pressed states. Contact and record sheets stay inside the frame; switching tabs preserves the companion state. The contacts sheet contains a native invitation disclosure with recipient name, role, create-link action and selectable invitation output. Record content exposes plan/seal counts, recent events and the record link without leaving the phone composition. The status-bar clock derives from session data, while the island and hardware details are decorative.
+The device is an interactive surface, not a static mockup. A shared sticky strip at the top of its screen keeps Guardian AI, New session and VI/EN controls available across companion, contact and record views. The internal navigation uses SVG icons, localized accessible names and explicit pressed states. Contact and record sheets stay inside the frame; switching tabs preserves the companion state. Where invitations are supported, the contacts sheet contains a native disclosure with recipient name, role, create-link action and selectable invitation output. Scripted DEMO directs the user to TEAM instead of presenting real invitation forms. Record content exposes plan/seal counts, recent events and the record link without leaving the phone composition. The status-bar clock derives from session data, while the island and hardware details are decorative.
 
 ### Tool Disclosures and Commitment Rows
 
@@ -303,7 +312,15 @@ The call board uses an 18px heading, a mode label, numeric activity summary and 
 
 The recipient page stays in its light world. Its private call panel uses a dark panel fill, pale text, 16px corners and 24px padding, while retaining the recipient page's type family. Incoming calls expose Answer, Busy and Decline; connected conversations expose reply and end actions. Copy differentiates a support inquiry from a task sent after user acceptance. The panel shows that recipient's conversation, with statements attributed to their source. An in-app call is not presented as a telephone-network call.
 
-The LIVE phone retains visible GPS readiness and consent. The compact AI explanation states that AI can activate an in-app SOS after consent and current GPS, while recipients must send their own acceptance. Plan acceptance and emergency dialing remain explicit user actions. Independent DEMO/LIVE mode labels, records and New session behavior prevent a simulated participant or commitment from appearing to be a LIVE one.
+The LIVE phone retains visible GPS readiness and consent. The compact AI explanation states that AI can activate an in-app SOS after consent and current GPS, while recipients must send their own acceptance. Plan acceptance and emergency dialing remain explicit user actions. Independent TEAM/DEMO/LIVE mode labels, records and New session behavior keep roleplay participants, scripted fixtures and LIVE requests distinguishable.
+
+### TEAM Support Profiles
+
+?H? s? h? tr?? / ?Support profiles? is the same component in the existing people tab and the main TEAM command view. It reuses panel fill, a fine border and the existing 12px corner value. Its heading is a local 24px/1.3 treatment with a blue people icon; introductory copy stays at 14px. The form combines a visible member-name label, a native Contact/Friend versus Receiving venue selector and a primary Create role link action. Controls retain a 44px minimum height. Generated-link rows keep the member name, selectable read-only link, Copy/Copied feedback and Open role action together.
+
+The dense readiness roster uses 13px text, 12px row padding and rules rather than cards. Each row keeps name, role and an explicit readiness reason together. Waiting, missing permission, closed role page or incomplete venue setup uses amber status text; ready-to-receive-calls uses blue. The roster announces updates politely and can move a late arrival into readiness after an SOS. Readiness is not rendered as an accepted commitment.
+
+TEAM explains its mixed provenance in both host and recipient views: locations and venues are simulated, while each joined person sends their own private replies. The recipient retains the existing light-page treatment, with a plain roleplay notice and a native simulated-venue selector for receiving roles. Joining the role explicitly includes in-app call permission; the separate consent control remains available. The legacy invitation notice explains how the host can recover the same role link into TEAM instead of suggesting that scripted fixtures will call it. The support profile and reply content remain distinct from the scripted DEMO room.
 
 ## Do's and Don'ts
 
@@ -316,9 +333,12 @@ The LIVE phone retains visible GPS readiness and consent. The compact AI explana
 
 - Do label synthetic road conditions and venue profiles beside their visual overlays.
 
+- Do keep each support profile?s name, role, invitation and explicit readiness state associated.
+
 ### Don't:
 - Don't reintroduce the landing header into the operational workspace.
 - Don't use a displayed route or open venue as proof of an accepted commitment.
 - Don't apply the workspace palette globally to surfaces that still use their existing stylesheet.
 - Don't treat this source documentation as browser or visual approval.
 - Don't turn call completion, open hours or a self-reported profile into a confirmed commitment.
+- Don't present TEAM readiness or simulated venue selection as an accepted support commitment.

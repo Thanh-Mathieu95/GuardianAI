@@ -93,6 +93,65 @@ export class Repository {
       (r) => JSON.parse(String(r.payload)) as Account,
     );
   }
+  // Recover real invitations mistakenly created in the old scripted workspace.
+  // Both owners must have been authenticated by the route; token rebinding and
+  // account revisions commit together so the original recipient links survive.
+  async recoverTeamInvitations(sourceId: string, targetId: string) {
+    if (sourceId === targetId) return 0;
+    await this.ready;
+    const client = await this.pool?.connect();
+    try {
+      if (client) await client.query("BEGIN");
+      else this.db!.exec("BEGIN IMMEDIATE");
+      const accounts: Account[] = [];
+      for (const id of [sourceId, targetId].sort()) {
+        const [row] = await this.query(
+          "SELECT payload FROM guardian_accounts WHERE id=$1" +
+            (client ? " FOR UPDATE" : ""),
+          [id],
+          client,
+        );
+        if (!row) throw new Error("SESSION_NOT_FOUND");
+        accounts.push(JSON.parse(String(row.payload)));
+      }
+      const source = accounts.find((a) => a.id === sourceId)!;
+      const target = accounts.find((a) => a.id === targetId)!;
+      if (source.incident.mode !== "DEMO" || target.incident.mode !== "TEAM")
+        throw new Error("INVALID_RECOVERY_SCOPE");
+      const incoming = source.members.filter(
+        (m) => !target.members.some((other) => other.id === m.id),
+      );
+      if (target.members.length + incoming.length > 12)
+        throw new Error("MEMBER_LIMIT");
+      target.members.push(...incoming);
+      source.members = [];
+      if (incoming.length) {
+        for (const a of [source, target]) {
+          a.version++;
+          await this.query(
+            "UPDATE guardian_accounts SET version=$1,payload=$2 WHERE id=$3",
+            [a.version, JSON.stringify(a), a.id],
+            client,
+          );
+        }
+        for (const m of incoming)
+          await this.query(
+            "UPDATE guardian_tokens SET owner=$1 WHERE hash=$2 AND owner=$3",
+            [target.id, m.tokenHash, source.id],
+            client,
+          );
+      }
+      if (client) await client.query("COMMIT");
+      else this.db!.exec("COMMIT");
+      return incoming.length;
+    } catch (error) {
+      if (client) await client.query("ROLLBACK");
+      else this.db!.exec("ROLLBACK");
+      throw error;
+    } finally {
+      client?.release();
+    }
+  }
   async save(account: Account, initial = false) {
     await this.ready;
     const client = await this.pool?.connect();

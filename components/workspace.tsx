@@ -36,13 +36,16 @@ import GuardianMap from "./guardian-map";
 import { connectVoice, type Voice } from "./voice";
 import { CommandTools } from "./command-tools";
 import { CallBoard } from "./call-board";
+import { TeamLobby } from "./team-lobby";
 import { LanguageSwitch } from "./language";
 export default function Workspace({
   demo = false,
   phone = false,
+  team = false,
 }: {
   demo?: boolean;
   phone?: boolean;
+  team?: boolean;
 }) {
   const { locale, t } = useLanguage();
   const [deletePending, setDeletePending] = useState(false);
@@ -83,16 +86,17 @@ export default function Workspace({
   const status = (s: string) => (states[s] ? translate(states[s]) : s);
   const apply = (next: PublicAccount) =>
     setData((old) => (!old || next.version >= old.version ? next : old));
+  const requestScope = team ? "team" : demo ? "demo" : "live";
   async function fetchJSON(url: string, body?: unknown) {
     const res = await fetch("/api/" + url, {
       cache: "no-store",
-      headers: { "x-guardian-mode": demo ? "demo" : "live" },
+      headers: { "x-guardian-mode": requestScope },
       ...(body
         ? {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "x-guardian-mode": demo ? "demo" : "live",
+              "x-guardian-mode": requestScope,
               "x-guardian-ai-code": aiCode,
             },
             body: JSON.stringify(body),
@@ -146,7 +150,8 @@ export default function Workspace({
       handle: ReturnType<typeof setTimeout>;
     const load = async (first = false) => {
       try {
-        const d = await fetchJSON(first ? "session" : "state");
+        let d = await fetchJSON(first ? "session" : "state");
+        if (first && team) d = await fetchJSON("recover-team", {});
         if (alive) {
           apply(d);
           setOnline(true);
@@ -309,7 +314,7 @@ export default function Workspace({
                         method: "POST",
                         headers: {
                           "Content-Type": blob.type || "audio/webm",
-                          "x-guardian-mode": demo ? "demo" : "live",
+                          "x-guardian-mode": requestScope,
                         },
                         body: blob,
                       },
@@ -383,20 +388,27 @@ export default function Workspace({
     >
       <div className="workspace-source">
         <span className="source">
-          {live
-            ? t("ĐỒNG HÀNH TRỰC TIẾP", "LIVE COMPANION")
-            : t("MÔ PHỎNG", "SIMULATION")}
+          {team
+            ? t("TEAM NHẬP VAI", "TEAM ROLEPLAY")
+            : live
+              ? t("ĐỒNG HÀNH TRỰC TIẾP", "LIVE COMPANION")
+              : t("MÔ PHỎNG", "SIMULATION")}
         </span>
         <p>
-          {live
+          {team
             ? t(
-                "Chỉ người đã tham gia nhận yêu cầu · giữ trang mở",
-                "Only joined people receive requests · keep pages open",
+                "Người thật nhập vai · vị trí mô phỏng · không tự tạo phản hồi",
+                "Real team participants · simulated locations · no scripted replies",
               )
-            : t(
-                "Vai và địa điểm minh họa · mọi quyết định qua engine",
-                "Illustrative people and places · decisions run through the engine",
-              )}
+            : live
+              ? t(
+                  "Chỉ người đã tham gia nhận yêu cầu · giữ trang mở",
+                  "Only joined people receive requests · keep pages open",
+                )
+              : t(
+                  "Vai và địa điểm minh họa · mọi quyết định qua engine",
+                  "Illustrative people and places · decisions run through the engine",
+                )}
         </p>
         <span className="connection" role="status">
           {online ? <Wifi size={15} /> : <WifiOff size={15} />}{" "}
@@ -405,6 +417,48 @@ export default function Workspace({
             : t("Đang nối lại", "Reconnecting")}
         </span>
       </div>
+      <nav
+        className="mode-navigation"
+        aria-label={t("Chọn cách sử dụng", "Choose workspace")}
+      >
+        <Link href="/team" aria-current={team ? "page" : undefined}>
+          <Users size={16} />
+          {t("Team nhập vai", "Team roleplay")}
+        </Link>
+        <Link
+          href="/demo/command-center"
+          aria-current={demo ? "page" : undefined}
+        >
+          <Play size={16} />
+          {t("Kịch bản tự chạy", "Scripted demo")}
+        </Link>
+        <Link href="/phone" aria-current={live ? "page" : undefined}>
+          <ShieldCheck size={16} />
+          {t("Dùng thật với GPS", "Live with GPS")}
+        </Link>
+      </nav>
+      {team && !phone && tab !== "people" && (
+        <TeamLobby
+          data={data}
+          busy={busy}
+          api={async (url, body) => {
+            const result = await fetchJSON(url, body);
+            apply(await fetchJSON("state"));
+            return result;
+          }}
+        />
+      )}
+      {demo && (
+        <p className="demo-team-notice">
+          {t(
+            "Minh, Linh và các địa điểm ở đây là vai có sẵn của kịch bản. Để tự tạo Dũng và gọi cho team, mở phòng nhập vai riêng.",
+            "Minh, Linh and these venues belong to the scripted scenario. To create Dung and call your own team, open the separate roleplay room.",
+          )}{" "}
+          <Link href="/team">
+            {t("Mở Team nhập vai", "Open team roleplay")}
+          </Link>
+        </p>
+      )}
       {error && (
         <div className="error-box" role="alert">
           <p>
@@ -583,7 +637,7 @@ export default function Workspace({
           onClick={() => setTab("people")}
         >
           <Users size={17} />
-          {t("Người hỗ trợ", "Your people")}
+          {t("Hồ sơ hỗ trợ", "Support profiles")}
         </button>
         <button
           aria-pressed={tab === "record"}
@@ -593,7 +647,7 @@ export default function Workspace({
           {t("Hồ sơ", "Record")}
         </button>
       </nav>
-      {demo && (
+      {(demo || team) && (
         <CommandTools
           incident={i}
           action={(name, fields) => run(() => action(name, fields))}
@@ -602,7 +656,7 @@ export default function Workspace({
       {tab === "journey" && (
         <div className="journey-grid">
           <div
-            className={`phone-shell ${plan ? "has-plan" : ""} ${live ? "is-live" : ""}`}
+            className={`phone-shell ${plan ? "has-plan" : ""} ${live || team ? "is-live" : ""}`}
             aria-label={t(
               "Mô phỏng điện thoại Guardian AI",
               "Guardian AI phone simulator",
@@ -646,7 +700,9 @@ export default function Workspace({
               <section className="companion" hidden={phoneTab !== "companion"}>
                 <div className="companion-title">
                   <p role="status">{status(i.status)}</p>
-                  <small className="phone-mode">{live ? "LIVE" : "DEMO"}</small>
+                  <small className="phone-mode">
+                    {team ? "TEAM" : live ? "LIVE" : "DEMO"}
+                  </small>
                 </div>
                 <div className="phone-voice-hero">
                   <h3>
@@ -821,24 +877,32 @@ export default function Workspace({
                         )}
                       />
                     </details>
-                    <button
-                      className="sos"
-                      disabled={busy || !online || !!i.sosAt || (live && !gps)}
-                      onClick={() =>
-                        void run(() =>
-                          action("sos", {
-                            text:
-                              message.trim() ||
-                              t(
-                                "Tôi thấy không an toàn. Tôi cần hỗ trợ.",
-                                "I feel unsafe. I need help.",
-                              ),
-                          }),
-                        )
-                      }
-                    >
-                      {t("SOS · Tôi cần hỗ trợ", "SOS · I need help")}
-                    </button>
+                    {demo ? (
+                      <Link className="sos button" href="/team">
+                        {t("SOS với team tự mời", "SOS with your own team")}
+                      </Link>
+                    ) : (
+                      <button
+                        className="sos"
+                        disabled={
+                          busy || !online || !!i.sosAt || (live && !gps)
+                        }
+                        onClick={() =>
+                          void run(() =>
+                            action("sos", {
+                              text:
+                                message.trim() ||
+                                t(
+                                  "Tôi thấy không an toàn. Tôi cần hỗ trợ.",
+                                  "I feel unsafe. I need help.",
+                                ),
+                            }),
+                          )
+                        }
+                      >
+                        {t("SOS · Tôi cần hỗ trợ", "SOS · I need help")}
+                      </button>
+                    )}
                     <p className="subtle">
                       {live
                         ? t(
@@ -1244,6 +1308,16 @@ export default function Workspace({
               </section>
               {phoneTab === "contacts" && (
                 <section className="phone-sheet">
+                  {demo && (
+                    <p>
+                      <Link className="button primary" href="/team">
+                        {t(
+                          "Mời team trong phòng nhập vai riêng",
+                          "Invite your team in a separate room",
+                        )}
+                      </Link>
+                    </p>
+                  )}
                   <CallBoard
                     incident={i}
                     cancel={(callId) =>
@@ -1287,62 +1361,64 @@ export default function Workspace({
                       )}
                     </p>
                   )}
-                  <details className="phone-invites">
-                    <summary>
-                      {t("Quản lý lời mời", "Manage invitations")}
-                    </summary>
-                    <label>
-                      {t("Tên người nhận", "Recipient name")}
-                      <input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        maxLength={60}
-                      />
-                    </label>
-                    <label>
-                      {t("Vai trò", "Role")}
-                      <select
-                        value={role}
-                        onChange={(e) =>
-                          setRole(e.target.value as "CONTACT" | "PARTNER")
-                        }
-                      >
-                        <option value="CONTACT">
-                          {t("Người thân", "Contact")}
-                        </option>
-                        <option value="PARTNER">
-                          {t("Điểm hỗ trợ", "Partner")}
-                        </option>
-                      </select>
-                    </label>
-                    <button
-                      disabled={busy || !name.trim()}
-                      onClick={() => void run(addPerson)}
-                    >
-                      {t("Tạo link mời", "Create invitation")}
-                    </button>
-                    {invite && (
+                  {!demo && (
+                    <details className="phone-invites">
+                      <summary>
+                        {t("Quản lý lời mời", "Manage invitations")}
+                      </summary>
                       <label>
-                        {t(
-                          "Gửi link này cho người nhận",
-                          "Share this link with the recipient",
-                        )}
+                        {t("Tên người nhận", "Recipient name")}
                         <input
-                          readOnly
-                          value={invite}
-                          onFocus={(e) => e.target.select()}
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          maxLength={60}
                         />
                       </label>
-                    )}
-                    {data.members.map((m) => (
-                      <p key={m.id}>
-                        {m.name} ?{" "}
-                        {m.joined
-                          ? t("Đã tham gia", "Joined")
-                          : t("Đang chờ", "Pending")}
-                      </p>
-                    ))}
-                  </details>
+                      <label>
+                        {t("Vai trò", "Role")}
+                        <select
+                          value={role}
+                          onChange={(e) =>
+                            setRole(e.target.value as "CONTACT" | "PARTNER")
+                          }
+                        >
+                          <option value="CONTACT">
+                            {t("Người thân", "Contact")}
+                          </option>
+                          <option value="PARTNER">
+                            {t("Điểm hỗ trợ", "Partner")}
+                          </option>
+                        </select>
+                      </label>
+                      <button
+                        disabled={busy || !name.trim()}
+                        onClick={() => void run(addPerson)}
+                      >
+                        {t("Tạo link mời", "Create invitation")}
+                      </button>
+                      {invite && (
+                        <label>
+                          {t(
+                            "Gửi link này cho người nhận",
+                            "Share this link with the recipient",
+                          )}
+                          <input
+                            readOnly
+                            value={invite}
+                            onFocus={(e) => e.target.select()}
+                          />
+                        </label>
+                      )}
+                      {data.members.map((m) => (
+                        <p key={m.id}>
+                          {m.name} ·{" "}
+                          {m.joined
+                            ? t("Đã tham gia", "Joined")
+                            : t("Đang chờ", "Pending")}
+                        </p>
+                      ))}
+                    </details>
+                  )}
                 </section>
               )}
               {phoneTab === "record" && (
@@ -1369,7 +1445,7 @@ export default function Workspace({
                     className="button primary"
                     target="_blank"
                     rel="noreferrer"
-                    href={`/api/record/${i.id}?lang=${locale}&scope=${demo ? "demo" : "live"}`}
+                    href={`/api/record/${i.id}?lang=${locale}&scope=${requestScope}`}
                   >
                     <FileText size={16} />
                     {t("Mở hồ sơ đầy đủ", "Open full record")}
@@ -1608,262 +1684,288 @@ export default function Workspace({
           </aside>
         </div>
       )}
-      {tab === "people" && (
-        <section className="setup">
-          <h1>
-            {t(
-              "Có người biết bạn đang đi đâu.",
-              "Someone knows where you are.",
-            )}
-          </h1>
-          <p className="lead">
-            {t(
-              "Tạo link mời riêng, gửi cho người bạn tin tưởng và chờ họ bấm tham gia. Link là quyền truy cập; chỉ chia sẻ với đúng người.",
-              "Create a private invitation, share it with someone you trust and wait for them to join. The link grants access; share it only with the intended person.",
-            )}
-          </p>
-          <div className="setup-grid">
-            <div>
-              <h2>{t("Mời người hỗ trợ", "Invite your people")}</h2>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void run(addPerson);
-                }}
-              >
-                <label>
-                  {t("Tên hiển thị", "Display name")}
-                  <input
-                    required
-                    maxLength={60}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </label>
-                <label>
-                  {t("Vai trò", "Role")}
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as typeof role)}
-                  >
-                    <option value="CONTACT">
-                      {t("Người thân / bạn bè", "Trusted contact")}
-                    </option>
-                    <option value="PARTNER">
-                      {t("Điểm hỗ trợ thử nghiệm", "Trial support venue")}
-                    </option>
-                  </select>
-                </label>
-                <button className="primary" disabled={busy || !name.trim()}>
-                  {t("Tạo link mời", "Create invitation")}
-                  <ArrowRight size={17} />
-                </button>
-              </form>
-              {invite && (
-                <div className="invite">
-                  <label>
-                    {t(
-                      "Link này chỉ hiện khi tạo",
-                      "This link is shown only when created",
-                    )}
-                    <input readOnly value={invite} />
-                  </label>
-                  <div className="actions">
-                    <button
-                      onClick={() =>
-                        void run(async () => {
-                          await navigator.clipboard.writeText(invite);
-                          setCopied(true);
-                        })
-                      }
-                    >
-                      <Copy size={16} />
-                      {copied
-                        ? t("Đã chép", "Copied")
-                        : t("Sao chép", "Copy link")}
-                    </button>
-                    <a
-                      className="button"
-                      href={invite}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <ExternalLink size={16} />
-                      {t("Mở thử", "Open test")}
-                    </a>
-                  </div>
-                </div>
+      {tab === "people" &&
+        (team ? (
+          <section className="setup">
+            <TeamLobby
+              data={data}
+              busy={busy}
+              api={async (url, body) => {
+                const result = await fetchJSON(url, body);
+                apply(await fetchJSON("state"));
+                return result;
+              }}
+            />
+          </section>
+        ) : (
+          <section className="setup">
+            <h1>
+              {t(
+                "Có người biết bạn đang đi đâu.",
+                "Someone knows where you are.",
               )}
-              <div className="member-list">
-                {data.members.map((m) => (
-                  <article key={m.id}>
-                    <div>
-                      <b>{m.name}</b>
-                      <small>
-                        {m.role === "CONTACT"
-                          ? t("Người thân", "Contact")
-                          : t("Điểm hỗ trợ", "Venue")}
-                      </small>
-                    </div>
-                    <span>
-                      {m.joined
-                        ? t("Đã tham gia", "Joined")
-                        : t("Chờ đồng ý", "Awaiting consent")}
-                      {m.role === "PARTNER" && m.joined
-                        ? m.onDuty
-                          ? t(" · đang trực", " · on duty")
-                          : t(" · ngừng trực", " · off duty")
-                        : ""}
-                    </span>
-                  </article>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h2>
-                {t("Chuẩn bị phiên trên thiết bị", "Prepare a device trial")}
-              </h2>
-              <ul className="readiness">
-                <li>
-                  <Users size={18} />
-                  {joined} {t("người thân đã tham gia", "contacts joined")}
-                </li>
-                <li>
-                  <MapPin size={18} />
-                  {gps
-                    ? t("Đang chia sẻ GPS", "GPS sharing on")
-                    : t("Chưa chia sẻ GPS", "GPS sharing off")}
-                </li>
-                <li>
-                  <ShieldCheck size={18} />
-                  {data.config.maps
-                    ? t(
-                        "Đã cấu hình tuyến bản đồ thật",
-                        "Live routes configured",
-                      )
-                    : t(
-                        "Chưa có tuyến thật · không tạo tuyến giả",
-                        "No live routing · no fake routes substituted",
-                      )}
-                </li>
-              </ul>
+            </h1>
+            <p className="lead">
+              {t(
+                "Tạo link mời riêng, gửi cho người bạn tin tưởng và chờ họ bấm tham gia. Link là quyền truy cập; chỉ chia sẻ với đúng người.",
+                "Create a private invitation, share it with someone you trust and wait for them to join. The link grants access; share it only with the intended person.",
+              )}
+            </p>
+            {demo && (
               <p>
-                {t(
-                  "Giữ trang mở ở cả hai thiết bị. Vị trí chỉ được chia sẻ sau khi bạn cho phép. Trang web chưa thể báo như cuộc gọi khi khóa màn hình.",
-                  "Keep both devices’ pages open. Location is shared only with your permission. The website cannot ring like a phone call when the screen is locked.",
-                )}
-              </p>
-              <div className="actions">
-                {!live || ended ? (
-                  <button
-                    className="primary"
-                    disabled={busy || running}
-                    onClick={() =>
-                      void run(() =>
-                        action("new", { mode: demo ? "DEMO" : "LIVE", locale }),
-                      )
-                    }
-                  >
-                    {t("Tạo phiên mới", "New session")}
-                  </button>
-                ) : (
-                  <button className="primary" onClick={startGps}>
-                    <MapPin size={17} />
-                    {gps
-                      ? t("Dừng GPS", "Stop GPS")
-                      : t("Cho phép và chia sẻ GPS", "Allow and share GPS")}
-                  </button>
-                )}
-                <Link
-                  className="button"
-                  href={demo ? "/phone" : "/demo/command-center"}
-                >
-                  {demo
-                    ? t("Mở app thật riêng", "Open separate live app")
-                    : t(
-                        "Mở demo riêng cho giám khảo",
-                        "Open separate judge demo",
-                      )}
+                <Link className="button primary" href="/team">
+                  {t(
+                    "Tạo lời mời trong Team nhập vai",
+                    "Create invitations in Team roleplay",
+                  )}
                 </Link>
-              </div>
-              <small>
-                {t(
-                  "Tạo phiên mới kết thúc phiên hiện tại; lời mời được giữ.",
-                  "A new session ends the current one; invitations are retained.",
-                )}
-              </small>
-              {live && !ended && (
+              </p>
+            )}
+            <div className={`setup-grid ${demo ? "demo-disabled-setup" : ""}`}>
+              <div>
+                <h2>{t("Mời người hỗ trợ", "Invite your people")}</h2>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    void run(() =>
-                      action("trip", { label: destination, minutes }),
-                    );
+                    void run(addPerson);
                   }}
                 >
-                  <h2>
-                    {t("Hẹn giờ về tới nơi", "Schedule an arrival check-in")}
-                  </h2>
                   <label>
-                    {t("Bạn đi đâu?", "Where are you going?")}
+                    {t("Tên hiển thị", "Display name")}
                     <input
                       required
-                      maxLength={80}
-                      value={destination}
-                      onChange={(e) => setDestination(e.target.value)}
+                      maxLength={60}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                     />
                   </label>
                   <label>
-                    {t("Dự kiến bao nhiêu phút?", "Expected minutes")}
-                    <input
-                      type="number"
-                      min={1}
-                      max={240}
-                      value={minutes}
-                      onChange={(e) => setMinutes(Number(e.target.value))}
-                    />
+                    {t("Vai trò", "Role")}
+                    <select
+                      value={role}
+                      onChange={(e) => setRole(e.target.value as typeof role)}
+                    >
+                      <option value="CONTACT">
+                        {t("Người thân / bạn bè", "Trusted contact")}
+                      </option>
+                      <option value="PARTNER">
+                        {t("Điểm hỗ trợ thử nghiệm", "Trial support venue")}
+                      </option>
+                    </select>
                   </label>
-                  <button
-                    disabled={
-                      busy ||
-                      !gps ||
-                      !joined ||
-                      !!i.sosAt ||
-                      i.trip?.state === "ACTIVE"
-                    }
-                  >
-                    {t("Bắt đầu hẹn giờ", "Start check-in timer")}
+                  <button className="primary" disabled={busy || !name.trim()}>
+                    {t("Tạo link mời", "Create invitation")}
+                    <ArrowRight size={17} />
                   </button>
-                  {i.trip && (
-                    <>
-                      <p>
-                        {t("Hẹn lúc ", "Due at ")}
-                        {new Date(i.trip.dueAt).toLocaleTimeString(locale)}
-                      </p>
-                      <div className="actions">
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => void run(() => action("arrived"))}
-                        >
-                          {t("Tôi đã tới nơi", "I have arrived")}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => void run(() => action("trip-stop"))}
-                        >
-                          {t("Dừng hẹn giờ", "Stop timer")}
-                        </button>
-                      </div>
-                    </>
-                  )}
                 </form>
-              )}
+                {invite && (
+                  <div className="invite">
+                    <label>
+                      {t(
+                        "Link này chỉ hiện khi tạo",
+                        "This link is shown only when created",
+                      )}
+                      <input readOnly value={invite} />
+                    </label>
+                    <div className="actions">
+                      <button
+                        onClick={() =>
+                          void run(async () => {
+                            await navigator.clipboard.writeText(invite);
+                            setCopied(true);
+                          })
+                        }
+                      >
+                        <Copy size={16} />
+                        {copied
+                          ? t("Đã chép", "Copied")
+                          : t("Sao chép", "Copy link")}
+                      </button>
+                      <a
+                        className="button"
+                        href={invite}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <ExternalLink size={16} />
+                        {t("Mở thử", "Open test")}
+                      </a>
+                    </div>
+                  </div>
+                )}
+                <div className="member-list">
+                  {data.members.map((m) => (
+                    <article key={m.id}>
+                      <div>
+                        <b>{m.name}</b>
+                        <small>
+                          {m.role === "CONTACT"
+                            ? t("Người thân", "Contact")
+                            : t("Điểm hỗ trợ", "Venue")}
+                        </small>
+                      </div>
+                      <span>
+                        {m.joined
+                          ? t("Đã tham gia", "Joined")
+                          : t("Chờ đồng ý", "Awaiting consent")}
+                        {m.role === "PARTNER" && m.joined
+                          ? m.onDuty
+                            ? t(" · đang trực", " · on duty")
+                            : t(" · ngừng trực", " · off duty")
+                          : ""}
+                      </span>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h2>
+                  {t("Chuẩn bị phiên trên thiết bị", "Prepare a device trial")}
+                </h2>
+                <ul className="readiness">
+                  <li>
+                    <Users size={18} />
+                    {joined} {t("người thân đã tham gia", "contacts joined")}
+                  </li>
+                  <li>
+                    <MapPin size={18} />
+                    {gps
+                      ? t("Đang chia sẻ GPS", "GPS sharing on")
+                      : t("Chưa chia sẻ GPS", "GPS sharing off")}
+                  </li>
+                  <li>
+                    <ShieldCheck size={18} />
+                    {data.config.maps
+                      ? t(
+                          "Đã cấu hình tuyến bản đồ thật",
+                          "Live routes configured",
+                        )
+                      : t(
+                          "Chưa có tuyến thật · không tạo tuyến giả",
+                          "No live routing · no fake routes substituted",
+                        )}
+                  </li>
+                </ul>
+                <p>
+                  {t(
+                    "Giữ trang mở ở cả hai thiết bị. Vị trí chỉ được chia sẻ sau khi bạn cho phép. Trang web chưa thể báo như cuộc gọi khi khóa màn hình.",
+                    "Keep both devices’ pages open. Location is shared only with your permission. The website cannot ring like a phone call when the screen is locked.",
+                  )}
+                </p>
+                <div className="actions">
+                  {!live || ended ? (
+                    <button
+                      className="primary"
+                      disabled={busy || running}
+                      onClick={() =>
+                        void run(() =>
+                          action("new", {
+                            mode: team ? "TEAM" : demo ? "DEMO" : "LIVE",
+                            locale,
+                          }),
+                        )
+                      }
+                    >
+                      {t("Tạo phiên mới", "New session")}
+                    </button>
+                  ) : (
+                    <button className="primary" onClick={startGps}>
+                      <MapPin size={17} />
+                      {gps
+                        ? t("Dừng GPS", "Stop GPS")
+                        : t("Cho phép và chia sẻ GPS", "Allow and share GPS")}
+                    </button>
+                  )}
+                  <Link
+                    className="button"
+                    href={demo ? "/phone" : "/demo/command-center"}
+                  >
+                    {demo
+                      ? t("Mở app thật riêng", "Open separate live app")
+                      : t(
+                          "Mở demo riêng cho giám khảo",
+                          "Open separate judge demo",
+                        )}
+                  </Link>
+                </div>
+                <small>
+                  {t(
+                    "Tạo phiên mới kết thúc phiên hiện tại; lời mời được giữ.",
+                    "A new session ends the current one; invitations are retained.",
+                  )}
+                </small>
+                {live && !ended && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void run(() =>
+                        action("trip", { label: destination, minutes }),
+                      );
+                    }}
+                  >
+                    <h2>
+                      {t("Hẹn giờ về tới nơi", "Schedule an arrival check-in")}
+                    </h2>
+                    <label>
+                      {t("Bạn đi đâu?", "Where are you going?")}
+                      <input
+                        required
+                        maxLength={80}
+                        value={destination}
+                        onChange={(e) => setDestination(e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      {t("Dự kiến bao nhiêu phút?", "Expected minutes")}
+                      <input
+                        type="number"
+                        min={1}
+                        max={240}
+                        value={minutes}
+                        onChange={(e) => setMinutes(Number(e.target.value))}
+                      />
+                    </label>
+                    <button
+                      disabled={
+                        busy ||
+                        !gps ||
+                        !joined ||
+                        !!i.sosAt ||
+                        i.trip?.state === "ACTIVE"
+                      }
+                    >
+                      {t("Bắt đầu hẹn giờ", "Start check-in timer")}
+                    </button>
+                    {i.trip && (
+                      <>
+                        <p>
+                          {t("Hẹn lúc ", "Due at ")}
+                          {new Date(i.trip.dueAt).toLocaleTimeString(locale)}
+                        </p>
+                        <div className="actions">
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => void run(() => action("arrived"))}
+                          >
+                            {t("Tôi đã tới nơi", "I have arrived")}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => void run(() => action("trip-stop"))}
+                          >
+                            {t("Dừng hẹn giờ", "Stop timer")}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </form>
+                )}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        ))}
       {tab === "record" && (
         <section className="record-view">
           <div className="record-title">
@@ -1877,7 +1979,7 @@ export default function Workspace({
               className="button primary"
               target="_blank"
               rel="noreferrer"
-              href={`/api/record/${i.id}?lang=${locale}&scope=${demo ? "demo" : "live"}`}
+              href={`/api/record/${i.id}?lang=${locale}&scope=${requestScope}`}
             >
               <FileText size={17} />
               {t("Mở / In hồ sơ", "Open / Print record")}
@@ -1940,7 +2042,7 @@ export default function Workspace({
             <article key={r.id}>
               <audio
                 controls
-                src={`/api/audio/${i.id}/${r.id}?scope=${demo ? "demo" : "live"}`}
+                src={`/api/audio/${i.id}/${r.id}?scope=${requestScope}`}
               />
               <small>
                 {r.bytes} bytes · SHA-256 {r.hash}
@@ -1964,7 +2066,7 @@ export default function Workspace({
               className="button"
               target="_blank"
               rel="noreferrer"
-              href={`/api/record/${i.id}?format=json&scope=${demo ? "demo" : "live"}`}
+              href={`/api/record/${i.id}?format=json&scope=${requestScope}`}
             >
               {t("Mở dữ liệu JSON", "Open JSON record")}
             </a>
@@ -2034,7 +2136,7 @@ export default function Workspace({
         <Link href="/demo/command-center">
           {t("Trung tâm", "Command center")}
         </Link>
-        <Link href={demo ? "/demo/phone" : "/phone"}>
+        <Link href={team ? "/team/phone" : demo ? "/demo/phone" : "/phone"}>
           {t("Điện thoại", "Phone")}
         </Link>
         <span>

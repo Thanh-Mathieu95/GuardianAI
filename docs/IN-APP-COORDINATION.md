@@ -21,6 +21,12 @@ The provider adapter is deliberately in-app, following the user's revised scope.
 
 ## DEMO and LIVE
 
+### TEAM support profiles
+
+`/team` and `/team/phone` use a third signed owner cookie, isolated from scripted DEMO and live GPS. Support profiles are the account's actual invited members, with names, roles, links and explicit readiness. TEAM creates no fixture recipients: SOS and late-join synchronization use only that member list. The location and route are simulated while each statement is submitted by its real roleplayer. The same central call queue and plan/handoff checks still apply. TEAM provenance is stored as REHEARSAL in incident events, and case-file JSON includes the participating support profiles.
+
+The host's authenticated demo cookie can recover legacy invitations accidentally created in the old scripted workspace. Account revisions and hashed-token ownership move atomically, preserving original recipient links and consent. A third party's unsigned account ID cannot perform recovery. Scripted DEMO no longer accepts real invitations or manual SOS through its API; its UI directs those tasks to Support profiles. Explicit scenario run controls continue to use fictional participants.
+
 `/demo/command-center` and `/demo/phone` use a separate signed demo cookie. `/walk` and `/phone` use the live cookie. Opening/resetting one scope does not replace the other. Report/audio URLs carry their scope and require its signed owner cookie.
 
 **Parallel-call demo** creates an isolated simulated incident and exercises the same call queue, deadlines, statement capture, admission, routing and task machinery. Its recipients and conversations are clearly synthetic; it does not mint voice sessions or contact real participants. Browser speech synthesis can read a scripted conversation when the presenter presses its listen button. The older ten-stage director remains available for withdrawal, rerouting, injury and lost-contact demonstrations.

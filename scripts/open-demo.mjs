@@ -12,7 +12,11 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const origin = "http://localhost:3131";
 const url =
   origin +
-  (process.argv.includes("--phone") ? "/phone" : "/demo/command-center");
+  (process.argv.includes("--phone")
+    ? "/phone"
+    : process.argv.includes("--demo")
+      ? "/demo/command-center"
+      : "/team");
 async function healthy() {
   try {
     const r = await fetch(origin + "/api/health", {

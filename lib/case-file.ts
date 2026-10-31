@@ -25,6 +25,7 @@ export function caseFile(i: Incident) {
     generatedAt: i.updatedAt,
     method: "COORDINATOR_EVIDENCE" as const,
     status: i.status,
+    participants: i.supportProfiles || [],
     claims,
     unresolved: [
       ...(!i.location ? ["CURRENT_LOCATION_REQUIRED"] : []),

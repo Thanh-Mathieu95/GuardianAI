@@ -50,6 +50,8 @@ Kiểm thử HTTP tự tạo máy chủ với cơ sở dữ liệu trong bộ nh
 
 ## In-app call coordinator
 
+Open **http://localhost:3131/team** for **Hồ sơ hỗ trợ / Support profiles**. Create named participant links, let teammates join as contacts or receiving venues, then press SOS. Calls go only to those invited people; late arrivals are included when ready. TEAM uses mock locations with real participant replies. Scripted DEMO and live GPS remain separate. The default Desktop launcher now opens Support profiles; use `node scripts/open-demo.mjs --demo` for the scripted workspace.
+
 Use **Parallel-call demo** for the competition walkthrough: three simultaneous in-app calls, private recipient conversations, sourced commitments, an early plan, user acceptance, task-notification calls and two-sided handoff. The original ten-stage director remains available. Demo and live sessions are isolated.
 
 For a real recipient flow, open `/phone`, enable GPS, invite someone and open their link in another tab. They must join and explicitly allow in-app calls. Partners provide their venue profile and on-duty status. No Twilio or phone-number gateway is required. See [implementation and boundaries](docs/IN-APP-COORDINATION.md) and [judge walkthrough](docs/LOCAL-DEMO.md).

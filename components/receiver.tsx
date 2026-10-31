@@ -17,7 +17,9 @@ import { connectVoice, type Voice } from "./voice";
 import type { AppCall } from "@/lib/coordination-types";
 import { RecipientCall } from "./recipient-call";
 import { PartnerProfileForm } from "./partner-profile";
+import { places } from "@/lib/city";
 type View = {
+  mode: Incident["mode"];
   member: Omit<Member, "tokenHash" | "createdAt">;
   config: { ai: boolean };
   incident: {
@@ -237,19 +239,30 @@ export default function Receiver({ token }: { token: string }) {
           </p>
           <p>
             {t(
-              "Giữ trang mở. Không có cuộc gọi tự động, thông báo nền hay nghĩa vụ cứu hộ. Link này là riêng tư.",
-              "Keep this page open. There are no automatic calls, background alerts or rescue obligations. This link is private.",
+              "Giữ trang mở. Cuộc gọi trong app cần sự đồng ý của bạn; không gọi số điện thoại hay báo khi khóa màn hình. Link này là riêng tư.",
+              "Keep this page open. In-app calls need your permission; no phone numbers are dialed and there is no locked-screen ringing. This link is private.",
             )}
           </p>
           <button
             className="primary"
             disabled={busy}
             onClick={() =>
-              void run(() => api({ action: "join", consent: true }))
+              void run(() =>
+                api({
+                  action: "join",
+                  consent: true,
+                  ...(view.mode === "TEAM" ? { calls: true } : {}),
+                }),
+              )
             }
           >
             <Check size={18} />
-            {t("Đồng ý tham gia", "Agree to join")}
+            {view.mode === "TEAM"
+              ? t(
+                  "Tham gia vai & cho phép cuộc gọi trong app",
+                  "Join role & allow in-app calls",
+                )
+              : t("Đồng ý tham gia", "Agree to join")}
           </button>
         </section>
       ) : (
@@ -262,6 +275,22 @@ export default function Receiver({ token }: { token: string }) {
                 : t("Đang kết nối lại", "Reconnecting")}
             </span>
           </div>
+          {view.mode === "TEAM" && (
+            <p className="roleplay-notice">
+              {t(
+                "Bạn đang nhập vai với người thật trong team. Vị trí và địa điểm là mô phỏng; câu trả lời do bạn tự gửi. Giữ trang mở để nhận cuộc gọi.",
+                "You are roleplaying with real teammates. Locations and venues are simulated; you send your own replies. Keep this page open to receive calls.",
+              )}
+            </p>
+          )}
+          {view.mode === "DEMO" && (
+            <p className="roleplay-notice">
+              {t(
+                "Link này thuộc kịch bản cũ nên SOS không gọi tới vai này. Người tạo phòng cần mở Team nhập vai để khôi phục lời mời; link này sẽ tiếp tục dùng được sau khi chuyển.",
+                "This link belongs to the old scripted workspace. The host should open Team roleplay to recover invitations; this link will keep working after recovery.",
+              )}
+            </p>
+          )}
           <label className="check">
             <input
               type="checkbox"
@@ -280,6 +309,40 @@ export default function Receiver({ token }: { token: string }) {
           </label>
           {m!.role === "PARTNER" && (
             <div className="partner-setup">
+              {view.mode === "TEAM" && (
+                <label>
+                  {t(
+                    "Chọn vị trí điểm hỗ trợ để nhập vai",
+                    "Choose a roleplay venue location",
+                  )}
+                  <select
+                    aria-label={t("Điểm hỗ trợ nhập vai", "Roleplay venue")}
+                    defaultValue=""
+                    disabled={busy}
+                    onChange={(e) => {
+                      if (e.target.value)
+                        void run(() =>
+                          api({
+                            action: "team-venue",
+                            placeId: e.target.value,
+                          }),
+                        );
+                    }}
+                  >
+                    <option value="">
+                      {t(
+                        "Chọn một điểm mô phỏng…",
+                        "Choose a simulated venue…",
+                      )}
+                    </option>
+                    {places.slice(0, 3).map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <PartnerProfileForm
                 profile={m!.profile}
                 busy={busy}
@@ -295,12 +358,14 @@ export default function Receiver({ token }: { token: string }) {
                 )}
               </p>
               <div className="actions">
-                <button disabled={busy} onClick={setLocation}>
-                  <MapPin size={17} />
-                  {m!.location
-                    ? t("Cập nhật vị trí điểm", "Update venue location")
-                    : t("Đặt vị trí điểm hỗ trợ", "Set venue location")}
-                </button>
+                {view.mode !== "TEAM" && (
+                  <button disabled={busy} onClick={setLocation}>
+                    <MapPin size={17} />
+                    {m!.location
+                      ? t("Cập nhật vị trí điểm", "Update venue location")
+                      : t("Đặt vị trí điểm hỗ trợ", "Set venue location")}
+                  </button>
+                )}
                 <button
                   aria-pressed={m!.onDuty}
                   disabled={busy}
@@ -330,17 +395,24 @@ export default function Receiver({ token }: { token: string }) {
             </div>
           ) : (
             <>
-              <span className="source">
-                {i.mode === "DEMO"
-                  ? t("MÔ PHỎNG", "SIMULATION")
-                  : t("PHIÊN TRÊN THIẾT BỊ", "DEVICE TRIAL")}
-              </span>
               <h2>
                 {ended
                   ? t("Phiên đã kết thúc", "Session ended")
                   : t("Có người đang cần bạn.", "Someone is counting on you.")}
               </h2>
               <p role="status">
+                <span>
+                  {i.mode === "TEAM"
+                    ? t(
+                        "Team nhập vai · vị trí mô phỏng",
+                        "Team roleplay · simulated location",
+                      )
+                    : i.mode === "DEMO"
+                      ? t("Mô phỏng", "Simulation")
+                      : t("Phiên dùng thật", "Live session")}
+                </span>
+                <br />
+
                 {states[i.status] ? choose(states[i.status], locale) : i.status}
               </p>
               {i.calls

@@ -38,7 +38,12 @@ function note(i: Incident, type: string, message: Pair, refs: string[]) {
     type,
     message,
     refs,
-    source: i.mode === "DEMO" ? "SIMULATED" : "LIVE",
+    source:
+      i.mode === "DEMO"
+        ? "SIMULATED"
+        : i.mode === "TEAM"
+          ? "REHEARSAL"
+          : "LIVE",
   });
 }
 export function transition(
@@ -132,7 +137,9 @@ export function queueCall(
 }
 export function enqueueIncident(i: Incident, members: Member[]) {
   const s = coordination(i);
+  const previous = JSON.stringify(s.discovery?.candidates);
   s.discovery = discover(i, members);
+  const before = s.calls.length;
   const eligible = new Set(
     s.discovery.candidates.filter((c) => c.eligible).map((c) => c.memberId),
   );
@@ -144,15 +151,19 @@ export function enqueueIncident(i: Incident, members: Member[]) {
   ))
     queueCall(i, m);
   s.outcome = "WAITING";
-  note(
-    i,
-    "DISCOVERY",
-    [
-      `Tìm trong ${s.discovery.radius} m: ${eligible.size} đối tác đủ điều kiện liên hệ.`,
-      `Searched ${s.discovery.radius} m: ${eligible.size} partners eligible for contact.`,
-    ],
-    s.discovery.candidates.filter((c) => c.eligible).map((c) => c.memberId),
-  );
+  if (
+    before !== s.calls.length ||
+    previous !== JSON.stringify(s.discovery.candidates)
+  )
+    note(
+      i,
+      "DISCOVERY",
+      [
+        `Tìm trong ${s.discovery.radius} m: ${eligible.size} đối tác đủ điều kiện liên hệ.`,
+        `Searched ${s.discovery.radius} m: ${eligible.size} partners eligible for contact.`,
+      ],
+      s.discovery.candidates.filter((c) => c.eligible).map((c) => c.memberId),
+    );
   pump(i, members);
 }
 export function intro(i: Incident, c: AppCall): string {
@@ -189,6 +200,18 @@ export function pump(i: Incident, members: Member[], time = Date.now()) {
     return;
   const adapter: CallAdapter =
     i.mode === "DEMO" ? new SimulatedCallAdapter() : new InAppAdapter();
+  if (i.mode !== "DEMO")
+    for (const c of s.calls) {
+      const m = members.find((m) => m.id === c.memberId);
+      if (
+        c.state === "NO_ANSWER" &&
+        c.attempt === 0 &&
+        c.reason === "RECIPIENT_OFFLINE_OR_QUEUE_TIMEOUT" &&
+        adapter.canDeliver(m, time)
+      ) {
+        transition(i, c, "QUEUED", "RECIPIENT_NOW_AVAILABLE", time);
+      }
+    }
   let slots = s.limits.concurrency - s.calls.filter(callActive).length;
   for (const c of s.calls) {
     if (slots <= 0) break;
@@ -196,7 +219,7 @@ export function pump(i: Incident, members: Member[], time = Date.now()) {
       continue;
     const m = members.find((m) => m.id === c.memberId);
     if (
-      i.mode === "LIVE" &&
+      i.mode !== "DEMO" &&
       (!m?.joined ||
         !m.callConsentAt ||
         (m.role === "PARTNER" &&

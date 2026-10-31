@@ -45,15 +45,21 @@ async function main() {
     fetch(base + "/api/" + url, {
       headers: {
         ...(cookie ? { Cookie: cookie } : {}),
-        "x-guardian-mode": cookie.startsWith("guardian_demo_v3=")
-          ? "demo"
-          : "live",
+        "x-guardian-mode":
+          url.includes("scope=team") || cookie.startsWith("guardian_team_v1=")
+            ? "team"
+            : url.includes("scope=demo") ||
+                cookie.startsWith("guardian_demo_v3=")
+              ? "demo"
+              : "live",
         ...(body ? { "Content-Type": "application/json", Origin: origin } : {}),
       },
       ...(body ? { method: "POST", body: JSON.stringify(body) } : {}),
     });
-  async function client(demo = false) {
-    const res = await request("session" + (demo ? "?scope=demo" : ""));
+  async function client(demo: boolean | "team" = false) {
+    const res = await request(
+      "session" + (demo === "team" ? "?scope=team" : demo ? "?scope=demo" : ""),
+    );
     assert.equal(res.status, 200);
     const c = {
       cookie: res.headers.get("set-cookie")!.split(";")[0],
@@ -304,7 +310,7 @@ async function main() {
       user.state.incident.id,
     );
     await action(user, "new", { mode: "DEMO", locale: "vi" });
-    await action(user, "sos", { text: "Có người theo tôi. Đây là kiểm thử." });
+    await action(user, "sos", { text: "Use the separate team room." }, 400);
     assert.equal(
       user.state.incident.demo,
       null,
@@ -389,6 +395,40 @@ async function main() {
       (await request(`audio/${user.state.incident.id}/${audioId}`, user.cookie))
         .status,
       404,
+    );
+    const team = await client("team");
+    assert.equal(team.state.incident.mode, "TEAM");
+    await action(team, "sos", { text: "Help me in this roleplay." });
+    assert.equal(team.state.incident.replies.length, 0);
+    assert.equal(team.state.incident.coordination.calls.length, 0);
+    const teammate = await (
+      await request("members", team.cookie, { name: "Dung", role: "CONTACT" })
+    ).json();
+    assert.equal(
+      (
+        await request("join/" + teammate.token, "", {
+          action: "join",
+          consent: true,
+          calls: true,
+        })
+      ).status,
+      200,
+    );
+    const roleView = await (await request("join/" + teammate.token)).json();
+    assert.equal(roleView.mode, "TEAM");
+    assert.equal(roleView.incident.calls.length, 1);
+    assert.equal(roleView.incident.calls[0].name, "Dung");
+    assert.equal(roleView.incident.calls[0].state, "CALLING");
+    assert.equal(roleView.incident.calls[0].adapter, "IN_APP");
+    await action(team, "demo", { locale: "en", ai: false }, 400);
+    assert.equal(
+      (
+        await request("members", user.cookie, {
+          name: "Wrong scope",
+          role: "CONTACT",
+        })
+      ).status,
+      400,
     );
     console.log(
       "PASS: page delivery; session isolation; CSRF; recipient consent and location privacy; stale session rejection; live route fail-closed; full demo; audio consent, idempotency and bytes; report; SSE; record deletion.",

@@ -1858,3 +1858,146 @@ body:has(.workspace) {
   padding-block: 14px;
   min-height: 44px;
 }
+
+.mode-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.mode-navigation a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+}
+.mode-navigation a[aria-current="page"] {
+  color: var(--cyan);
+  background: var(--dock-active, #0f2a24);
+}
+.mode-navigation a:hover {
+  background: var(--panel2);
+}
+.demo-team-notice {
+  margin: 12px 0;
+  max-width: 100ch;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.demo-team-notice a {
+  color: var(--blue);
+  text-underline-offset: 3px;
+}
+.demo-disabled-setup {
+  display: none !important;
+}
+.team-lobby {
+  padding: 20px;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--panel);
+}
+.team-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.team-heading > svg {
+  margin-top: 5px;
+  color: var(--blue);
+  flex-shrink: 0;
+}
+.team-heading h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 1.3;
+}
+.team-heading p {
+  max-width: 85ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.team-invite-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin: 20px 0;
+}
+.team-invite-form label {
+  flex: 1 1 220px;
+  margin: 0;
+}
+.team-invite-form input,
+.team-invite-form select {
+  margin: 6px 0 0;
+  min-height: 44px;
+}
+.team-invite-form button {
+  min-height: 44px;
+}
+.team-invite-links > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.team-invite-links input {
+  flex: 1 1 260px;
+  margin: 0;
+  min-height: 44px;
+  font-size: 13px;
+}
+.team-invite-links b {
+  min-width: 90px;
+}
+.team-readiness {
+  margin-top: 16px;
+}
+.team-member {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) 2fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.team-member > span:last-child {
+  color: var(--amber);
+}
+.team-member.ready > span:last-child {
+  color: var(--blue);
+}
+.roleplay-notice {
+  padding: 14px 0;
+  line-height: 1.7;
+  border-block: 1px solid #c3cec8;
+}
+.phone-workspace > .mode-navigation,
+.phone-workspace > .demo-team-notice {
+  display: none;
+}
+@media (max-width: 760px) {
+  .team-lobby {
+    padding: 16px;
+  }
+  .team-member {
+    grid-template-columns: 1fr 1fr;
+  }
+  .team-member > span:last-child {
+    grid-column: 1/-1;
+  }
+}

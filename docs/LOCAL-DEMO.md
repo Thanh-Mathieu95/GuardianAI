@@ -1,5 +1,15 @@
 # Trình diễn Guardian AI trên máy
 
+## Hồ sơ hỗ trợ — team tự nhập vai
+
+Mở `http://localhost:3131/team` (nút mở dự án trên Desktop hiện mở trang này). Trong **Hồ sơ hỗ trợ**, nhập tên như Dũng, chọn vai người thân hoặc điểm tiếp nhận rồi tạo link riêng. Mỗi thành viên mở link, bấm **Tham gia vai & cho phép cuộc gọi trong app** và giữ trang mở. Người đóng vai điểm tiếp nhận chọn một địa điểm mô phỏng để sẵn sàng.
+
+Bấm SOS trên màn hình điện thoại của người cần giúp. Hệ thống chỉ gọi các thành viên đã tạo trong Hồ sơ hỗ trợ; không thêm Minh/Linh. Người tham gia hoặc bật quyền nhận cuộc gọi sau SOS vẫn được đưa vào hàng đợi khi sẵn sàng. Mỗi người tự nhận, từ chối hoặc trả lời cuộc gọi; lời đồng ý và xác nhận gặp mặt không được tự tạo.
+
+Vị trí và tuyến của TEAM là mô phỏng, phản hồi đến từ người thật nhập vai. Các lời mời tạo nhầm trong phiên DEMO cũ của cùng chủ phòng được chuyển sang TEAM khi mở trang này; token cũ vẫn hoạt động. Kịch bản tự chạy dùng dữ liệu khác tại `/demo/command-center`; dùng thật với GPS ở `/phone`.
+
+Link `localhost` chỉ dùng trên máy đang chạy dự án. Các bài kiểm thử nhập vai dùng nhiều tab riêng trên một máy; thiết bị khác cần địa chỉ máy chủ chung có thể truy cập, và thoại trên điện thoại cần HTTPS.
+
 ## Demo cuộc gọi để thi
 
 1. Mở **GuardianAI - Mở demo** trên Desktop hoặc `http://localhost:3131/demo/command-center`. Chọn VI/EN.

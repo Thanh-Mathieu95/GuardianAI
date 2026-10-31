@@ -54,17 +54,23 @@ function aiAccess(req: NextRequest) {
   )
     throw new Error("AI_ACCESS_CODE_REQUIRED");
 }
+function scope(req: NextRequest): "DEMO" | "TEAM" | "LIVE" {
+  const value =
+    req.headers.get("x-guardian-mode") ||
+    (req.method === "GET" ? req.nextUrl.searchParams.get("scope") : null);
+  return value === "demo" ? "DEMO" : value === "team" ? "TEAM" : "LIVE";
+}
 function demoScope(req: NextRequest) {
-  return (
-    req.headers.get("x-guardian-mode") === "demo" ||
-    (req.method === "GET" && req.nextUrl.searchParams.get("scope") === "demo")
-  );
+  return scope(req) === "DEMO";
 }
 function ownerCookie(req: NextRequest) {
-  return demoScope(req) ? "guardian_demo_v3" : "guardian_live_v3";
+  return scope(req) === "DEMO"
+    ? "guardian_demo_v3"
+    : scope(req) === "TEAM"
+      ? "guardian_team_v1"
+      : "guardian_live_v3";
 }
-function owner(req: NextRequest) {
-  const value = req.cookies.get(ownerCookie(req))?.value;
+function signedOwner(value?: string) {
   const [id, sig] = value?.split(".") || [];
   if (!id || !/^[a-f0-9-]{36}$/.test(id) || !sig) return null;
   const expected = sign(id);
@@ -72,6 +78,9 @@ function owner(req: NextRequest) {
     timingSafeEqual(Buffer.from(sig), Buffer.from(expected))
     ? id
     : null;
+}
+function owner(req: NextRequest) {
+  return signedOwner(req.cookies.get(ownerCookie(req))?.value);
 }
 function rate(key: string, max: number, window = 60000) {
   const m = (globals.rate ??= new Map<string, number[]>());
@@ -88,6 +97,7 @@ const point = {
 const locale = z.enum(["vi", "en"]);
 const text = z.string().trim().min(1).max(2000);
 const input = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("team-location"), ...point }).strict(),
   z.object({ action: z.literal("call-demo") }).strict(),
   z
     .object({ action: z.literal("demo-received"), planId: z.string().uuid() })
@@ -125,7 +135,7 @@ const input = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("new"),
-      mode: z.enum(["DEMO", "LIVE"]),
+      mode: z.enum(["DEMO", "LIVE", "TEAM"]),
       locale,
     })
     .strict(),
@@ -208,6 +218,12 @@ const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("delete-transcript") }).strict(),
 ]);
 const memberInput = z.discriminatedUnion("action", [
+  z
+    .object({
+      action: z.literal("team-venue"),
+      placeId: z.string().min(1).max(80),
+    })
+    .strict(),
   z.object({ action: z.literal("heartbeat") }).strict(),
   z
     .object({ action: z.literal("call-consent"), enabled: z.boolean() })
@@ -269,7 +285,13 @@ const memberInput = z.discriminatedUnion("action", [
       meeting: z.string().max(500),
     })
     .strict(),
-  z.object({ action: z.literal("join"), consent: z.literal(true) }).strict(),
+  z
+    .object({
+      action: z.literal("join"),
+      consent: z.literal(true),
+      calls: z.boolean().optional(),
+    })
+    .strict(),
   z.object({ action: z.literal("duty"), enabled: z.boolean() }).strict(),
   z
     .object({
@@ -321,6 +343,7 @@ function receiver(a: Account, m: Member) {
       profile: m.profile,
       callConsentAt: m.callConsentAt || null,
     },
+    mode: i.mode,
     config: { ai: aiConfigured() && i.ai.enabled },
     incident: r
       ? {
@@ -409,7 +432,7 @@ export async function GET(req: NextRequest, context: Context) {
     let id = owner(req);
     if (path[0] === "session") {
       id ??= randomUUID();
-      const a = await e.account(id, demoScope(req) ? "DEMO" : "LIVE");
+      const a = await e.account(id, scope(req));
       const response = json(publicAccount(a));
       response.cookies.set(ownerCookie(req), id + "." + sign(id), {
         httpOnly: true,
@@ -540,9 +563,32 @@ export async function POST(req: NextRequest, context: Context) {
         if (d.action === "join") {
           member.joined = true;
           member.lastSeenAt = nowDate();
+          if (d.calls === true) member.callConsentAt = nowDate();
           return;
         }
         if (!member.joined) throw new Error("CONSENT_REQUIRED");
+        if (d.action === "team-venue") {
+          if (i.mode !== "TEAM" || member.role !== "PARTNER")
+            throw new Error("TEAM_ONLY");
+          const place = places.find((p) => p.id === d.placeId);
+          if (!place) throw new Error("NOT_FOUND");
+          member.location = place.point;
+          member.profile = {
+            ...e.demoProfile(place.id)!,
+            hours: [{ days: [0, 1, 2, 3, 4, 5, 6], open: 0, close: 0 }],
+            contact: "in-app:" + member.id,
+            contactVerifiedAt: nowDate(),
+            source: "SIMULATED",
+          };
+          member.onDuty = true;
+          const r = i.replies.find((r) => r.memberId === member.id);
+          if (r) {
+            r.location = member.location;
+            r.profile = member.profile;
+            await e.plan(i);
+          }
+          return;
+        }
         if (d.action === "heartbeat") {
           member.lastSeenAt = nowDate();
           pump(i, e.callMembers(current));
@@ -632,7 +678,16 @@ export async function POST(req: NextRequest, context: Context) {
     const id = owner(req);
     if (!id) throw new Error("SESSION_REQUIRED");
     rate("owner:" + id, 100);
+    if (path[0] === "recover-team") {
+      if (scope(req) !== "TEAM") throw new Error("TEAM_ONLY");
+      const source = signedOwner(req.cookies.get("guardian_demo_v3")?.value);
+      if (source && (await e.repo.load(source))?.incident.mode === "DEMO")
+        await e.repo.recoverTeamInvitations(source, id);
+      await e.with(id, (a) => e.syncRecipients(a));
+      return json(publicAccount(await e.account(id)));
+    }
     if (path[0] === "members") {
+      if (scope(req) === "DEMO") throw new Error("TEAM_INVITATION_REQUIRED");
       const d = z
         .object({
           name: z.string().trim().min(1).max(60),
@@ -713,8 +768,7 @@ export async function POST(req: NextRequest, context: Context) {
     const result = await e.with(id, async (a) => {
       const i = a.incident;
       if (d.action === "new") {
-        if (d.mode !== (demoScope(req) ? "DEMO" : "LIVE"))
-          throw new Error("MODE_SCOPE_MISMATCH");
+        if (d.mode !== scope(req)) throw new Error("MODE_SCOPE_MISMATCH");
         await e.create(a, d.mode, d.locale);
         return publicAccount(a);
       }
@@ -743,6 +797,17 @@ export async function POST(req: NextRequest, context: Context) {
       if (terminal(i) && !["locale", "delete-transcript"].includes(d.action))
         throw new Error("SESSION_ENDED");
       switch (d.action) {
+        case "team-location":
+          if (i.mode !== "TEAM") throw new Error("TEAM_ONLY");
+          i.location = {
+            lat: d.lat,
+            lng: d.lng,
+            at: nowDate(),
+            source: "SIMULATED",
+          };
+          i.track.push({ lat: d.lat, lng: d.lng, at: nowDate() });
+          await e.plan(i);
+          break;
         case "demo-received": {
           if (i.mode !== "DEMO") throw new Error("DEMO_ONLY");
           const p = activePlan(i);
@@ -768,7 +833,7 @@ export async function POST(req: NextRequest, context: Context) {
           break;
         }
         case "scenario-time":
-          if (i.mode !== "DEMO") throw Error("DEMO_ONLY");
+          if (i.mode === "LIVE") throw Error("DEMO_ONLY");
           i.scenarioMinute = d.minute;
           if (i.reference) {
             const place = places.find((p) => p.name === i.reference!.name);
@@ -784,7 +849,7 @@ export async function POST(req: NextRequest, context: Context) {
           const place = places.find((p) => p.id === d.placeId);
           if (!place || !isOpen(place, i.scenarioMinute) || !i.location)
             throw Error("NO_OPEN_DESTINATION");
-          if (i.mode !== "DEMO") throw Error("SIMULATED_PLACE_NOT_LIVE");
+          if (i.mode === "LIVE") throw Error("SIMULATED_PLACE_NOT_LIVE");
           i.reference = {
             name: place.name,
             route: walkingRoute(i.location, place.point, [], true),
@@ -895,6 +960,7 @@ export async function POST(req: NextRequest, context: Context) {
           i.ai.status = d.enabled ? "READY" : "OFF";
           break;
         case "sos":
+          if (i.mode === "DEMO") throw new Error("TEAM_INVITATION_REQUIRED");
           if (i.mode === "LIVE") rate("sos:" + id, 6, 3600000);
           await e.sos(a, d.text);
           break;
@@ -902,7 +968,7 @@ export async function POST(req: NextRequest, context: Context) {
           {
             const result = await e.chat(i, d.text);
             extra =
-              i.mode === "LIVE" && result.intent === "SOS"
+              i.mode !== "DEMO" && result.intent === "SOS"
                 ? { ...result, ...(await e.autoSos(a, d.text)) }
                 : result;
           }
@@ -996,7 +1062,7 @@ export async function POST(req: NextRequest, context: Context) {
             const urgent = emergency(d.text);
             if (urgent) {
               i.risk = urgent.risk;
-              if (i.mode === "LIVE") extra = await e.autoSos(a, d.text);
+              if (i.mode !== "DEMO") extra = await e.autoSos(a, d.text);
               event(i, "URGENT_TRANSCRIPT", [
                 "Hội thoại có dấu hiệu khẩn cấp; bạn có thể chọn SOS hoặc gọi hỗ trợ.",
                 "Urgent content in conversation; you can choose SOS or call for help.",

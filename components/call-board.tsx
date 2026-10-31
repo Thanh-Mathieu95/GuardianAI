@@ -31,7 +31,11 @@ export function CallBoard({
         <PhoneCall size={19} />
         <h2>{t("Cuộc gọi trong app", "In-app calls")}</h2>
         <span className="source">
-          {i.mode === "DEMO" ? "SIMULATED" : "LIVE"}
+          {i.mode === "TEAM"
+            ? "TEAM"
+            : i.mode === "DEMO"
+              ? "SIMULATED"
+              : "LIVE"}
         </span>
       </div>
       <p className="call-overview" role="status">
