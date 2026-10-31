@@ -5,9 +5,30 @@ data/
 !.env.example
 *.tsbuildinfo
 test-results/
+playwright-report/
 .vercel/
-.impeccable/review/
+
+# Impeccable: keep PRODUCT.md, DESIGN.md, design.json and surface briefs.
 **/.impeccable/config.local.json
 **/.impeccable/hook.cache.json
-docs/*BUILD-PROMPT.md
+**/.impeccable/hook.pending.json
+**/.impeccable/*.png
+**/.impeccable/review/
+**/.impeccable/questions/
+**/.impeccable/live/server.json
+**/.impeccable/live/sessions/
+**/.impeccable/live/previews/
+**/.impeccable/live/annotations/
+**/.impeccable/live/cache/
+**/.impeccable/live/manual-edit-apply-transaction.json
+**/.impeccable/live/manual-edit-events.jsonl
+**/.impeccable/live/manual-edit-evidence/
+**/.impeccable/live/pending-manual-edits.json
+**/.impeccable/live/deferred-svelte-component-accepts.json
+**/.impeccable/live/*.png
+
+# Local scratch files and private build inputs.
 work/
+*.log
+.impeccable/mocks/
+docs/*BUILD-PROMPT.md

@@ -1,447 +1,358 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
-import { randomBytes, randomUUID, createHash } from "node:crypto";
-import { createServer } from "node:net";
-import { setTimeout as delay } from "node:timers/promises";
-import { readdirSync } from "node:fs";
-
+import type { Incident } from "../lib/types";
+import { emptyNeeds } from "../lib/support";
+const base = process.env.GUARDIAN_TEST_URL || "http://127.0.0.1:3000";
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function main() {
-  const socket = createServer();
-  await new Promise<void>((resolve) => socket.listen(0, "127.0.0.1", resolve));
-  const port = (socket.address() as { port: number }).port;
-  await new Promise<void>((resolve) => socket.close(() => resolve()));
-  const base = `http://127.0.0.1:${port}`;
-  const server = spawn(
-    process.execPath,
-    [
-      "node_modules/next/dist/bin/next",
-      "start",
-      "--port",
-      String(port),
-      "--hostname",
-      "127.0.0.1",
-    ],
-    {
-      env: {
-        ...process.env,
-        NODE_ENV: "production",
-        DATABASE_URL: "",
-        DATABASE_PATH: ":memory:",
-        AI_ENABLED: "false",
-        OPENAI_API_KEY: "",
-        GOOGLE_MAPS_API_KEY: "",
-        PUBLIC_URL: "",
-        AI_ACCESS_CODE: "isolated-test-code",
-        SESSION_SECRET: randomBytes(32).toString("hex"),
-      },
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-    },
+  const session = await fetch(base + "/api/session"),
+    cookie = session.headers.get("set-cookie")!.split(";")[0],
+    data = await session.json();
+  const token = data.operatorToken;
+  if (!token)
+    throw new Error(
+      "Run tests with OPERATOR_PASSWORD unset in a local test environment.",
+    );
+  const headers = {
+    "Content-Type": "application/json",
+    Origin: new URL(base).origin,
+    Cookie: cookie,
+    "x-operator-token": token,
+  };
+  const post = async (
+    path: string,
+    body: unknown,
+    custom: Record<string, string> = headers,
+  ) => {
+    const r = await fetch(base + "/api/" + path, {
+      method: "POST",
+      headers: custom,
+      body: JSON.stringify(body),
+    });
+    return { status: r.status, body: await r.json() };
+  };
+  const fresh = await post("incidents", { scenario: "NIGHT_WALK" });
+  assert.equal(fresh.status, 201);
+  const id = fresh.body.id;
+  const aiConfigResponse = await fetch(base + "/api/ai/config", {
+      headers: { Cookie: cookie },
+    }),
+    aiConfig = await aiConfigResponse.json();
+  assert.equal(aiConfigResponse.status, 200);
+  assert.equal("key" in aiConfig, false);
+  assert.equal("OPENAI_API_KEY" in aiConfig, false);
+  assert.equal(
+    (await post(`incidents/${id}/message`, { text: "Xin chào AI" })).status,
+    409,
   );
-  let output = "";
-  server.stdout.on("data", (b) => (output += b));
-  server.stderr.on("data", (b) => (output += b));
-  const request = (url: string, cookie = "", body?: unknown, origin = base) =>
-    fetch(base + "/api/" + url, {
-      headers: {
-        ...(cookie ? { Cookie: cookie } : {}),
-        "x-guardian-mode":
-          url.includes("scope=team") || cookie.startsWith("guardian_team_v1=")
-            ? "team"
-            : url.includes("scope=demo") ||
-                cookie.startsWith("guardian_demo_v3=")
-              ? "demo"
-              : "live",
-        ...(body ? { "Content-Type": "application/json", Origin: origin } : {}),
-      },
-      ...(body ? { method: "POST", body: JSON.stringify(body) } : {}),
-    });
-  async function client(demo: boolean | "team" = false) {
-    const res = await request(
-      "session" + (demo === "team" ? "?scope=team" : demo ? "?scope=demo" : ""),
-    );
-    assert.equal(res.status, 200);
-    const c = {
-      cookie: res.headers.get("set-cookie")!.split(";")[0],
-      state: await res.json(),
-    };
-    return c;
-  }
-  type Client = Awaited<ReturnType<typeof client>>;
-  async function action(
-    c: Client,
-    action: string,
-    fields: Record<string, unknown> = {},
-    expected = 200,
-  ) {
-    const res = await request("action", c.cookie, {
-      action,
-      incidentId: c.state.incident.id,
-      ...fields,
-    });
-    assert.equal(
-      res.status,
-      expected,
-      `${action}: ${await res.clone().text()}`,
-    );
-    const value = await res.json();
-    if (value.incident) c.state = value;
-    return value;
-  }
-  try {
-    let ready = false;
-    for (let n = 0; n < 100; n++) {
-      try {
-        ready = (await request("health")).ok;
-      } catch {}
-      if (ready) break;
-      await delay(200);
-    }
-    assert.ok(ready, `Server did not start: ${output.slice(-1000)}`);
-    assert.equal((await fetch(base)).status, 200);
-    assert.equal((await fetch(base + "/demo")).status, 200);
-    assert.equal((await fetch(base + "/walk")).status, 200);
-    const workers = readdirSync(".next/static/media").filter((name) =>
-      /^maplibre-gl-worker\.[^.]+\.mjs$/.test(name),
-    );
-    assert.ok(
-      workers.length,
-      "production build must emit MapLibre's module worker",
-    );
-    for (const worker of workers) {
-      const resource = await fetch(`${base}/_next/static/media/${worker}`);
-      assert.equal(
-        resource.status,
-        200,
-        "worker must be served rather than an HTML 404",
-      );
-      assert.match(resource.headers.get("content-type") || "", /javascript/);
-      assert.ok((await resource.text()).includes("MapLibre"));
-    }
-    assert.equal((await request("state")).status, 401);
-    let user = await client();
-    const stranger = await client();
-    assert.equal(user.state.config.ai, false);
-    assert.equal(JSON.stringify(user.state).includes("tokenHash"), false);
-    assert.equal(
-      (
-        await request(
-          "action",
-          user.cookie,
-          { action: "sos", text: "test" },
-          "https://wrong-origin.invalid",
-        )
-      ).status,
-      403,
-    );
-    await action(user, "new", { mode: "LIVE", locale: "en" });
-    assert.equal(user.state.incident.location, null);
-    await action(user, "sos", { text: "Help me" }, 400);
-    await action(user, "location", { lat: 10.77, lng: 106.7, consent: true });
-    const contact = await (
-      await request("members", user.cookie, {
-        name: "QA contact",
-        role: "CONTACT",
-      })
-    ).json();
-    const partner = await (
-      await request("members", user.cookie, {
-        name: "QA partner",
-        role: "PARTNER",
-      })
-    ).json();
-    assert.equal(contact.member.tokenHash, undefined);
-    for (const invite of [contact, partner])
-      assert.equal(
-        (
-          await request("join/" + invite.token, "", {
-            action: "join",
-            consent: true,
-          })
-        ).status,
-        200,
-      );
-    assert.equal(
-      (
-        await request("join/" + partner.token, "", {
-          action: "duty",
-          enabled: true,
-        })
-      ).status,
-      200,
-    );
-    assert.equal(
-      (
-        await request("join/" + partner.token, "", {
-          action: "location",
-          lat: 10.7701,
-          lng: 106.7001,
-          consent: true,
-        })
-      ).status,
-      200,
-    );
-    for (const invite of [contact, partner]) {
-      assert.equal(
-        (
-          await request("join/" + invite.token, "", {
-            action: "call-consent",
-            enabled: true,
-          })
-        ).status,
-        200,
-      );
-    }
-    assert.equal(
-      (
-        await request("join/" + partner.token, "", {
-          action: "profile",
-          kind: "Cafe",
-          address: "Test address",
-          timezone: "Asia/Ho_Chi_Minh",
-          hours: [{ days: [0, 1, 2, 3, 4, 5, 6], open: 0, close: 0 }],
-          receiving: true,
-          staffed: true,
-          waiting: true,
-          accessible: true,
-          limitations: "",
-          entrance: "Main entrance",
-          meeting: "Staff at entrance",
-        })
-      ).status,
-      200,
-    );
-    await action(user, "sos", { text: "Someone is following me." });
-    const receiver = await (await request("join/" + partner.token)).json();
-    assert.equal(receiver.incident.calls.length, 1);
-    assert.equal(receiver.incident.calls[0].memberId, receiver.member.id);
-    const call = receiver.incident.calls[0];
-    const answer = {
-      action: "call-event",
-      incidentId: user.state.incident.id,
-      callId: call.id,
-      attempt: call.attempt,
-      seq: call.seq,
-      eventId: randomUUID(),
-      kind: "answer",
-    };
-    assert.equal(
-      (await request("join/" + partner.token, "", answer)).status,
-      200,
-    );
-    assert.equal(
-      (await (await request("join/" + partner.token, "", answer)).json())
-        .duplicate,
-      true,
-    );
-    assert.equal(
-      (
-        await request("join/" + contact.token, "", {
-          ...answer,
-          eventId: randomUUID(),
-        })
-      ).status,
-      400,
-    );
-    const privateView = await (await request("join/" + partner.token)).json();
-    assert.equal(privateView.incident.calls[0].state, "CONVERSING");
-    const sourceId = randomUUID();
-    assert.equal(
-      (
-        await request("join/" + partner.token, "", {
-          action: "call-message",
-          incidentId: user.state.incident.id,
-          callId: call.id,
-          attempt: call.attempt,
-          messageId: sourceId,
-          text: "Maybe, let me ask the manager.",
-        })
-      ).status,
-      200,
-    );
-    assert.equal(
-      receiver.incident.location,
-      null,
-      "unconfirmed partner must not see walker location",
-    );
-    assert.ok(
-      (await (await request("join/" + contact.token)).json()).incident.location,
-    );
-    assert.equal(
-      (await request("join/" + contact.token + "/record")).status,
-      404,
-    );
-    assert.equal(
-      (await request("record/" + user.state.incident.id, stranger.cookie))
-        .status,
-      404,
-    );
-    assert.equal(
-      (
-        await request("join/" + partner.token, "", {
-          action: "reply",
-          incidentId: user.state.incident.id,
-          text: "I accept. You can wait here.",
-        })
-      ).status,
-      200,
-    );
-    user.state = await (await request("state", user.cookie)).json();
-    assert.equal(
-      user.state.incident.plans.length,
-      0,
-      "live routing must not invent a fallback when maps are absent",
-    );
-    const oldId = user.state.incident.id;
-    const liveUser = user;
-    user = await client(true);
-    assert.equal(user.state.incident.mode, "DEMO");
-    assert.notEqual(user.state.id, liveUser.state.id);
-    await action(liveUser, "demo", { locale: "en", ai: false }, 400);
-    await action(liveUser, "new", { mode: "DEMO", locale: "vi" }, 400);
-    const combinedCookies = liveUser.cookie + "; " + user.cookie;
-    assert.equal(
-      (await (await request("state", combinedCookies)).json()).incident.id,
-      oldId,
-    );
-    assert.equal(
-      (await (await request("state?scope=demo", combinedCookies)).json())
-        .incident.id,
-      user.state.incident.id,
-    );
-    await action(user, "new", { mode: "DEMO", locale: "vi" });
-    await action(user, "sos", { text: "Use the separate team room." }, 400);
-    assert.equal(
-      user.state.incident.demo,
-      null,
-      "SOS must not start judge choreography",
-    );
-    await action(user, "covert", { enabled: true, incidentId: oldId }, 400);
-    await action(user, "ai", { enabled: true, consent: true }, 400);
-    await action(user, "demo", { locale: "en", ai: false });
-    for (let n = 0; n < 5; n++) await action(user, "next");
-    assert.ok(user.state.incident.plans[0].acceptedAt);
-    assert.equal(user.state.incident.replies.length, 5);
-    const audioId = randomUUID(),
-      bytes = Buffer.from([0, 1, 2, 3, 4]);
-    const upload = (seq: number, value = bytes, mime = "audio/webm") =>
-      fetch(
-        `${base}/api/audio/${user.state.incident.id}?id=${audioId}&seq=${seq}`,
+  assert.equal(
+    (await post(`incidents/${id}/ai/enable`, { enabled: true, consent: false }))
+      .status,
+    409,
+  );
+  assert.equal(
+    (
+      await post(
+        "ai/test",
+        {},
         {
-          method: "POST",
-          headers: {
-            Cookie: user.cookie,
-            Origin: base,
-            "Content-Type": mime,
-            "x-guardian-mode": "demo",
-          },
-          body: value,
+          "Content-Type": "application/json",
+          Cookie: cookie,
+          Origin: new URL(base).origin,
         },
-      );
-    assert.equal(
-      (await upload(0)).status,
-      400,
-      "recording must require consent",
-    );
-    await action(user, "recording-consent", { consent: true });
-    assert.equal((await upload(1)).status, 400);
-    assert.equal((await upload(0)).status, 200);
-    assert.equal(
-      (await upload(0)).status,
-      200,
-      "identical retry should be idempotent",
-    );
-    assert.equal((await upload(0, Buffer.from([5]))).status, 400);
-    assert.equal((await upload(1, bytes, "audio/ogg")).status, 400);
-    const audio = await request(
-      `audio/${user.state.incident.id}/${audioId}`,
-      user.cookie,
-    );
-    assert.deepEqual(Buffer.from(await audio.arrayBuffer()), bytes);
-    const record = await (
-      await request(`record/${user.state.incident.id}?format=json`, user.cookie)
-    ).json();
-    assert.equal(
-      record.incident.recordings[0].hash,
-      createHash("sha256").update(bytes).digest("hex"),
-    );
-    for (let n = 0; n < 4; n++) await action(user, "next");
-    assert.equal(user.state.incident.demo.status, "DONE");
-    assert.equal(user.state.incident.status, "SIGNAL_LOST");
-    assert.equal(user.state.incident.plans.length, 3);
-    assert.ok(
-      user.state.incident.plans.every(
-        (p: { invalidatedAt: string }) => p.invalidatedAt,
-      ),
-    );
-    const html = await (
-      await request(`record/${user.state.incident.id}?lang=en`, user.cookie)
-    ).text();
-    assert.ok(html.includes("Incident record"));
-    const sse = await fetch(base + "/api/stream", {
-      headers: { Cookie: user.cookie, "x-guardian-mode": "demo" },
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (await post("incidents", { aiEnabled: true, aiConsent: false })).status,
+    400,
+  );
+  if (!aiConfig.configured)
+    assert.equal((await post("ai/test", {})).status, 409);
+  assert.equal(
+    (
+      await post(
+        `incidents/${id}/inject`,
+        { action: "GPS_STALE" },
+        { "Content-Type": "application/json", Cookie: cookie },
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await post(
+        `incidents/${id}/sos`,
+        { text: "SOS" },
+        { ...headers, Origin: "https://untrusted.invalid" },
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await post(`incidents/${id}/location`, {
+        lat: 999,
+        lng: 0,
+        consent: true,
+      })
+    ).status,
+    400,
+  );
+  const second = await fetch(base + "/api/session"),
+    otherCookie = second.headers.get("set-cookie")!.split(";")[0];
+  assert.equal(
+    (
+      await fetch(base + `/api/incidents/${id}`, {
+        headers: { Cookie: otherCookie },
+      })
+    ).status,
+    404,
+  );
+  const controller = new AbortController(),
+    stream = await fetch(base + `/api/incidents/${id}/stream`, {
+      headers: { Cookie: cookie },
+      signal: controller.signal,
     });
-    const reader = sse.body!.getReader();
-    assert.ok(
-      new TextDecoder()
-        .decode((await reader.read()).value)
-        .startsWith("data: "),
-    );
-    await reader.cancel();
-    await action(user, "cancel");
-    await action(user, "delete-transcript");
-    assert.equal(user.state.incident.transcript.length, 0);
-    assert.equal(
-      (await request(`audio/${user.state.incident.id}/${audioId}`, user.cookie))
-        .status,
-      404,
-    );
-    const team = await client("team");
-    assert.equal(team.state.incident.mode, "TEAM");
-    await action(team, "sos", { text: "Help me in this roleplay." });
-    assert.equal(team.state.incident.replies.length, 0);
-    assert.equal(team.state.incident.coordination.calls.length, 0);
-    const teammate = await (
-      await request("members", team.cookie, { name: "Dung", role: "CONTACT" })
-    ).json();
-    assert.equal(
-      (
-        await request("join/" + teammate.token, "", {
-          action: "join",
-          consent: true,
-          calls: true,
-        })
-      ).status,
-      200,
-    );
-    const roleView = await (await request("join/" + teammate.token)).json();
-    assert.equal(roleView.mode, "TEAM");
-    assert.equal(roleView.incident.calls.length, 1);
-    assert.equal(roleView.incident.calls[0].name, "Dung");
-    assert.equal(roleView.incident.calls[0].state, "CALLING");
-    assert.equal(roleView.incident.calls[0].adapter, "IN_APP");
-    await action(team, "demo", { locale: "en", ai: false }, 400);
-    assert.equal(
-      (
-        await request("members", user.cookie, {
-          name: "Wrong scope",
-          role: "CONTACT",
-        })
-      ).status,
-      400,
-    );
-    console.log(
-      "PASS: page delivery; session isolation; CSRF; recipient consent and location privacy; stale session rejection; live route fail-closed; full demo; audio consent, idempotency and bytes; report; SSE; record deletion.",
-    );
-  } finally {
-    server.kill();
-    await new Promise<void>((resolve) => {
-      if (server.exitCode !== null) resolve();
-      else server.once("exit", () => resolve());
+  assert.ok(stream.headers.get("content-type")?.includes("text/event-stream"));
+  const reader = stream.body!.getReader();
+  let streamText = "";
+  const monitor = (async () => {
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        streamText += new TextDecoder().decode(value);
+      }
+    } catch {
+      /* Expected on abort. */
+    }
+  })();
+  const sos = await post(`incidents/${id}/sos`, {
+    text: "Guardian, có người đang đi theo tôi. Hãy giúp tôi.",
+  });
+  assert.equal(sos.status, 202);
+  async function snapshot() {
+    const r = await fetch(base + `/api/incidents/${id}`, {
+      headers: { Cookie: cookie },
     });
+    assert.equal(r.status, 200);
+    return r.json();
   }
+  async function until(predicate: (s: Incident) => boolean) {
+    for (let n = 0; n < 120; n++) {
+      const s = await snapshot();
+      if (predicate(s)) return s;
+      await sleep(100);
+    }
+    throw new Error("Timed out waiting for backend state");
+  }
+  const researched = await until((s) => s.places.length >= 3 && !s.running);
+  assert.equal(researched.status, "CONTACTING");
+  assert.equal(
+    (await post(`incidents/${id}/calls/start`, { provider: "MOCK" })).status,
+    202,
+  );
+  const routed = await until((s) => s.plans.length === 1 && !s.running);
+  assert.deepEqual(
+    routed.calls.map((c: { status: string }) => c.status).sort(),
+    ["DECLINED", "CONFIRMED", "NO_ANSWER"].sort(),
+  );
+  const blocked = await post(`incidents/${id}/inject`, {
+    action: "ROAD_BLOCKED",
+  });
+  assert.equal(blocked.status, 202);
+  assert.equal(blocked.body.plans.length, 2);
+  assert.equal(blocked.body.plans[0].superseded, true);
+  const replay = await fetch(base + `/api/incidents/${id}/replay`, {
+    headers: { Cookie: cookie },
+  });
+  assert.ok((await replay.json()).length > 10);
+  assert.ok(streamText.includes("SOS_TRIGGERED"));
+  assert.ok(streamText.includes("CONFIRMED"));
+  const reset = await post(`incidents/${id}/reset`, {});
+  assert.equal(reset.status, 201);
+  await sleep(100);
+  assert.ok(
+    streamText.includes(reset.body.id),
+    "SSE must follow new incident across tabs",
+  );
+  controller.abort();
+  await monitor;
+  const previous = await snapshot();
+  assert.equal(previous.status, "USER_CANCELLED");
+  assert.equal(
+    (await post(`incidents/${id}/route/accept`, {})).status,
+    409,
+    "Closed incidents cannot resume guiding",
+  );
+  assert.equal((await post(`incidents/${id}/freeze`, {})).status, 409);
+  assert.equal(reset.body.plans.length, 0);
+  assert.equal((await fetch(base + "/demo/phone")).status, 200);
+  assert.equal((await fetch(base + "/demo/control")).status, 200);
+  assert.equal((await fetch(base + "/demo/calls")).status, 200);
+  assert.equal((await fetch(base + "/demo/architecture")).status, 200);
+  const demo = await post(`incidents/${reset.body.id}/demo/run`, {
+    demoCase: "CLARIFY",
+    needs: emptyNeeds(),
+    text: "Tôi cần một nơi chờ trong demo",
+  });
+  assert.equal(demo.status, 202);
+  const demoId = demo.body.id;
+  async function demoState() {
+    return (
+      await fetch(base + `/api/incidents/${demoId}`, {
+        headers: { Cookie: cookie },
+      })
+    ).json() as Promise<Incident>;
+  }
+  let demoSnapshot = await demoState();
+  for (
+    let n = 0;
+    n < 150 && (demoSnapshot.running || !demoSnapshot.calls.length);
+    n++
+  ) {
+    await sleep(100);
+    demoSnapshot = await demoState();
+  }
+  const proposal = demoSnapshot.plans.find((p) => !p.superseded)!;
+  assert.ok(proposal);
+  assert.ok(demoSnapshot.calls.some((c) => (c.questions?.length ?? 0) > 1));
+  assert.equal(
+    (
+      await post(`incidents/${demoId}/route/accept`, {
+        planId: "obsolete-plan",
+      })
+    ).status,
+    409,
+  );
+  const liveStatus = await post(`incidents/${demoId}/tool`, { name: "get_status", args: {} });
+  assert.equal(liveStatus.status, 200);
+  const coordination = JSON.parse(liveStatus.body.output).coordination;
+  assert.equal(coordination.plan.id, proposal.id);
+  assert.equal(coordination.guidance, "AWAITING_ACCEPTANCE");
+  assert.deepEqual(coordination.plan.route.steps, []);
+  assert.equal((await post(`incidents/${demoId}/tool`, { name: "accept_route", args: {} })).status, 400);
+  assert.equal((await post(`incidents/${demoId}/tool`, { name: "accept_route", args: { plan_id: "obsolete-plan" } })).status, 409);
+  assert.equal(
+    (
+      await post(`incidents/${demoId}/handoff`, {
+        side: "USER",
+        planId: proposal.id,
+      })
+    ).status,
+    409,
+  );
+  assert.equal(
+    (await post(`incidents/${demoId}/route/accept`, { planId: proposal.id }))
+      .status,
+    202,
+  );
+  const selectedCall = demoSnapshot.calls.find(
+    (c) => c.placeId === proposal.selectedPlaceId,
+  )!;
+  assert.equal(
+    (
+      await post(`incidents/${demoId}/demo/update`, {
+        callId: selectedCall.id,
+        generation: selectedCall.generation + 1,
+        text: "Đồng ý tiếp nhận",
+      })
+    ).status,
+    409,
+  );
+  assert.equal(
+    (
+      await post(`incidents/${demoId}/demo/family`, {
+        action: "ON_THE_WAY",
+        arrivalMinutes: 6,
+      })
+    ).status,
+    202,
+  );
+  assert.equal(
+    (
+      await post(`incidents/${demoId}/handoff`, {
+        side: "USER",
+        planId: proposal.id,
+      })
+    ).status,
+    202,
+  );
+  assert.notEqual((await demoState()).status, "CLOSED");
+  assert.equal(
+    (
+      await post(
+        `incidents/${demoId}/handoff`,
+        { side: "PARTNER", planId: proposal.id },
+        { ...headers, "x-operator-token": "" },
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    (
+      await post(`incidents/${demoId}/handoff`, {
+        side: "PARTNER",
+        planId: proposal.id,
+      })
+    ).status,
+    202,
+  );
+  assert.equal((await demoState()).status, "CLOSED");
+  const historyResponse = await fetch(base + `/api/incidents/${demoId}/report-history`, { headers: { Cookie: cookie } });
+  assert.equal(historyResponse.status, 200);
+  const history = await historyResponse.json();
+  assert.equal(history.integrity.valid, true);
+  assert.ok(history.revisions.length > 1);
+  assert.ok(history.revisions.some((r: { snapshot: Incident }) => r.snapshot.routeDecisions?.length));
+  assert.equal((await fetch(base + `/api/incidents/${demoId}/report-history`, { headers: { Cookie: otherCookie } })).status, 404);
+  const report = await (await fetch(base + `/api/incidents/${demoId}/evidence?format=json`, { headers: { Cookie: cookie } })).json();
+  assert.equal(report.schemaVersion, 2);
+  assert.ok(report.plans.length && report.routeDecisions.length && report.handoff.completedAt);
+  assert.equal((await post(`incidents/${demoId}/transcript/delete`, {})).status, 202);
+  const redacted = await (await fetch(base + `/api/incidents/${demoId}/report-history`, { headers: { Cookie: cookie } })).json();
+  assert.equal(redacted.revisions.length, 1, "Explicit transcript deletion also removes historical report payloads");
+  assert.deepEqual(redacted.revisions[0].snapshot.routeDecisions, []);
+  assert.ok(redacted.revisions[0].snapshot.calls.every((c: Incident["calls"][number]) => !c.transcript.length && !c.support));
+  assert.equal(redacted.integrity.valid, true);
+  const spokenDemo = await post(`incidents/${demoId}/demo/showcase`, { pace: "QUICK", voiceEnabled: true });
+  assert.equal(spokenDemo.status, 202);
+  const spokenId = spokenDemo.body.id;
+  const spokenState = async () => (await (await fetch(base + `/api/incidents/${spokenId}`, { headers: { Cookie: cookie } })).json()) as Incident;
+  const opening = await spokenState();
+  assert.equal(opening.showcase?.step, 0);
+  assert.equal(opening.showcase?.voiceEnabled, true);
+  const narrationId = opening.showcase!.narrationId!;
+  assert.equal((await post(`incidents/${spokenId}/demo/narration`, { narrationId, playback: "FINISHED" }, { ...headers, "x-operator-token": "" })).status, 403);
+  assert.equal((await post(`incidents/${spokenId}/demo/narration`, { narrationId: "00000000-0000-4000-8000-000000000000", playback: "FINISHED" })).body.applied, false);
+  assert.equal((await post(`incidents/${spokenId}/freeze`, {})).status, 202);
+  assert.equal((await post(`incidents/${spokenId}/demo/narration`, { narrationId, playback: "SKIPPED" })).body.applied, true);
+  assert.equal((await spokenState()).showcase?.step, 0, "A skip must not defeat pause");
+  assert.equal((await post(`incidents/${spokenId}/demo/pacing`, { pace: "PRESENTATION", voiceEnabled: false })).status, 202);
+  assert.equal((await spokenState()).showcase?.pace, "PRESENTATION");
+  assert.equal((await post(`incidents/${spokenId}/demo/stop`, {})).status, 202);
+  assert.equal((await post(`incidents/${spokenId}/demo/narration`, { narrationId, playback: "FINISHED" })).body.applied, false);
+  assert.equal((await spokenState()).showcase?.status, "STOPPED");
+  const world = await post("incidents", { placesAdapter: "CITY", routeAdapter: "CITY" });
+  assert.equal(world.status, 201);
+  const worldId = world.body.id;
+  assert.equal(world.body.places.length, 30);
+  assert.ok(world.body.places.every((p: Incident["places"][number]) => p.profile?.sourceKind === "SIMULATED"));
+  assert.equal((await post(`incidents/${worldId}/world/time`, { time: "25:00" })).status, 400);
+  assert.equal((await post(`incidents/${worldId}/world/time`, { time: "23:30" }, { ...headers, "x-operator-token": "" })).status, 403);
+  const night = await post(`incidents/${worldId}/world/time`, { time: "23:30" });
+  assert.equal(night.status, 202);
+  assert.equal(night.body.places.find((p: Incident["places"][number]) => p.id === "c").openingStatus, "CLOSED");
+  assert.equal((await post(`incidents/${worldId}/world/time`, { time: "22:15" })).status, 202);
+  const extraSlot = await post("network/members", { role: "PARTNER", name: "Vai cà phê đêm QA", slot: "cafe-night" });
+  assert.equal(extraSlot.status, 201);
+  assert.equal(extraSlot.body.slot, "cafe-night");
+  console.log(
+    "PASS: HTTP state flow, policy/operator, origin, validation, session isolation, SSE, revision, replay, reset, demo clarification, stale callbacks/acceptance, family and two-sided handoff, 5 pages. No external calls.",
+  );
 }
-void main().catch((e) => {
-  console.error(e instanceof Error ? e.message : e);
+main().catch((e) => {
+  console.error(e);
   process.exitCode = 1;
 });

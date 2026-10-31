@@ -1,661 +1,147 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T06:10:37.671898+00:00",
+  "generatedAt": "2026-10-29T00:00:00Z",
   "title": "Design System: Guardian AI",
   "extensions": {
     "colorMeta": {
-      "bg": {
-        "displayName": "Bg",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00442 254.64)",
-          "oklch(27.0% 0.01502 254.64)",
-          "oklch(38.0% 0.02208 254.64)",
-          "oklch(50.0% 0.02208 254.64)",
-          "oklch(61.0% 0.02208 254.64)",
-          "oklch(73.0% 0.01988 254.64)",
-          "oklch(84.0% 0.01178 254.64)",
-          "oklch(95.0% 0.00368 254.64)"
-        ]
-      },
-      "panel": {
-        "displayName": "Panel",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00605 253.21)",
-          "oklch(27.0% 0.02056 253.21)",
-          "oklch(38.0% 0.03023 253.21)",
-          "oklch(50.0% 0.03023 253.21)",
-          "oklch(61.0% 0.03023 253.21)",
-          "oklch(73.0% 0.02721 253.21)",
-          "oklch(84.0% 0.01612 253.21)",
-          "oklch(95.0% 0.00504 253.21)"
-        ]
-      },
-      "panel2": {
-        "displayName": "Panel2",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00726 252.53)",
-          "oklch(27.0% 0.02469 252.53)",
-          "oklch(38.0% 0.0363 252.53)",
-          "oklch(50.0% 0.0363 252.53)",
-          "oklch(61.0% 0.0363 252.53)",
-          "oklch(73.0% 0.03267 252.53)",
-          "oklch(84.0% 0.01936 252.53)",
-          "oklch(95.0% 0.00605 252.53)"
-        ]
-      },
-      "border": {
-        "displayName": "Border",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00736 252.1)",
-          "oklch(27.0% 0.02504 252.1)",
-          "oklch(38.0% 0.03682 252.1)",
-          "oklch(50.0% 0.03682 252.1)",
-          "oklch(61.0% 0.03682 252.1)",
-          "oklch(73.0% 0.03314 252.1)",
-          "oklch(84.0% 0.01964 252.1)",
-          "oklch(95.0% 0.00614 252.1)"
-        ]
-      },
-      "text": {
-        "displayName": "Text",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00276 247.97)",
-          "oklch(27.0% 0.00938 247.97)",
-          "oklch(38.0% 0.0138 247.97)",
-          "oklch(50.0% 0.0138 247.97)",
-          "oklch(61.0% 0.0138 247.97)",
-          "oklch(73.0% 0.01242 247.97)",
-          "oklch(84.0% 0.00736 247.97)",
-          "oklch(95.0% 0.0023 247.97)"
-        ]
-      },
-      "muted": {
-        "displayName": "Muted",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00591 251.52)",
-          "oklch(27.0% 0.02011 251.52)",
-          "oklch(38.0% 0.02957 251.52)",
-          "oklch(50.0% 0.02957 251.52)",
-          "oklch(61.0% 0.02957 251.52)",
-          "oklch(73.0% 0.02662 251.52)",
-          "oklch(84.0% 0.01577 251.52)",
-          "oklch(95.0% 0.00493 251.52)"
-        ]
-      },
-      "cyan": {
-        "displayName": "Cyan",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02844 174.29)",
-          "oklch(27.0% 0.0967 174.29)",
-          "oklch(38.0% 0.1422 174.29)",
-          "oklch(50.0% 0.1422 174.29)",
-          "oklch(61.0% 0.1422 174.29)",
-          "oklch(73.0% 0.12798 174.29)",
-          "oklch(84.0% 0.07584 174.29)",
-          "oklch(95.0% 0.0237 174.29)"
-        ]
-      },
-      "blue": {
-        "displayName": "Blue",
-        "role": "secondary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02408 254.42)",
-          "oklch(27.0% 0.08187 254.42)",
-          "oklch(38.0% 0.1204 254.42)",
-          "oklch(50.0% 0.1204 254.42)",
-          "oklch(61.0% 0.1204 254.42)",
-          "oklch(73.0% 0.10836 254.42)",
-          "oklch(84.0% 0.06421 254.42)",
-          "oklch(95.0% 0.02007 254.42)"
-        ]
-      },
-      "amber": {
-        "displayName": "Amber",
-        "role": "secondary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02133 74.47)",
-          "oklch(27.0% 0.07252 74.47)",
-          "oklch(38.0% 0.10665 74.47)",
-          "oklch(50.0% 0.10665 74.47)",
-          "oklch(61.0% 0.10665 74.47)",
-          "oklch(73.0% 0.09599 74.47)",
-          "oklch(84.0% 0.05688 74.47)",
-          "oklch(95.0% 0.01778 74.47)"
-        ]
-      },
-      "red": {
-        "displayName": "Red",
-        "role": "secondary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02643 18.33)",
-          "oklch(27.0% 0.08986 18.33)",
-          "oklch(38.0% 0.13215 18.33)",
-          "oklch(50.0% 0.13215 18.33)",
-          "oklch(61.0% 0.13215 18.33)",
-          "oklch(73.0% 0.11893 18.33)",
-          "oklch(84.0% 0.07048 18.33)",
-          "oklch(95.0% 0.02202 18.33)"
-        ]
-      },
-      "primary-fill": {
-        "displayName": "Primary Fill",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02258 170.8)",
-          "oklch(27.0% 0.07676 170.8)",
-          "oklch(38.0% 0.11289 170.8)",
-          "oklch(50.0% 0.11289 170.8)",
-          "oklch(61.0% 0.11289 170.8)",
-          "oklch(73.0% 0.1016 170.8)",
-          "oklch(84.0% 0.06021 170.8)",
-          "oklch(95.0% 0.01881 170.8)"
-        ]
-      },
-      "primary-hover": {
-        "displayName": "Primary Hover",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.01632 172.34)",
-          "oklch(27.0% 0.0555 172.34)",
-          "oklch(38.0% 0.08162 172.34)",
-          "oklch(50.0% 0.08162 172.34)",
-          "oklch(61.0% 0.08162 172.34)",
-          "oklch(73.0% 0.07346 172.34)",
-          "oklch(84.0% 0.04353 172.34)",
-          "oklch(95.0% 0.0136 172.34)"
-        ]
-      },
-      "primary-ink": {
-        "displayName": "Primary Ink",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.00791 172.68)",
-          "oklch(27.0% 0.02689 172.68)",
-          "oklch(38.0% 0.03954 172.68)",
-          "oklch(50.0% 0.03954 172.68)",
-          "oklch(61.0% 0.03954 172.68)",
-          "oklch(73.0% 0.03559 172.68)",
-          "oklch(84.0% 0.02109 172.68)",
-          "oklch(95.0% 0.00659 172.68)"
-        ]
-      },
-      "control-hover": {
-        "displayName": "Control Hover",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.0085 245.71)",
-          "oklch(27.0% 0.02891 245.71)",
-          "oklch(38.0% 0.04252 245.71)",
-          "oklch(50.0% 0.04252 245.71)",
-          "oklch(61.0% 0.04252 245.71)",
-          "oklch(73.0% 0.03826 245.71)",
-          "oklch(84.0% 0.02267 245.71)",
-          "oklch(95.0% 0.00709 245.71)"
-        ]
-      },
-      "field-border": {
-        "displayName": "Field Border",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00942 250.08)",
-          "oklch(27.0% 0.03202 250.08)",
-          "oklch(38.0% 0.04709 250.08)",
-          "oklch(50.0% 0.04709 250.08)",
-          "oklch(61.0% 0.04709 250.08)",
-          "oklch(73.0% 0.04238 250.08)",
-          "oklch(84.0% 0.02511 250.08)",
-          "oklch(95.0% 0.00785 250.08)"
-        ]
-      },
-      "sos-fill": {
-        "displayName": "Sos Fill",
-        "role": "secondary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02403 13.97)",
-          "oklch(27.0% 0.0817 13.97)",
-          "oklch(38.0% 0.12014 13.97)",
-          "oklch(50.0% 0.12014 13.97)",
-          "oklch(61.0% 0.12014 13.97)",
-          "oklch(73.0% 0.10813 13.97)",
-          "oklch(84.0% 0.06408 13.97)",
-          "oklch(95.0% 0.02002 13.97)"
-        ]
-      },
-      "sos-rule": {
-        "displayName": "Sos Rule",
-        "role": "secondary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02336 12.65)",
-          "oklch(27.0% 0.07942 12.65)",
-          "oklch(38.0% 0.11679 12.65)",
-          "oklch(50.0% 0.11679 12.65)",
-          "oklch(61.0% 0.11679 12.65)",
-          "oklch(73.0% 0.10511 12.65)",
-          "oklch(84.0% 0.06229 12.65)",
-          "oklch(95.0% 0.01946 12.65)"
-        ]
-      },
-      "white": {
-        "displayName": "White",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.0 89.88)",
-          "oklch(27.0% 0.0 89.88)",
-          "oklch(38.0% 0.0 89.88)",
-          "oklch(50.0% 0.0 89.88)",
-          "oklch(61.0% 0.0 89.88)",
-          "oklch(73.0% 0.0 89.88)",
-          "oklch(84.0% 0.0 89.88)",
-          "oklch(95.0% 0.0 89.88)"
-        ]
-      },
-      "dock-active": {
-        "displayName": "Dock Active",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00819 177.6)",
-          "oklch(27.0% 0.02786 177.6)",
-          "oklch(38.0% 0.04097 177.6)",
-          "oklch(50.0% 0.04097 177.6)",
-          "oklch(61.0% 0.04097 177.6)",
-          "oklch(73.0% 0.03688 177.6)",
-          "oklch(84.0% 0.02185 177.6)",
-          "oklch(95.0% 0.00683 177.6)"
-        ]
-      },
-      "dock-rule": {
-        "displayName": "Dock Rule",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.01603 173.54)",
-          "oklch(27.0% 0.0545 173.54)",
-          "oklch(38.0% 0.08015 173.54)",
-          "oklch(50.0% 0.08015 173.54)",
-          "oklch(61.0% 0.08015 173.54)",
-          "oklch(73.0% 0.07214 173.54)",
-          "oklch(84.0% 0.04275 173.54)",
-          "oklch(95.0% 0.01336 173.54)"
-        ]
-      },
-      "phone-frame": {
-        "displayName": "Phone Frame",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00328 248.93)",
-          "oklch(27.0% 0.01116 248.93)",
-          "oklch(38.0% 0.01641 248.93)",
-          "oklch(50.0% 0.01641 248.93)",
-          "oklch(61.0% 0.01641 248.93)",
-          "oklch(73.0% 0.01476 248.93)",
-          "oklch(84.0% 0.00875 248.93)",
-          "oklch(95.0% 0.00273 248.93)"
-        ]
-      },
-      "phone-frame-border": {
-        "displayName": "Phone Frame Border",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00692 251.85)",
-          "oklch(27.0% 0.02353 251.85)",
-          "oklch(38.0% 0.0346 251.85)",
-          "oklch(50.0% 0.0346 251.85)",
-          "oklch(61.0% 0.0346 251.85)",
-          "oklch(73.0% 0.03114 251.85)",
-          "oklch(84.0% 0.01845 251.85)",
-          "oklch(95.0% 0.00577 251.85)"
-        ]
-      },
-      "phone-screen": {
-        "displayName": "Phone Screen",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.00546 249.29)",
-          "oklch(27.0% 0.01855 249.29)",
-          "oklch(38.0% 0.02728 249.29)",
-          "oklch(50.0% 0.02728 249.29)",
-          "oklch(61.0% 0.02728 249.29)",
-          "oklch(73.0% 0.02455 249.29)",
-          "oklch(84.0% 0.01455 249.29)",
-          "oklch(95.0% 0.00455 249.29)"
-        ]
-      },
-      "phone-mic": {
-        "displayName": "Phone Mic",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.01012 176.99)",
-          "oklch(27.0% 0.0344 176.99)",
-          "oklch(38.0% 0.05059 176.99)",
-          "oklch(50.0% 0.05059 176.99)",
-          "oklch(61.0% 0.05059 176.99)",
-          "oklch(73.0% 0.04553 176.99)",
-          "oklch(84.0% 0.02698 176.99)",
-          "oklch(95.0% 0.00843 176.99)"
-        ]
-      },
-      "phone-mic-text": {
-        "displayName": "Phone Mic Text",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.02196 174.24)",
-          "oklch(27.0% 0.07467 174.24)",
-          "oklch(38.0% 0.10981 174.24)",
-          "oklch(50.0% 0.10981 174.24)",
-          "oklch(61.0% 0.10981 174.24)",
-          "oklch(73.0% 0.09883 174.24)",
-          "oklch(84.0% 0.05856 174.24)",
-          "oklch(95.0% 0.0183 174.24)"
-        ]
-      },
-      "phone-mic-border": {
-        "displayName": "Phone Mic Border",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.01809 172.77)",
-          "oklch(27.0% 0.06151 172.77)",
-          "oklch(38.0% 0.09046 172.77)",
-          "oklch(50.0% 0.09046 172.77)",
-          "oklch(61.0% 0.09046 172.77)",
-          "oklch(73.0% 0.08141 172.77)",
-          "oklch(84.0% 0.04824 172.77)",
-          "oklch(95.0% 0.01508 172.77)"
-        ]
-      },
-      "phone-mic-hover": {
-        "displayName": "Phone Mic Hover",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.01194 175.55)",
-          "oklch(27.0% 0.04061 175.55)",
-          "oklch(38.0% 0.05972 175.55)",
-          "oklch(50.0% 0.05972 175.55)",
-          "oklch(61.0% 0.05972 175.55)",
-          "oklch(73.0% 0.05374 175.55)",
-          "oklch(84.0% 0.03185 175.55)",
-          "oklch(95.0% 0.00995 175.55)"
-        ]
-      },
-      "phone-mic-hover-border": {
-        "displayName": "Phone Mic Hover Border",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.0% 0.01818 174.81)",
-          "oklch(27.0% 0.0618 174.81)",
-          "oklch(38.0% 0.09088 174.81)",
-          "oklch(50.0% 0.09088 174.81)",
-          "oklch(61.0% 0.09088 174.81)",
-          "oklch(73.0% 0.08179 174.81)",
-          "oklch(84.0% 0.04847 174.81)",
-          "oklch(95.0% 0.01515 174.81)"
-        ]
-      },
-      "phone-nav": {
-        "displayName": "Phone Nav",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.0% 0.0051 249.31)",
-          "oklch(27.0% 0.01733 249.31)",
-          "oklch(38.0% 0.02548 249.31)",
-          "oklch(50.0% 0.02548 249.31)",
-          "oklch(61.0% 0.02548 249.31)",
-          "oklch(73.0% 0.02293 249.31)",
-          "oklch(84.0% 0.01359 249.31)",
-          "oklch(95.0% 0.00425 249.31)"
-        ]
-      },
-      "quiet-road": {
-        "displayName": "Quiet-road Lavender",
-        "role": "secondary",
-        "tonalRamp": [
-          "oklch(15.0% 0.01837 297.11)",
-          "oklch(27.0% 0.06246 297.11)",
-          "oklch(38.0% 0.09185 297.11)",
-          "oklch(50.0% 0.09185 297.11)",
-          "oklch(61.0% 0.09185 297.11)",
-          "oklch(73.0% 0.08266 297.11)",
-          "oklch(84.0% 0.04899 297.11)",
-          "oklch(95.0% 0.01531 297.11)"
-        ]
-      }
+      "ink": { "role": "primary", "displayName": "Ballpoint Blue-Black", "canonical": "#1b2550", "tonalRamp": ["#0c1128", "#141c3f", "#1b2550", "#2c3770", "#4a5378", "#8a90a8", "#c5ccec", "#eef0f8"] },
+      "ballpoint-blue": { "role": "primary", "displayName": "Ballpoint Blue", "canonical": "#2a4cc0", "tonalRamp": ["#14245e", "#1e3a8a", "#2a4cc0", "#4a6ad6", "#7f9cff", "#a9b8f5", "#c9d4ff", "#e8edfb"] },
+      "seal-red": { "role": "secondary", "displayName": "Seal Vermilion", "canonical": "#d22f27", "tonalRamp": ["#4a1a22", "#8f1d17", "#d22f27", "#ff5a4c", "#ff8a7f", "#ffb4ab", "#ffd3cf", "#fbe9e7"] },
+      "support-amber": { "role": "tertiary", "displayName": "Support-List Amber", "canonical": "#a86200", "tonalRamp": ["#3f2f12", "#6e4100", "#a86200", "#d08a1e", "#f0b44c", "#f7cf85", "#ffe3b0", "#fbf1dc"] },
+      "paper": { "role": "neutral", "displayName": "Cool Paper", "canonical": "#f6f7f5", "tonalRamp": ["#4a5378", "#8a90a8", "#a3a9b8", "#c8ccd4", "#e6e8e3", "#eef0ec", "#f6f7f5", "#ffffff"] },
+      "hairline": { "role": "neutral", "displayName": "Hairline Grey", "canonical": "#c8ccd4" },
+      "steel-rule": { "role": "neutral", "displayName": "Steel Rule", "canonical": "#a3a9b8" },
+      "ink-muted": { "role": "neutral", "displayName": "Faded Ink", "canonical": "#4a5378" },
+      "ink-struck": { "role": "neutral", "displayName": "Struck Ink", "canonical": "#8a90a8" },
+      "night-ground": { "role": "neutral", "displayName": "Night Ink Ground", "canonical": "#141c3f", "tonalRamp": ["#0f1533", "#141c3f", "#1a2350", "#212b5e", "#2c3770", "#3b4785", "#a9b2d6", "#eef0f8"] },
+      "night-blue": { "role": "primary", "displayName": "Night Ballpoint", "canonical": "#7f9cff" }
     },
     "typographyMeta": {
-      "headline": {
-        "displayName": "Headline",
-        "purpose": "Base operational h1; more specific surface headings vary."
-      },
-      "section": {
-        "displayName": "Section",
-        "purpose": "Base workspace h2."
-      },
-      "title": {
-        "displayName": "Title",
-        "purpose": "Base workspace h3."
-      },
-      "body": {
-        "displayName": "Body",
-        "purpose": "Operational text in Arial with Segoe UI fallback."
-      },
-      "label": {
-        "displayName": "Label",
-        "purpose": "Field labels and disclosures."
-      },
-      "metadata": {
-        "displayName": "Metadata",
-        "purpose": "Statuses, original quotes and compact supporting text."
-      }
+      "display": { "displayName": "Display", "purpose": "Page and receiver headings." },
+      "headline": { "displayName": "Headline", "purpose": "Panel titles and the selected venue name." },
+      "title": { "displayName": "Title", "purpose": "Card headings on the receiver page." },
+      "body": { "displayName": "Body", "purpose": "Default text; 16px at 1650px and wider." },
+      "clause": { "displayName": "Clause", "purpose": "Minute entries; helper names in 700." },
+      "minute-title": { "displayName": "Minute Title", "purpose": "Uppercase centered title of the minute over a 96px ink rule." },
+      "label": { "displayName": "Clause Label", "purpose": "Uppercase clause numbers and venue codes." }
     },
     "shadows": [
-      {
-        "name": "phone-frame",
-        "value": "0 18px 45px #0005",
-        "purpose": "Physical device frame."
-      },
-      {
-        "name": "phone-microphone",
-        "value": "0 9px 24px #0003",
-        "purpose": "Resting phone microphone action."
-      },
-      {
-        "name": "connected-voice-glow",
-        "value": "0 0 25px #3be1bd35",
-        "purpose": "Midpoint of the connected microphone animation; not amplitude."
-      }
+      { "name": "device-bezel", "value": "0 15px 40px rgba(8,12,36,0.15), 0 0 0 3px #141c3f", "purpose": "Phone shell only, so the phone reads as an object placed on paper." },
+      { "name": "modal-lift", "value": "0 30px 120px rgba(27,37,80,0.22)", "purpose": "Modal sheets over the blue-wash backdrop." },
+      { "name": "sos-lift", "value": "0 4px 14px rgba(8,12,36,0.3)", "purpose": "The phone SOS button." }
     ],
     "motion": [
-      {
-        "name": "button-state",
-        "value": "background 0.15s, border-color 0.15s",
-        "purpose": "Inherited button transitions; disabled under reduced motion."
-      },
-      {
-        "name": "panel-columns",
-        "value": "grid-template-columns 0.35s ease",
-        "purpose": "Workspace panel toggles; disabled under reduced motion."
-      },
-      {
-        "name": "route-framing",
-        "value": "900ms",
-        "purpose": "Map fitBounds; zero duration under reduced motion."
-      },
-      {
-        "name": "location-framing",
-        "value": "600ms",
-        "purpose": "Map easeTo; zero duration under reduced motion."
-      },
-      {
-        "name": "connected-voice-breathe",
-        "value": "voice-breathe 1.8s ease-in-out infinite",
-        "purpose": "Connected voice state, not microphone amplitude; disabled under reduced motion."
-      },
-      {
-        "name": "map-pitch-toggle",
-        "value": "500ms",
-        "purpose": "2D/3D pitch transition; zero duration under reduced motion."
-      },
-      {
-        "name": "sos-sweep",
-        "value": "sos-sweep 2.2s linear infinite",
-        "purpose": "Location-centered rotation during a 3.4s SOS display window; suppressed under reduced motion."
-      },
-      {
-        "name": "sos-ring",
-        "value": "sos-ring 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite",
-        "purpose": "Two expanding rings, second delayed 1.1s; scale 0.08 to 1 and opacity 0.9 to 0; disabled under reduced motion."
-      },
-      {
-        "name": "venue-discovery",
-        "value": "venue-discover 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Opacity 0 to 1, brightness 1.6 to 1; disabled under reduced motion."
-      }
+      { "name": "stamp", "value": "260ms cubic-bezier(0.16, 1, 0.3, 1); from opacity 0, rotate(-11deg) scale(1.35)", "purpose": "The seal landing on the confirmed clause. Disabled under prefers-reduced-motion." },
+      { "name": "state-transition", "value": "0.16s on background, border-color, color", "purpose": "Button hover and press." },
+      { "name": "live-pulse", "value": "pulse 2s infinite", "purpose": "Live dots and the listening voice ring." }
     ],
     "breakpoints": [
-      {
-        "name": "stacked",
-        "value": "760px"
-      },
-      {
-        "name": "two-column-upper-bound",
-        "value": "1099px"
-      }
+      { "name": "phone", "value": "800px" },
+      { "name": "laptop", "value": "1200px" },
+      { "name": "projector", "value": "1650px" }
     ]
   },
   "components": [
     {
-      "name": "Default action",
+      "name": "Default Button",
       "kind": "button",
       "refersTo": "button-default",
-      "description": "Observed operational action styling.",
-      "html": "<button class=\"ds-command-scope ds-button-default\">Show reference route</button>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-button-default{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;background:var(--panel2, #142232);color:var(--text, #e5edf5);border-color:var(--border, #223142);}.ds-button-default:hover{background:#1b3042;border-color:var(--cyan, #3be1bd);}.ds-button-default:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}.ds-button-default:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-default{transition:none;}}"
+      "description": "White sheet button with a steel stroke; the everyday control.",
+      "html": "<button class=\"ds-btn\">Đi theo tuyến</button>",
+      "css": ".ds-btn { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; font-weight: 500; background: #ffffff; color: #1b2550; border: 1px solid #a3a9b8; border-radius: 2px; padding: 9px 14px; cursor: pointer; transition: background .16s, border-color .16s, color .16s; } .ds-btn:hover { background: #eef0ec; border-color: #1b2550; } .ds-btn:focus-visible { outline: 2px solid #2a4cc0; outline-offset: 3px; }"
     },
     {
-      "name": "Primary action",
+      "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Observed operational action styling.",
-      "html": "<button class=\"ds-command-scope ds-button-primary\">Accept this plan</button>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-button-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;background:#72dfbd;color:#07261e;border-color:#72dfbd;}.ds-button-primary:hover{background:#a1ecd4;border-color:#a1ecd4;}.ds-button-primary:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}.ds-button-primary:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none;}}"
+      "description": "Ink-filled button for the one main action on a card.",
+      "html": "<button class=\"ds-btn-primary\">Bật chuông nhận cuộc gọi</button>",
+      "css": ".ds-btn-primary { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 14px; font-weight: 600; background: #1b2550; color: #ffffff; border: 1px solid #1b2550; border-radius: 2px; padding: 9px 14px; cursor: pointer; transition: background .16s, border-color .16s; } .ds-btn-primary:hover { background: #2a4cc0; border-color: #2a4cc0; } .ds-btn-primary:focus-visible { outline: 2px solid #2a4cc0; outline-offset: 3px; }"
     },
     {
-      "name": "SOS action",
+      "name": "SOS Button",
       "kind": "button",
       "refersTo": "button-sos",
-      "description": "Full-width SOS action inside the phone.",
-      "html": "<button class=\"ds-command-scope ds-button-sos\">I need help</button>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-button-sos{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;background:#943b48;color:#fff;border-color:#c86c78;width:100%;min-height:52px;border-radius:14px;font-size:14px;font-weight:700;}.ds-button-sos:hover{background:#943b48;border-color:#c86c78;}.ds-button-sos:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}.ds-button-sos:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-sos{transition:none;}}"
+      "description": "Seal-red emergency action on the phone companion.",
+      "html": "<button class=\"ds-btn-sos\"><span>SOS<small>Tôi cần hỗ trợ</small></span></button>",
+      "css": ".ds-btn-sos { font-family: 'Be Vietnam Pro', system-ui, sans-serif; display: flex; width: 280px; background: #d22f27; border: 1px solid #d22f27; color: #ffffff; border-radius: 2px; padding: 12px 14px; cursor: pointer; box-shadow: 0 4px 14px rgba(8,12,36,0.3); text-align: left; } .ds-btn-sos span { font-size: 16px; font-weight: 700; letter-spacing: 1.4px; } .ds-btn-sos small { display: block; font-size: 9px; font-weight: 400; letter-spacing: 0; color: #ffd3cf; margin-top: 2px; } .ds-btn-sos:hover { background: #ff5a4c; border-color: #ffd3cf; } .ds-btn-sos:focus-visible { outline: 2px solid #7f9cff; outline-offset: 3px; }"
     },
     {
-      "name": "Workspace field",
+      "name": "Text Field",
       "kind": "input",
       "refersTo": "input-field",
-      "description": "A general workspace field, also applied explicitly to companion fields.",
-      "html": "<label class=\"ds-command-scope ds-field-label\">Scenario time<input class=\"ds-field\" type=\"time\" value=\"22:15\"></label>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-field-label{display:block;font-family:Arial,\"Segoe UI\",sans-serif;font-size:13px;color:var(--text, #e5edf5);}.ds-field{display:block;margin-top:7px;width:100%;min-height:44px;padding:11px 12px;border:1px solid #3b5168;border-radius:8px;background:var(--bg, #080f18);color:var(--text, #e5edf5);font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;}.ds-field:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}"
+      "description": "White field with a hairline stroke and a blue caret.",
+      "html": "<label class=\"ds-label\">Phản hồi của bạn<textarea class=\"ds-input\" placeholder=\"Tôi đồng ý tiếp nhận...\"></textarea></label>",
+      "css": ".ds-label { display: flex; flex-direction: column; gap: 8px; font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-size: 12px; color: #1b2550; width: 300px; } .ds-input { font: inherit; font-size: 14px; background: #ffffff; color: #1b2550; border: 1px solid #c8ccd4; border-radius: 2px; padding: 10px; caret-color: #2a4cc0; outline: none; line-height: 1.5; } .ds-input:focus-visible { outline: 2px solid #2a4cc0; outline-offset: 3px; }"
     },
     {
-      "name": "Bottom navigation",
+      "name": "Tabs",
       "kind": "nav",
-      "refersTo": "dock-active",
-      "description": "Dock navigation for Companion, Support profiles and Record, shown in flow for preview; production pins it to the viewport.",
-      "html": "<nav class=\"ds-command-scope ds-dock\" aria-label=\"Workspace\"><button aria-pressed=\"true\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>Companion</button><button aria-pressed=\"false\">Support profiles</button><button aria-pressed=\"false\">Record</button></nav>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-dock{display:flex;gap:5px;padding:9px 12px;background:var(--panel, #101b28);border-top:1px solid var(--border, #223142);overflow-x:auto;}.ds-dock button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;padding:8px 10px;font-size:12px;white-space:nowrap;background:var(--panel2, #142232);color:var(--text, #e5edf5);}.ds-dock button:hover{border-color:var(--cyan, #3be1bd);background:#1b3042;}.ds-dock button[aria-pressed=\"true\"]{color:var(--cyan, #3be1bd);background:#15362f;border-color:#2e7966;}.ds-dock button:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-dock button{transition:none;}}"
+      "refersTo": "tab-active",
+      "description": "Underline tabs; the active one turns ballpoint blue.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab is-active\">Agent</button><button class=\"ds-tab\">Cuộc gọi</button><button class=\"ds-tab\">Dòng thời gian</button></nav>",
+      "css": ".ds-tabs { display: flex; gap: 22px; border-bottom: 1px solid #c8ccd4; padding: 0 19px; font-family: 'Be Vietnam Pro', system-ui, sans-serif; } .ds-tab { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; padding: 10px 0 12px; color: #4a5378; font-size: 11px; cursor: pointer; } .ds-tab:hover { color: #1b2550; } .ds-tab.is-active { color: #2a4cc0; border-bottom-color: #2a4cc0; } .ds-tab:focus-visible { outline: 2px solid #2a4cc0; outline-offset: 3px; }"
     },
     {
-      "name": "Source label",
-      "kind": "chip",
-      "refersTo": "source-label",
-      "description": "Explicit noninteractive simulation provenance.",
-      "html": "<span class=\"ds-command-scope ds-source\">SIMULATION</span>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-source{display:inline-flex;padding:5px 8px;border:1px solid #70532e;background:#251f17;color:var(--amber, #e9b66f);font-family:Arial,\"Segoe UI\",sans-serif;font-size:12px;line-height:1.4;font-weight:700;letter-spacing:.055em;white-space:nowrap;}"
-    },
-    {
-      "name": "Physical phone simulator",
-      "kind": "custom",
-      "refersTo": "phone-shell",
-      "description": "Invitation-bearing TEAM/LIVE example of the source-derived device frame; scripted DEMO directs invitations to TEAM. The preview is static.",
-      "html": "<section class=\"ds-command-scope ds-phone\" aria-label=\"Guardian AI phone simulator\"><div class=\"ds-phone-hardware\" aria-hidden=\"true\"></div><div class=\"ds-phone-status\"><time>22:15</time><span class=\"ds-island\" aria-hidden=\"true\"></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"2\" y=\"6\" width=\"16\" height=\"12\" rx=\"2\"/><path d=\"M22 10v4M6 10v4M10 10v4M14 10v4\"/></svg></div><div class=\"ds-phone-screen\"><div class=\"ds-phone-language\"><h2>Guardian AI</h2><button class=\"ds-new-session\" aria-label=\"New session\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M3 11a9 9 0 1 1 2.64 6.36M3 4v7h7\"/></svg></button><div><button aria-pressed=\"true\">VI</button><button aria-pressed=\"false\">EN</button></div></div><div class=\"ds-phone-content\"><h2>Your people</h2><p>Messages and commitments from people in this session.</p><details><summary>Manage invitations</summary><label>Recipient name<input placeholder=\"Name\"></label><button>Create invitation</button></details></div></div><nav class=\"ds-phone-nav\" aria-label=\"Phone views\"><button aria-label=\"Companion\" aria-pressed=\"false\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z\"/><path d=\"m9 12 2 2 4-4\"/></svg></button><button aria-label=\"Your people\" aria-pressed=\"true\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/></svg></button><button aria-label=\"Record\" aria-pressed=\"false\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z\"/><path d=\"M14 2v6h6M8 13h8M8 17h8\"/></svg></button></nav><div class=\"ds-home-indicator\" aria-hidden=\"true\"></div></section>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-phone{position:relative;width:100%;max-width:380px;height:780px;padding:8px;border:1px solid #3b4a5b;border-radius:44px;background:#050a10;color:#e5edf5;box-shadow:0 18px 45px #0005;isolation:isolate;min-width:0;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;line-height:1.6;}.ds-phone-status{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;font-size:12px;font-weight:600;}.ds-phone-status time{font-variant-numeric:tabular-nums;}.ds-island{position:absolute;top:17px;left:50%;transform:translateX(-50%);width:86px;height:22px;border-radius:20px;background:#000;}.ds-phone-screen{height:calc(100% - 122px);overflow-y:auto;overflow-x:hidden;background:#0d1823;border-radius:28px 28px 12px 12px;scrollbar-width:thin;scrollbar-color:#334b5c transparent;overscroll-behavior:contain;}.ds-phone-language{position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:3px;background:#0d1823;padding:15px 20px 0;}.ds-phone-language h2{font-size:17px;letter-spacing:-.03em;margin:0 auto 0 0;}.ds-phone button{min-height:44px;padding:7px 8px;border:1px solid #223142;border-radius:8px;background:#142232;color:#e5edf5;font-family:inherit;font-size:11px;cursor:pointer;}.ds-phone button:hover{border-color:#3be1bd;background:#1b3042;}.ds-phone button:focus-visible,.ds-phone input:focus-visible,.ds-phone summary:focus-visible{outline:3px solid #7db7ff;outline-offset:3px;}.ds-phone-language button[aria-pressed=\"true\"]{background:#3be1bd;color:#07261e;border-color:#3be1bd;}.ds-phone-content{padding:24px 20px;}.ds-phone-content h2{font-size:23px;line-height:1.3;margin:10px 0;}.ds-phone-content p{font-size:13px;color:#a5b4c5;}.ds-phone-content details{padding-top:14px;}.ds-phone-content summary{min-height:44px;cursor:pointer;}.ds-phone-content label{display:block;font-size:13px;}.ds-phone-content input{display:block;min-height:44px;margin:7px 0 12px;padding:11px 12px;border:1px solid #3b5168;border-radius:8px;background:#080f18;color:#e5edf5;font-family:inherit;}.ds-phone-nav{height:52px;display:flex;align-items:center;justify-content:space-around;padding:4px 28px;background:#09131d;border-radius:0 0 22px 22px;}.ds-phone-nav button{background:transparent;border:0;min-width:48px;color:#8da2b5;}.ds-phone-nav button[aria-pressed=\"true\"]{color:#6fdfbd;background:#132f2b;border-radius:13px;}.ds-home-indicator{width:105px;height:4px;border-radius:4px;background:#bdcbd4;margin:12px auto 0;}@media(max-width:760px){.ds-phone{max-width:370px;height:760px;}}.ds-phone-hardware{position:absolute;right:-3px;top:145px;width:3px;height:57px;background:#506070;border-radius:0 3px 3px 0;}.ds-phone-hardware:before{content:\"\";position:absolute;top:-45px;width:3px;height:28px;background:#506070;border-radius:0 3px 3px 0;}.ds-phone-nav button{display:inline-flex;align-items:center;justify-content:center;}.ds-phone-language .ds-new-session{min-width:44px;min-height:44px;padding:7px;display:inline-flex;align-items:center;justify-content:center;}@media(max-width:760px){.ds-phone-language{padding-left:16px;padding-right:16px;}.ds-phone-language h2{font-size:16px;}}"
-    },
-    {
-      "name": "In-app call disclosure",
-      "kind": "custom",
-      "refersTo": "call-row",
-      "description": "Completed call state stays blue with a phone icon; it does not certify a commitment.",
-      "html": "<details class=\"ds-command-scope ds-call-row\" open><summary><span class=\"ds-call-person\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.79a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.89.34 1.83.58 2.79.7A2 2 0 0 1 22 16.92Z\"/><path d=\"M14.05 2a9 9 0 0 1 8 7.94M14.05 6A5 5 0 0 1 18 10\"/></svg><b>Linh</b></span><span>Completed</span><small>Support inquiry</small></summary><p class=\"ds-call-meta\">In-app channel</p><ol class=\"ds-call-conversation\"><li><span>Guardian AI</span><p>What support can you offer?</p></li><li class=\"ds-recipient-turn\"><span>Linh</span><p>I can stay in touch.</p><small>Recipient statement ? preserved verbatim</small></li></ol></details>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-call-row{padding:10px 0;border-bottom:1px solid var(--border);color:var(--text);font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;line-height:1.6;}.ds-call-row>summary{min-height:64px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;padding:6px 0;cursor:pointer;}.ds-call-person{display:flex;align-items:center;gap:7px;color:var(--blue);}.ds-call-row>summary>span:nth-child(2){font-size:12px;color:var(--blue);}.ds-call-row>summary>small{width:100%;font-size:12px;color:var(--muted);}.ds-call-row>summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px;}.ds-call-meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere;}.ds-call-conversation{list-style:none;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:12px;}.ds-call-conversation li{padding:12px;background:var(--panel2);border-radius:12px;line-height:1.6;}.ds-call-conversation .ds-recipient-turn{background:var(--bg);}.ds-call-conversation li>span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}.ds-call-conversation p{margin:6px 0;font-size:14px;overflow-wrap:anywhere;}.ds-call-conversation small{font-size:12px;color:var(--muted);}.ds-call-row.ds-declined .ds-call-person,.ds-call-row.ds-error .ds-call-person{color:var(--red);}"
-    },
-    {
-      "name": "Commitment row",
+      "name": "Panel",
       "kind": "card",
-      "refersTo": "commitment-row",
-      "description": "Original human response beside an explicit semantic state.",
-      "html": "<article class=\"ds-command-scope ds-commitment\"><b>Linh</b><span class=\"ds-on-the-way\">On the way</span><q>I am on my way, about 10 minutes.</q></article>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-commitment{display:flex;flex-direction:column;gap:7px;padding:12px 0;border-top:1px solid var(--border, #223142);color:var(--text, #e5edf5);font-family:Arial,\"Segoe UI\",sans-serif;}.ds-commitment b{font-size:14px;}.ds-commitment span{font-size:12px;color:var(--amber, #e9b66f);}.ds-commitment q{font-size:12px;line-height:1.5;font-style:italic;color:var(--muted, #a5b4c5);overflow-wrap:anywhere;}.ds-commitment .ds-on-the-way{color:var(--blue);}.ds-commitment .ds-accepted{color:var(--cyan);}.ds-commitment .ds-revoked,.ds-commitment .ds-declined{color:var(--red);}"
+      "refersTo": "panel",
+      "description": "Top-level sheet framed by a 1px ink rule, no shadow.",
+      "html": "<section class=\"ds-panel\"><h2>Quán Cháo Ấm</h2><p>Đã nhận · tuyến v1</p></section>",
+      "css": ".ds-panel { font-family: 'Be Vietnam Pro', system-ui, sans-serif; background: #ffffff; border: 1px solid #1b2550; border-radius: 2px; padding: 20px; width: 300px; color: #1b2550; } .ds-panel h2 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.3px; } .ds-panel p { margin: 6px 0 0; font-size: 12px; color: #4a5378; }"
     },
     {
-      "name": "Phone microphone",
-      "kind": "button",
-      "refersTo": "phone-microphone",
-      "description": "108px voice action, reduced to 72px with a plan or LIVE setup; glow means connected, not amplitude.",
-      "html": "<button class=\"ds-command-scope ds-phone-mic ds-connected\" aria-label=\"End voice\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><rect x=\"9\" y=\"2\" width=\"6\" height=\"12\" rx=\"3\"/><path d=\"M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8\"/></svg></button>",
-      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-phone-mic{display:flex;align-items:center;justify-content:center;width:108px;height:108px;min-height:44px;margin:0 auto 12px;border-radius:50%;background:#123e35;color:#7eebce;border:1px solid #3c927b;box-shadow:0 9px 24px #0003;cursor:pointer;transition:background .15s,border-color .15s;}.ds-phone-mic:hover{background:#1c5145;border-color:#9df4dc;}.ds-phone-mic:focus-visible{outline:3px solid #a9c0ff;outline-offset:3px;}.ds-phone-mic:disabled{opacity:.45;cursor:not-allowed;}.ds-phone-mic.ds-connected{animation:ds-phone-breathe 1.8s ease-in-out infinite;}.ds-phone-mic.ds-has-plan,.ds-phone-mic.ds-live{width:72px;height:72px;margin-bottom:8px;}@keyframes ds-phone-breathe{50%{box-shadow:0 0 25px #3be1bd35;}}@media(prefers-reduced-motion:reduce){.ds-phone-mic{transition:none;}.ds-phone-mic.ds-connected{animation:none;}}"
+      "name": "Minute Clauses",
+      "kind": "custom",
+      "refersTo": "venue-code",
+      "description": "Signature record: numbered clauses with venue codes, a red seal stamped on the confirmed one, struck-through and dotted-blank states.",
+      "html": "<section class=\"ds-minute\"><header><h3>Biên bản điều phối</h3><p>Lập lúc 10:00 · kế hoạch v1</p></header><ol><li class=\"sealed\"><span class=\"ds-head\"><span class=\"ds-no\">Điều 1 · Nơi đến</span></span><b><span class=\"ds-code\">Q-27</span>Quán Cháo Ấm</b><p>Tiếp nhận tại cửa chính.</p><q>Cứ đưa em ấy vào, quán còn mở tới khuya.</q><svg class=\"ds-seal\" viewBox=\"0 0 100 100\" role=\"img\" aria-label=\"Đã xác nhận lúc 10:02\"><circle cx=\"50\" cy=\"50\" r=\"46\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><circle cx=\"50\" cy=\"50\" r=\"39\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.2\"/><text x=\"50\" y=\"39\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"700\" letter-spacing=\"1.5\">ĐÃ</text><text x=\"50\" y=\"56\" text-anchor=\"middle\" font-size=\"12.5\" font-weight=\"700\" letter-spacing=\".6\">XÁC NHẬN</text><text x=\"50\" y=\"71\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"600\">10:02</text></svg></li><li class=\"pending\"><span class=\"ds-head\"><span class=\"ds-no\">Điều 2 · Hỗ trợ</span><span class=\"ds-status\">Đang gọi</span></span><b>Chị Linh</b><span class=\"ds-blank\"></span></li><li class=\"struck\"><span class=\"ds-head\"><span class=\"ds-no\">Điều 3 · Chưa dùng</span><span class=\"ds-status\">Lỗi gọi</span></span><b><span class=\"ds-code\">K-02</span>Khách sạn Bình Minh</b></li></ol></section>",
+      "css": ".ds-minute { font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-variant-numeric: tabular-nums; width: 300px; color: #1b2550; background: #ffffff; padding: 16px; border: 1px solid #1b2550; border-radius: 2px; } .ds-minute header { text-align: center; padding-bottom: 10px; } .ds-minute h3 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; } .ds-minute header p { margin: 2px 0 0; font-size: 12px; color: #4a5378; } .ds-minute header::after { content: ''; display: block; width: 96px; height: 1px; background: #1b2550; margin: 8px auto 0; } .ds-minute ol { list-style: none; margin: 0; padding: 0; } .ds-minute li { position: relative; padding: 10px 0; border-top: 1px solid #c8ccd4; font-size: 13px; line-height: 1.5; } .ds-minute li.sealed { padding-right: 84px; min-height: 96px; } .ds-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; } .ds-no { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #2a4cc0; } .ds-status { font-size: 11px; font-weight: 700; white-space: nowrap; } .ds-minute b { display: block; font-weight: 700; } .ds-minute p { margin: 1px 0 0; } .ds-minute q { display: block; margin-top: 3px; color: #2a4cc0; font-style: italic; } .ds-code { display: inline-block; margin-right: 6px; padding: 0 4px; border: 1px solid #1b2550; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; line-height: 16px; } .sealed .ds-no { color: #d22f27; } .pending { color: #4a5378; } .pending .ds-no, .pending .ds-status { color: #4a5378; } .ds-blank { display: block; margin-top: 10px; border-bottom: 1px dotted #4a5378; height: 1px; } .struck b { color: #8a90a8; text-decoration: line-through; text-decoration-color: #d22f27; } .struck .ds-no { color: #8a90a8; } .struck .ds-status { color: #d22f27; } .struck .ds-code { border-color: #a3a9b8; } .ds-seal { position: absolute; right: 0; top: 8px; width: 82px; height: 82px; color: #d22f27; fill: currentColor; opacity: .9; transform: rotate(-11deg); animation: ds-stamp 260ms cubic-bezier(.16,1,.3,1) both; } .ds-seal text { fill: currentColor; font-family: inherit; } @keyframes ds-stamp { from { opacity: 0; transform: rotate(-11deg) scale(1.35); } } @media (prefers-reduced-motion: reduce) { .ds-seal { animation: none; } }"
+    },
+    {
+      "name": "Night Message Card",
+      "kind": "card",
+      "refersTo": "night-screen",
+      "description": "Guardian's spoken reply on the phone companion's night ground.",
+      "html": "<div class=\"ds-night\"><div class=\"ds-night-msg\"><div>GUARDIAN<span>10:01</span></div><p>Mình đã tìm được nơi tiếp nhận. Đi thẳng 200 m tới Quán Cháo Ấm.</p></div><button class=\"ds-night-btn\">Cuộc gọi giả</button></div>",
+      "css": ".ds-night { font-family: 'Be Vietnam Pro', system-ui, sans-serif; background: #141c3f; color: #eef0f8; padding: 16px; border-radius: 28px; width: 300px; display: grid; gap: 12px; } .ds-night-msg { border: 1px solid #2c3770; background: #1a2350; border-radius: 2px; padding: 11px 12px; } .ds-night-msg > div { display: flex; color: #7f9cff; font-size: 10px; letter-spacing: 1px; } .ds-night-msg > div span { margin-left: auto; color: #a9b2d6; } .ds-night-msg p { margin: 7px 0 0; font-size: 13px; line-height: 1.7; } .ds-night-btn { font: inherit; font-size: 12px; background: #1a2350; color: #eef0f8; border: 1px solid #2c3770; border-radius: 2px; padding: 9px 14px; cursor: pointer; } .ds-night-btn:hover { background: #212b5e; border-color: #7f9cff; } .ds-night-btn:focus-visible { outline: 2px solid #7f9cff; outline-offset: 3px; }"
     }
   ],
   "narrative": {
-    "northStar": "The Command Center",
-    "overview": "The operational workspace is a dark command center: an interactive physical phone simulator, a central map and a coordination panel share a continuous night background. Cyan identifies confirmed or primary coordination, blue supports reference information, amber marks unresolved or simulated information, and muted borders separate dense content.\n\nThe interface keeps the need, original human replies, proposed action and user acceptance legible together. The phone has its own scrolling screen, shared VI/EN strip, contact and record sheets, and internal navigation. Rounded command panels organize tools and evidence; the desktop bottom dock replaces the workspace header. Vietnamese and English retain the same compact system-font structure.",
+    "northStar": "The Sealed Minute",
+    "overview": "Every incident is a minute being drawn up in real time. The command center reads as an official record on cool white paper: ballpoint blue-black ink for text and rules, ballpoint blue for quotes, routes and live state, and one vermilion seal that appears only when a place has actually agreed to take the person in. Each offer from a helper becomes a numbered clause (\"Điều 2 · Nơi đến\") with the helper's own words quoted beneath it, so a viewer can check every AI conclusion against what was said.\n\nDensity is high and deliberate: three columns of record (minute, map, call register) sit on one screen for a projector audience, framed by 1px ink rules rather than cards floating on shadows. States are printed marks rather than colored badges: a confirmed clause is stamped, a withdrawn one is struck through in red, and an unanswered one is a dotted blank line waiting to be filled.\n\nThe phone companion is the same document carried at night. Inside the phone screen the ground inverts to deep ink and the paper palette shifts to its night equivalents, so the person alone in the street gets a dark, low-glare screen while the record stays recognisably the same system. The world explicitly rejects the near-black neon command console it replaced.",
     "keyCharacteristics": [
-      "Dark continuous workspace with two levels of panel fill.",
-      "Map-centered operational grid and a fixed bottom dock.",
-      "Eight-pixel command controls, ten-pixel panels and a physical phone frame.",
-      "Explicit provenance, original quotes and acceptance states.",
-      "Support profiles distinguish real teammate replies from simulated roleplay locations."
+      "Cool paper ground, ink text, 1px ink frames, 2px corners everywhere.",
+      "One seal red, reserved for SOS, danger and the confirmation stamp.",
+      "States drawn as marks on paper: sealed, struck through, dotted blank.",
+      "Venue codes (Q-27, T-01, K-02) shared verbatim by map labels and minute clauses.",
+      "Tabular numerals throughout; times and counters never jitter.",
+      "Night inversion scoped to the phone screen only."
     ],
     "rules": [
-      {
-        "name": "The Source Before Status Rule",
-        "body": "Keep simulation, device-trial and reference-route labels next to the information they qualify; color does not replace explicit status.",
-        "section": "colors"
-      },
-      {
-        "name": "The Bordered Depth Rule",
-        "body": "Separate command panels with fills and fine borders; reserve ambient shadows for the physical phone frame and its microphone action.",
-        "section": "elevation"
-      },
-      {
-        "name": "The Call Is Not Consent Rule",
-        "body": "Show conversing and completed calls in blue with a phone icon. Reserve acceptance treatments for sourced commitments; answering or ending a call does not confirm help.",
-        "section": "colors"
-      },
-      {
-        "name": "The Roleplay Provenance Rule",
-        "body": "Label TEAM as simulated locations with participant-authored replies. A ready support profile means available for an in-app call, not acceptance of an incident.",
-        "section": "colors"
-      }
+      { "name": "The One Seal Rule", "body": "Seal red appears only for SOS, danger, strike-throughs and the confirmation stamp. A red element that is not one of those dilutes the stamp.", "section": "colors" },
+      { "name": "The Amber Means Support-List Rule", "body": "Amber marks partner support-list venues and warnings, nothing decorative. If it is not a support-list marker or a caution, it is not amber.", "section": "colors" },
+      { "name": "The Scoped Night Rule", "body": "The night palette is applied by redefining the same tokens on the phone screen and standalone phone root, never by inverting the whole page. The command center stays on paper.", "section": "colors" },
+      { "name": "The Tabular Record Rule", "body": "font-variant-numeric: tabular-nums is set at the root. Timers, clause numbers, ETAs and timestamps must line up column to column.", "section": "typography" },
+      { "name": "The Quote Is Italic Blue Rule", "body": "A helper's own words render in italic ballpoint blue inside curly quotes, directly beneath the clause they support. AI paraphrase stays upright ink.", "section": "typography" },
+      { "name": "The Ruled Not Raised Rule", "body": "Panels, cards, lanes and map controls carry a 1px border and no shadow. A shadow on a panel turns the record back into a dashboard.", "section": "elevation" }
     ],
     "dos": [
-      "Do use the scoped dark palette for operational workspace additions.",
-      "Do preserve the map, companion and coordination hierarchy with the bottom dock.",
-      "Do keep original replies and explicit acceptance status beside derived plans.",
-      "Do retain visible keyboard focus and support Vietnamese and English text.",
-      "Do keep reference routes visibly labeled as reception unconfirmed.",
-      "Do label synthetic road conditions and venue profiles beside their visual overlays.",
-      "Do keep each support profile?s name, role, invitation and explicit readiness state associated."
+      "Do frame top-level panels with a 1px ink border and 2px corners on a white sheet over the paper ground.",
+      "Do show every AI conclusion next to the quote that supports it, in italic ballpoint blue.",
+      "Do express state as a printed mark: the seal for confirmed, a red strike-through for withdrawn, a dotted blank for waiting.",
+      "Do give every venue its code and use the same code on the map and in the minute.",
+      "Do keep tabular numerals on anything that counts or tells time.",
+      "Do scope the night palette by redefining tokens on the phone screen root.",
+      "Do respect reduced motion: the seal appears without the stamp animation."
     ],
     "donts": [
-      "Don't reintroduce the landing header into the operational workspace.",
-      "Don't use a displayed route or open venue as proof of an accepted commitment.",
-      "Don't apply the workspace palette globally to surfaces that still use their existing stylesheet.",
-      "Don't treat this source documentation as browser or visual approval.",
-      "Don't turn call completion, open hours or a self-reported profile into a confirmed commitment.",
-      "Don't present TEAM readiness or simulated venue selection as an accepted support commitment."
+      "Don't use seal red for anything except SOS, danger, strike-throughs and the confirmation stamp.",
+      "Don't use amber except for support-list venue markers and warnings.",
+      "Don't return to a near-black neon console look on the command center: no dark page ground, no glowing accents, no cyan on black.",
+      "Don't put shadows on panels or cards; only the phone bezel, modal and SOS button lift.",
+      "Don't round sheets past 2px or square off the round marks (pins, dots, seal).",
+      "Don't show a confirmation as a colored pill when the seal is available; the stamp is the confirmation."
     ]
   }
 }
