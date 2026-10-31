@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
-    "start": "next start --hostname 0.0.0.0",
+    "build": "next build && node scripts/prepare-standalone.mjs",
+    "start": "node scripts/start.mjs",
+    "demo": "node scripts/start.mjs --port 3131",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "test:api": "tsx tests/api.integration.ts"
+    "test:api": "tsx tests/api.integration.ts",
+    "test:ai": "tsx tests/ai.smoke.ts",
+    "format": "prettier --write app components lib tests scripts package.json next.config.ts tsconfig.json"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

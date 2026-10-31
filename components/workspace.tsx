@@ -34,6 +34,8 @@ import GuardianMap from "./guardian-map";
 import { connectVoice, type Voice } from "./voice";
 export default function Workspace({ demo = false }: { demo?: boolean }) {
   const { locale, t } = useLanguage();
+  const [deletePending, setDeletePending] = useState(false);
+  const [aiCode, setAiCode] = useState("");
   const [data, setData] = useState<PublicAccount | null>(null),
     [online, setOnline] = useState(false),
     [busy, setBusy] = useState(false),
@@ -69,7 +71,10 @@ export default function Workspace({ demo = false }: { demo?: boolean }) {
       ...(body
         ? {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-guardian-ai-code": aiCode,
+            },
             body: JSON.stringify(body),
           }
         : {}),
@@ -79,7 +84,15 @@ export default function Workspace({ demo = false }: { demo?: boolean }) {
     return d;
   }
   async function action(action: string, fields: Record<string, unknown> = {}) {
-    const d = await fetchJSON("action", { action, ...fields });
+    if (["new", "demo", "cancel", "stop"].includes(action)) {
+      await voice.current?.close();
+      await queue.current;
+    }
+    const d = await fetchJSON("action", {
+      action,
+      incidentId: current.current?.incident.id,
+      ...fields,
+    });
     if (d.incident) apply(d);
     return d.result;
   }
@@ -224,14 +237,22 @@ export default function Workspace({ demo = false }: { demo?: boolean }) {
     if (!aiConsent) throw new Error("AI_CONSENT_REQUIRED");
     if (!data!.incident.ai.enabled)
       await action("ai", { enabled: true, consent: true });
+    if (record) await action("recording-consent", { consent: true });
     const id = data!.incident.id,
       audioId = crypto.randomUUID();
     voice.current = await connectVoice(
       () => action("voice", { consent: true }),
       {
-        transcript: (who, text, id) => {
+        transcript: (who, text, transcriptId) => {
           queue.current = queue.current
-            .then(() => action("transcript", { who, text, id }))
+            .then(() =>
+              action("transcript", {
+                who,
+                text,
+                id: transcriptId,
+                incidentId: id,
+              }),
+            )
             .catch((e) => setError(e.message));
         },
         tool: async (name, args) => {
@@ -729,6 +750,21 @@ export default function Workspace({ demo = false }: { demo?: boolean }) {
                   "I consent to sending content to OpenAI",
                 )}
               </label>
+              {data.config.aiAccessRequired && (
+                <label>
+                  {t("Mã truy cập AI", "AI access code")}
+                  <input
+                    type="password"
+                    autoComplete="off"
+                    value={aiCode}
+                    onChange={(e) => setAiCode(e.target.value)}
+                    placeholder={t(
+                      "Người tổ chức demo cung cấp",
+                      "Provided by your demo host",
+                    )}
+                  />
+                </label>
+              )}
               <label className="check">
                 <input
                   type="checkbox"
@@ -817,8 +853,9 @@ export default function Workspace({ demo = false }: { demo?: boolean }) {
                   type="number"
                   min={20}
                   max={5000}
-                  value={i.needs.maxWalk}
-                  onChange={(e) =>
+                  key={`${i.id}-${i.needs.maxWalk}`}
+                  defaultValue={i.needs.maxWalk}
+                  onBlur={(e) =>
                     void run(() =>
                       action("needs", {
                         ...i.needs,
@@ -1299,10 +1336,8 @@ export default function Workspace({ demo = false }: { demo?: boolean }) {
             >
               {t("Mở dữ liệu JSON", "Open JSON record")}
             </a>
-            {ended && (
-              <button
-                onClick={() => void run(() => action("delete-transcript"))}
-              >
+            {ended && !deletePending && (
+              <button onClick={() => setDeletePending(true)}>
                 {t(
                   "Xóa hội thoại và ghi âm của phiên",
                   "Delete session conversation and audio",
@@ -1310,6 +1345,32 @@ export default function Workspace({ demo = false }: { demo?: boolean }) {
               </button>
             )}
           </div>
+          {ended && deletePending && (
+            <div className="delete-confirm" role="alert">
+              <p>
+                {t(
+                  "Xóa vĩnh viễn hội thoại và ghi âm của phiên này? Các phiên bản hồ sơ chứa nội dung đó cũng sẽ bị xóa.",
+                  "Permanently delete this session’s conversation and audio? Record revisions containing that content will also be deleted.",
+                )}
+              </p>
+              <div className="actions">
+                <button onClick={() => setDeletePending(false)}>
+                  {t("Giữ lại", "Keep records")}
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    void run(async () => {
+                      await action("delete-transcript");
+                      setDeletePending(false);
+                    })
+                  }
+                >
+                  {t("Xác nhận xóa", "Confirm deletion")}
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       )}
       <footer className="workspace-footer">

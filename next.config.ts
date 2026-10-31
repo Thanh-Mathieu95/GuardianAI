@@ -3,6 +3,15 @@ const backend = process.env.GUARDIAN_BACKEND_ORIGIN;
 const config: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  outputFileTracingExcludes: {
+    "/*": [
+      "./.env*",
+      "./data/**/*",
+      "./.git/**/*",
+      "./.agents/**/*",
+      "./work/**/*",
+    ],
+  },
   serverExternalPackages: ["pg"],
   async rewrites() {
     return backend
