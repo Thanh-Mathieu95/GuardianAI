@@ -4,13 +4,14 @@ import {
   admission,
   demoStart,
   distance,
+  routeDistance,
   emergency,
   liveRoute,
   ruleExtract,
   simulatedRoute,
   validateExtraction,
 } from "./rules";
-import { aiConfigured, analyze, extract } from "./ai";
+import { aiConfigured, analyze, extract, recommend } from "./ai";
 import {
   now,
   type Account,
@@ -62,6 +63,7 @@ export function fresh(
     seals: [],
     covert: false,
     recordings: [],
+    recordingConsentAt: null,
   };
 }
 export function event(
@@ -272,7 +274,7 @@ export class Engine {
         i.ai.status = "ERROR";
         i.ai.error = e instanceof Error ? e.message : "AI_FAILED";
         event(i, "AI_FALLBACK", [
-          "Analyse AI indisponible; dùng quy tắc có giới hạn.",
+          "AI chưa phân tích được; dùng quy tắc có giới hạn.",
           "AI extraction unavailable; using bounded rules.",
         ]);
       }
@@ -318,12 +320,16 @@ export class Engine {
     );
     await this.plan(i);
   }
-  async plan(i: Incident) {
+  async plan(i: Incident, time = Date.now()) {
     if (terminal(i)) return;
     const current = activePlan(i);
     if (current) {
       const r = i.replies.find((r) => r.id === current.replyId);
-      if (r && !admission(i, r).length) {
+      if (
+        r &&
+        !admission(i, r, time).length &&
+        current.route.meters <= i.needs.maxWalk
+      ) {
         return;
       }
       invalidate(i, [
@@ -332,13 +338,44 @@ export class Engine {
       ]);
     }
     if (!i.location) return;
+    if (
+      i.mode === "LIVE" &&
+      (i.blocked || time - Date.parse(i.location.at) > 90000)
+    ) {
+      if (i.sosAt) i.status = "NO_SUPPORT";
+      return;
+    }
     const eligible = i.replies
-      .filter((r) => !admission(i, r).length)
+      .filter((r) => !admission(i, r, time).length)
       .sort(
         (a, b) =>
           distance(i.location!, a.location!) -
           distance(i.location!, b.location!),
       );
+    if (eligible.length && i.ai.enabled && aiConfigured() && i.ai.calls < 40) {
+      i.ai.calls++;
+      try {
+        const choice = await recommend(i, eligible);
+        const index = eligible.findIndex((r) => r.id === choice.replyId);
+        if (index < 0) throw new Error("UNVERIFIED_AI_PLAN");
+        eligible.unshift(...eligible.splice(index, 1));
+        i.ai.status = "LIVE";
+        event(
+          i,
+          "AI_COMPARISON",
+          [
+            "AI đã so sánh các lời đồng ý hợp lệ; engine kiểm tra tuyến trước khi đề xuất.",
+            "AI compared eligible offers; the engine checks the route before proposing it.",
+          ],
+          [choice.replyId],
+        );
+      } catch {
+        event(i, "PLANNER_FALLBACK", [
+          "Chưa dùng được đề xuất AI; so sánh khoảng cách giữa các lời đồng ý đã kiểm chứng.",
+          "AI selection unavailable; comparing distance between verified offers.",
+        ]);
+      }
+    }
     for (const r of eligible) {
       try {
         const route =
@@ -447,6 +484,14 @@ export class Engine {
     i.track.push({ ...p, at: now() });
     if (i.track.length > 1500) i.track.shift();
     event(i, "LOCATION", ["Đã cập nhật GPS", "GPS updated"]);
+    const plan = activePlan(i);
+    if (plan?.acceptedAt && routeDistance(p, plan.route.points) > 75) {
+      invalidate(i, [
+        "GPS cách tuyến đã nhận hơn 75 m; cần xem lại phương án.",
+        "GPS is more than 75 m from the accepted route; review a new plan.",
+      ]);
+      await this.plan(i);
+    }
     if (i.status === "SIGNAL_LOST") i.status = i.sosAt ? "NO_SUPPORT" : "READY";
   }
   async chat(i: Incident, text: string) {
@@ -506,10 +551,25 @@ export class Engine {
     }
     if (i.demo) return false;
     let changed = false;
+    for (const reply of i.replies) {
+      if (reply.state === "RINGING" && time - Date.parse(reply.at) >= 45000) {
+        reply.state = "NO_ANSWER";
+        event(
+          i,
+          "NO_ANSWER",
+          [
+            `${reply.name}: chưa trả lời sau 45 giây.`,
+            `${reply.name}: no answer after 45 seconds.`,
+          ],
+          [reply.id],
+        );
+        changed = true;
+      }
+    }
     const p = activePlan(i),
       r = i.replies.find((r) => r.id === p?.replyId);
     if (p && r && admission(i, r, time).length) {
-      await this.plan(i);
+      await this.plan(i, time);
       changed = true;
     }
     if (
@@ -571,6 +631,7 @@ export class Engine {
     const d = i.demo;
     if (!d || d.status !== "RUNNING") return;
     const step = d.step + 1;
+    const t = (vi: string, en: string) => (i.locale === "vi" ? vi : en);
     try {
       if (step === 0)
         event(i, "DEMO_CONTEXT", [
@@ -587,39 +648,64 @@ export class Engine {
         } as Account;
         await this.sos(
           a,
-          "Có người bám theo tôi. Tôi cần chỗ chờ, không qua hẻm.",
+          t(
+            "Có người bám theo tôi. Tôi cần chỗ chờ, không qua hẻm.",
+            "Someone is following me. I need a place to wait without using an alley.",
+          ),
         );
         if (i.replies.length !== 5)
           throw new Error("DEMO_EXPECTED_FIVE_RECIPIENTS");
       }
       if (step === 2) {
-        await this.reply(i, "venue-cafe", "Có lẽ được, để hỏi quản lý.", false);
+        await this.reply(
+          i,
+          "venue-cafe",
+          t("Có lẽ được, để hỏi quản lý.", "Maybe, let me ask the manager."),
+          false,
+        );
         await this.reply(
           i,
           "venue-hotel",
-          "Đồng ý, bạn có thể vào chờ qua cửa sau ở hẻm.",
+          t(
+            "Đồng ý, bạn có thể vào chờ qua cửa sau ở hẻm.",
+            "I accept. You can wait here; use the back entrance through the alley.",
+          ),
           false,
         );
         await this.reply(
           i,
           "contact-linh",
-          "Tôi đang đến đón, 10 phút nữa tới.",
+          t(
+            "Tôi đang đến đón, 10 phút nữa tới.",
+            "I am on my way to pick you up, arriving in 10 minutes.",
+          ),
           false,
         );
-        await this.reply(i, "contact-minh", "Tôi sẽ giữ liên lạc.", false);
+        await this.reply(
+          i,
+          "contact-minh",
+          t("Tôi sẽ giữ liên lạc.", "I will stay in touch."),
+          false,
+        );
         if (activePlan(i)) throw new Error("UNVERIFIED_PLAN");
       }
       if (step === 3) {
         await this.reply(
           i,
           "venue-cafe",
-          "Đồng ý, có chỗ ngồi chờ, nhân viên đón ở cửa chính.",
+          t(
+            "Đồng ý, có chỗ ngồi chờ, nhân viên đón ở cửa chính.",
+            "I accept. You can wait here; staff will meet you at the main entrance.",
+          ),
           i.ai.enabled,
         );
         await this.reply(
           i,
           "venue-shop",
-          "Đồng ý, bạn có thể vào chờ ở cửa chính.",
+          t(
+            "Đồng ý, bạn có thể vào chờ ở cửa chính.",
+            "I accept. You can wait here by the main entrance.",
+          ),
           i.ai.enabled,
         );
         if (!activePlan(i)) throw new Error("NO_CONFIRMED_PLAN");
@@ -649,7 +735,10 @@ export class Engine {
         await this.reply(
           i,
           r.memberId,
-          "Xin lỗi, nhân viên vừa đi, không thể nhận giúp nữa.",
+          t(
+            "Xin lỗi, nhân viên vừa đi, không thể nhận giúp nữa.",
+            "Sorry, our staff have left. I can no longer help.",
+          ),
           false,
         );
         if (!old.invalidatedAt || !activePlan(i) || activePlan(i)?.acceptedAt)
@@ -663,7 +752,14 @@ export class Engine {
       }
       if (step === 8) {
         i.risk = 4;
-        original(i, "You", "Tôi bị cướp và đang chảy máu.");
+        original(
+          i,
+          "You",
+          t(
+            "Tôi bị cướp và đang chảy máu.",
+            "I have been robbed and I am bleeding.",
+          ),
+        );
         event(i, "EMERGENCY", [
           "Tình huống mô phỏng có thương tích. Nút 115 do người dùng tự chọn.",
           "Simulated injury. Only the user can choose to dial 115.",

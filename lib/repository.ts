@@ -6,10 +6,36 @@ import { Pool, type PoolClient } from "pg";
 import type { Account, Incident } from "./types";
 export const digest = (value: unknown) =>
   createHash("sha256")
-    .update(typeof value === "string" ? value : JSON.stringify(value))
+    .update(
+      value instanceof Uint8Array
+        ? value
+        : typeof value === "string"
+          ? value
+          : JSON.stringify(value),
+    )
     .digest("hex");
 const schema = `CREATE TABLE IF NOT EXISTS guardian_accounts(id TEXT PRIMARY KEY,version INTEGER NOT NULL,payload TEXT NOT NULL); CREATE TABLE IF NOT EXISTS guardian_records(incident TEXT NOT NULL,seq INTEGER NOT NULL,payload TEXT NOT NULL,previous TEXT NOT NULL,hash TEXT NOT NULL,PRIMARY KEY(incident,seq)); CREATE TABLE IF NOT EXISTS guardian_tokens(hash TEXT PRIMARY KEY,owner TEXT NOT NULL); CREATE TABLE IF NOT EXISTS guardian_audio(incident TEXT NOT NULL,id TEXT NOT NULL,seq INTEGER NOT NULL,mime TEXT NOT NULL,payload TEXT NOT NULL,hash TEXT NOT NULL,PRIMARY KEY(incident,id,seq));`;
 export class Repository {
+  private pendingAudio = new WeakMap<
+    Account,
+    { id: string; seq: number; mime: string; payload: string; hash: string }[]
+  >();
+  private privateHistoryErased = new WeakSet<Account>();
+  stageAudio(
+    a: Account,
+    chunk: {
+      id: string;
+      seq: number;
+      mime: string;
+      payload: string;
+      hash: string;
+    },
+  ) {
+    this.pendingAudio.set(a, [...(this.pendingAudio.get(a) || []), chunk]);
+  }
+  erasePrivateHistory(a: Account) {
+    this.privateHistoryErased.add(a);
+  }
   db?: DatabaseSync;
   pool?: Pool;
   ready: Promise<unknown>;
@@ -29,7 +55,10 @@ export class Repository {
       this.ready = this.pool.query(schema);
     } else {
       if (filename !== ":memory:")
-        mkdirSync(path.dirname(path.resolve(filename)), { recursive: true });
+        mkdirSync(
+          path.dirname(path.resolve(/* turbopackIgnore: true */ filename)),
+          { recursive: true },
+        );
       this.db = new DatabaseSync(filename);
       this.db.exec("PRAGMA journal_mode=WAL;" + schema);
       this.ready = Promise.resolve();
@@ -79,6 +108,32 @@ export class Repository {
       if (existing && Number(existing.version) !== account.version)
         throw new Error("STATE_CONFLICT");
       if (!existing && !initial) throw new Error("SESSION_NOT_FOUND");
+      if (this.privateHistoryErased.has(account)) {
+        await this.query(
+          "DELETE FROM guardian_records WHERE incident=$1",
+          [account.incident.id],
+          client,
+        );
+        await this.query(
+          "DELETE FROM guardian_audio WHERE incident=$1",
+          [account.incident.id],
+          client,
+        );
+      }
+      for (const chunk of this.pendingAudio.get(account) || []) {
+        await this.query(
+          "INSERT INTO guardian_audio VALUES($1,$2,$3,$4,$5,$6)",
+          [
+            account.incident.id,
+            chunk.id,
+            chunk.seq,
+            chunk.mime,
+            chunk.payload,
+            chunk.hash,
+          ],
+          client,
+        );
+      }
       const next = { ...account, version: account.version + 1 };
       await this.query(
         "INSERT INTO guardian_accounts(id,version,payload) VALUES($1,$2,$3) ON CONFLICT(id) DO UPDATE SET version=excluded.version,payload=excluded.payload",
@@ -115,6 +170,8 @@ export class Repository {
       if (client) await client.query("COMMIT");
       else this.db!.exec("COMMIT");
       account.version = next.version;
+      this.pendingAudio.delete(account);
+      this.privateHistoryErased.delete(account);
     } catch (e) {
       if (client) await client.query("ROLLBACK");
       else this.db!.exec("ROLLBACK");

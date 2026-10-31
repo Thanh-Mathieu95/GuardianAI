@@ -146,6 +146,29 @@ export function admission(i: Incident, r: Reply, time = Date.now()): string[] {
     why.push("SIMULATED_DATA");
   return why;
 }
+// Local projection measures distance to segments, not sparse route vertices.
+export function routeDistance(point: Point, route: Point[]): number {
+  if (route.length < 2)
+    return route.length ? distance(point, route[0]) : Infinity;
+  const scale = Math.cos((point.lat * Math.PI) / 180);
+  const xy = (p: Point) => ({
+    x: (p.lng - point.lng) * 111320 * scale,
+    y: (p.lat - point.lat) * 111320,
+  });
+  let minimum = Infinity;
+  for (let n = 1; n < route.length; n++) {
+    const a = xy(route[n - 1]),
+      b = xy(route[n]);
+    const dx = b.x - a.x,
+      dy = b.y - a.y;
+    const t = Math.max(
+      0,
+      Math.min(1, -(a.x * dx + a.y * dy) / (dx * dx + dy * dy || 1)),
+    );
+    minimum = Math.min(minimum, Math.hypot(a.x + t * dx, a.y + t * dy));
+  }
+  return minimum;
+}
 export const demoStart: Point = { lat: 10.7714, lng: 106.7049 };
 export function simulatedRoute(
   from: Point,

@@ -1,0 +1,445 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T04:02:20.481072+00:00",
+  "title": "Design System: Guardian AI",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "tonalRamp": [
+          "oklch(15.0% 0.00057 128.49)",
+          "oklch(27.0% 0.00193 128.49)",
+          "oklch(38.0% 0.00284 128.49)",
+          "oklch(50.0% 0.00284 128.49)",
+          "oklch(61.0% 0.00284 128.49)",
+          "oklch(73.0% 0.00256 128.49)",
+          "oklch(84.0% 0.00151 128.49)",
+          "oklch(95.0% 0.00047 128.49)"
+        ]
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "White Sheet",
+        "tonalRamp": [
+          "oklch(15.0% 0.0 89.88)",
+          "oklch(27.0% 0.0 89.88)",
+          "oklch(38.0% 0.0 89.88)",
+          "oklch(50.0% 0.0 89.88)",
+          "oklch(61.0% 0.0 89.88)",
+          "oklch(73.0% 0.0 89.88)",
+          "oklch(84.0% 0.0 89.88)",
+          "oklch(95.0% 0.0 89.88)"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Blue Ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.01591 270.69)",
+          "oklch(27.0% 0.05409 270.69)",
+          "oklch(38.0% 0.07954 270.69)",
+          "oklch(50.0% 0.07954 270.69)",
+          "oklch(61.0% 0.07954 270.69)",
+          "oklch(73.0% 0.07158 270.69)",
+          "oklch(84.0% 0.04242 270.69)",
+          "oklch(95.0% 0.01326 270.69)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.01237 273.2)",
+          "oklch(27.0% 0.04205 273.2)",
+          "oklch(38.0% 0.06184 273.2)",
+          "oklch(50.0% 0.06184 273.2)",
+          "oklch(61.0% 0.06184 273.2)",
+          "oklch(73.0% 0.05566 273.2)",
+          "oklch(84.0% 0.03298 273.2)",
+          "oklch(95.0% 0.01031 273.2)"
+        ]
+      },
+      "blue": {
+        "role": "primary",
+        "displayName": "Ballpoint Blue",
+        "tonalRamp": [
+          "oklch(15.0% 0.03717 266.44)",
+          "oklch(27.0% 0.12639 266.44)",
+          "oklch(38.0% 0.18586 266.44)",
+          "oklch(50.0% 0.18586 266.44)",
+          "oklch(61.0% 0.18586 266.44)",
+          "oklch(73.0% 0.16728 266.44)",
+          "oklch(84.0% 0.09913 266.44)",
+          "oklch(95.0% 0.03098 266.44)"
+        ]
+      },
+      "wash": {
+        "role": "primary",
+        "displayName": "Blue Wash",
+        "tonalRamp": [
+          "oklch(15.0% 0.00392 270.21)",
+          "oklch(27.0% 0.01333 270.21)",
+          "oklch(38.0% 0.0196 270.21)",
+          "oklch(50.0% 0.0196 270.21)",
+          "oklch(61.0% 0.0196 270.21)",
+          "oklch(73.0% 0.01764 270.21)",
+          "oklch(84.0% 0.01046 270.21)",
+          "oklch(95.0% 0.00327 270.21)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Divider Rule",
+        "tonalRamp": [
+          "oklch(15.0% 0.00239 264.5)",
+          "oklch(27.0% 0.00811 264.5)",
+          "oklch(38.0% 0.01193 264.5)",
+          "oklch(50.0% 0.01193 264.5)",
+          "oklch(61.0% 0.01193 264.5)",
+          "oklch(73.0% 0.01073 264.5)",
+          "oklch(84.0% 0.00636 264.5)",
+          "oklch(95.0% 0.00199 264.5)"
+        ]
+      },
+      "control-rule": {
+        "role": "neutral",
+        "displayName": "Control Rule",
+        "tonalRamp": [
+          "oklch(15.0% 0.00453 268.36)",
+          "oklch(27.0% 0.0154 268.36)",
+          "oklch(38.0% 0.02265 268.36)",
+          "oklch(50.0% 0.02265 268.36)",
+          "oklch(61.0% 0.02265 268.36)",
+          "oklch(73.0% 0.02039 268.36)",
+          "oklch(84.0% 0.01208 268.36)",
+          "oklch(95.0% 0.00378 268.36)"
+        ]
+      },
+      "red": {
+        "role": "secondary",
+        "displayName": "Action Red",
+        "tonalRamp": [
+          "oklch(15.0% 0.04004 28.39)",
+          "oklch(27.0% 0.13613 28.39)",
+          "oklch(38.0% 0.2002 28.39)",
+          "oklch(50.0% 0.2002 28.39)",
+          "oklch(61.0% 0.2002 28.39)",
+          "oklch(73.0% 0.18018 28.39)",
+          "oklch(84.0% 0.10677 28.39)",
+          "oklch(95.0% 0.03337 28.39)"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "tonalRamp": [
+          "oklch(15.0% 0.01346 270.9)",
+          "oklch(27.0% 0.04577 270.9)",
+          "oklch(38.0% 0.06731 270.9)",
+          "oklch(50.0% 0.06731 270.9)",
+          "oklch(61.0% 0.06731 270.9)",
+          "oklch(73.0% 0.06057 270.9)",
+          "oklch(84.0% 0.0359 270.9)",
+          "oklch(95.0% 0.01122 270.9)"
+        ]
+      },
+      "night-sheet": {
+        "role": "neutral",
+        "displayName": "Night Sheet",
+        "tonalRamp": [
+          "oklch(15.0% 0.01658 271.46)",
+          "oklch(27.0% 0.05637 271.46)",
+          "oklch(38.0% 0.08289 271.46)",
+          "oklch(50.0% 0.08289 271.46)",
+          "oklch(61.0% 0.08289 271.46)",
+          "oklch(73.0% 0.0746 271.46)",
+          "oklch(84.0% 0.04421 271.46)",
+          "oklch(95.0% 0.01382 271.46)"
+        ]
+      },
+      "night-text": {
+        "role": "neutral",
+        "displayName": "Night Text",
+        "tonalRamp": [
+          "oklch(15.0% 0.00218 274.89)",
+          "oklch(27.0% 0.00742 274.89)",
+          "oklch(38.0% 0.01092 274.89)",
+          "oklch(50.0% 0.01092 274.89)",
+          "oklch(61.0% 0.01092 274.89)",
+          "oklch(73.0% 0.00982 274.89)",
+          "oklch(84.0% 0.00582 274.89)",
+          "oklch(95.0% 0.00182 274.89)"
+        ]
+      },
+      "night-muted": {
+        "role": "neutral",
+        "displayName": "Night Muted",
+        "tonalRamp": [
+          "oklch(15.0% 0.0105 274.09)",
+          "oklch(27.0% 0.03569 274.09)",
+          "oklch(38.0% 0.05249 274.09)",
+          "oklch(50.0% 0.05249 274.09)",
+          "oklch(61.0% 0.05249 274.09)",
+          "oklch(73.0% 0.04724 274.09)",
+          "oklch(84.0% 0.02799 274.09)",
+          "oklch(95.0% 0.00875 274.09)"
+        ]
+      },
+      "night-rule": {
+        "role": "neutral",
+        "displayName": "Night Rule",
+        "tonalRamp": [
+          "oklch(15.0% 0.01537 270.48)",
+          "oklch(27.0% 0.05225 270.48)",
+          "oklch(38.0% 0.07684 270.48)",
+          "oklch(50.0% 0.07684 270.48)",
+          "oklch(61.0% 0.07684 270.48)",
+          "oklch(73.0% 0.06916 270.48)",
+          "oklch(84.0% 0.04098 270.48)",
+          "oklch(95.0% 0.01281 270.48)"
+        ]
+      },
+      "night-confirmation": {
+        "role": "neutral",
+        "displayName": "Night Confirmation",
+        "tonalRamp": [
+          "oklch(15.0% 0.01859 268.79)",
+          "oklch(27.0% 0.06321 268.79)",
+          "oklch(38.0% 0.09295 268.79)",
+          "oklch(50.0% 0.09295 268.79)",
+          "oklch(61.0% 0.09295 268.79)",
+          "oklch(73.0% 0.08366 268.79)",
+          "oklch(84.0% 0.04958 268.79)",
+          "oklch(95.0% 0.01549 268.79)"
+        ]
+      },
+      "warning-wash": {
+        "role": "secondary",
+        "displayName": "Warning Paper",
+        "tonalRamp": [
+          "oklch(15.0% 0.00593 85.56)",
+          "oklch(27.0% 0.02017 85.56)",
+          "oklch(38.0% 0.02966 85.56)",
+          "oklch(50.0% 0.02966 85.56)",
+          "oklch(61.0% 0.02966 85.56)",
+          "oklch(73.0% 0.02669 85.56)",
+          "oklch(84.0% 0.01582 85.56)",
+          "oklch(95.0% 0.00494 85.56)"
+        ]
+      },
+      "warning-ink": {
+        "role": "secondary",
+        "displayName": "Warning Ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.01857 66.76)",
+          "oklch(27.0% 0.06315 66.76)",
+          "oklch(38.0% 0.09287 66.76)",
+          "oklch(50.0% 0.09287 66.76)",
+          "oklch(61.0% 0.09287 66.76)",
+          "oklch(73.0% 0.08359 66.76)",
+          "oklch(84.0% 0.04953 66.76)",
+          "oklch(95.0% 0.01548 66.76)"
+        ]
+      },
+      "warning-rule": {
+        "role": "secondary",
+        "displayName": "Warning Rule",
+        "tonalRamp": [
+          "oklch(15.0% 0.0255 63.83)",
+          "oklch(27.0% 0.08671 63.83)",
+          "oklch(38.0% 0.12751 63.83)",
+          "oklch(50.0% 0.12751 63.83)",
+          "oklch(61.0% 0.12751 63.83)",
+          "oklch(73.0% 0.11476 63.83)",
+          "oklch(84.0% 0.06801 63.83)",
+          "oklch(95.0% 0.02125 63.83)"
+        ]
+      },
+      "error-ink": {
+        "role": "secondary",
+        "displayName": "Error Ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.0301 28.5)",
+          "oklch(27.0% 0.10233 28.5)",
+          "oklch(38.0% 0.15048 28.5)",
+          "oklch(50.0% 0.15048 28.5)",
+          "oklch(61.0% 0.15048 28.5)",
+          "oklch(73.0% 0.13544 28.5)",
+          "oklch(84.0% 0.08026 28.5)",
+          "oklch(95.0% 0.02508 28.5)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero headline; responsive overrides are recorded in DESIGN.md."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Base h2, with surface-specific sizes."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Base h3."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default interface text; paragraphs use a more open line height."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Visible field labels."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Default light-surface actions."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "control-state",
+        "value": "background 0.15s, border-color 0.15s",
+        "purpose": "Default button state transitions."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none !important; transition: none !important; scroll-behavior: auto",
+        "purpose": "Applied under prefers-reduced-motion: reduce; scroll behavior applies to html."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stacked",
+        "value": "760px"
+      },
+      {
+        "name": "two-column-workspace",
+        "value": "1200px"
+      },
+      {
+        "name": "wide",
+        "value": "1550px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action from the current authored styles.",
+      "html": "<button class=\"ds-button-primary\">Run the simulation</button>",
+      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--ink, #1b2550);color:var(--sheet, #fff);border-color:var(--ink, #1b2550);}.ds-button-primary:hover{background:var(--blue, #2a4cc0);border-color:var(--blue, #2a4cc0);}.ds-button-primary:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}.ds-button-primary:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none;}}"
+    },
+    {
+      "name": "Default action",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "Default action from the current authored styles.",
+      "html": "<button class=\"ds-button-default\">Open companion</button>",
+      "css": ".ds-button-default{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--sheet, #fff);color:var(--ink, #1b2550);border-color:#a3a9b8;}.ds-button-default:hover{background:var(--wash, #e8edfb);border-color:var(--blue, #2a4cc0);}.ds-button-default:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}.ds-button-default:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-default{transition:none;}}"
+    },
+    {
+      "name": "Danger action",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Danger action from the current authored styles.",
+      "html": "<button class=\"ds-button-danger\">End session</button>",
+      "css": ".ds-button-danger{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--red, #d22f27);color:var(--sheet, #fff);border-color:var(--red, #d22f27);}.ds-button-danger:hover{background:var(--red, #d22f27);border-color:var(--red, #d22f27);}.ds-button-danger:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}.ds-button-danger:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-danger{transition:none;}}"
+    },
+    {
+      "name": "Night primary action",
+      "kind": "button",
+      "refersTo": "button-night-primary",
+      "description": "Night primary action from the current authored styles.",
+      "html": "<button class=\"ds-button-night-primary\">Accept this plan</button>",
+      "css": ".ds-button-night-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--night-text, #eef0f8);color:var(--ink, #1b2550);border-color:var(--night-text, #eef0f8);font-size:12px;}.ds-button-night-primary:hover{background:var(--wash, #e8edfb);border-color:var(--wash, #e8edfb);}.ds-button-night-primary:focus-visible{outline:3px solid #a9c0ff;outline-offset:3px;}.ds-button-night-primary:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-night-primary{transition:none;}}"
+    },
+    {
+      "name": "SOS action",
+      "kind": "button",
+      "refersTo": "button-sos",
+      "description": "SOS action from the current authored styles.",
+      "html": "<button class=\"ds-button-sos\">I need help</button>",
+      "css": ".ds-button-sos{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--red, #d22f27);color:var(--sheet, #fff);border-color:var(--red, #d22f27);width:100%;min-height:58px;font-size:16px;font-weight:700;}.ds-button-sos:hover{background:#b42720;border-color:var(--red, #d22f27);}.ds-button-sos:focus-visible{outline:3px solid #a9c0ff;outline-offset:3px;}.ds-button-sos:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-sos{transition:none;}}"
+    },
+    {
+      "name": "Labeled field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Visible label, light field and keyboard focus.",
+      "html": "<label class=\"ds-field-label\">How can you help?<input class=\"ds-field\" placeholder=\"I am on my way, about 10 minutes.\"></label>",
+      "css": ".ds-field-label{display:block;margin:15px 0 9px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--ink, #1b2550);}.ds-field{display:block;width:100%;margin-top:7px;min-height:44px;border:1px solid #a3a9b8;border-radius:2px;padding:11px 12px;background:var(--sheet, #fff);color:var(--ink, #1b2550);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;caret-color:var(--blue, #2a4cc0);}.ds-field::placeholder{color:var(--muted, #4a5378);}.ds-field:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}"
+    },
+    {
+      "name": "Workspace navigation",
+      "kind": "nav",
+      "refersTo": "workspace-tab-active",
+      "description": "Explicit selected state for operational views.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Workspace\"><button aria-pressed=\"true\">Journey</button><button aria-pressed=\"false\">People</button><button aria-pressed=\"false\">Record</button></nav>",
+      "css": ".ds-tabs{display:flex;gap:8px;padding:8px 24px;border-block:1px solid var(--rule, #c8ccd4);}.ds-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;border-color:transparent;background:transparent;color:var(--ink, #1b2550);}.ds-tabs button:hover{background:var(--wash, #e8edfb);border-color:var(--blue, #2a4cc0);}.ds-tabs button[aria-pressed=\"true\"]{background:var(--wash, #e8edfb);color:var(--blue, #2a4cc0);border-color:var(--blue, #2a4cc0);}.ds-tabs button:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}@media(max-width:760px){.ds-tabs{padding:8px;gap:0;}.ds-tabs button{flex:1;font-size:12px;padding:10px;}}@media(prefers-reduced-motion:reduce){.ds-tabs button{transition:none;}}"
+    },
+    {
+      "name": "Language switch",
+      "kind": "nav",
+      "refersTo": "language-active",
+      "description": "Same interface in Vietnamese and English.",
+      "html": "<div class=\"ds-languages\" role=\"group\" aria-label=\"Language\"><button aria-pressed=\"true\">VI</button><button aria-pressed=\"false\">EN</button></div>",
+      "css": ".ds-languages{display:flex;}.ds-languages button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;min-width:44px;padding:8px;background:transparent;border-color:var(--rule, #c8ccd4);color:var(--ink, #1b2550);}.ds-languages button[aria-pressed=\"true\"]{background:var(--ink, #1b2550);color:var(--sheet, #fff);border-color:var(--ink, #1b2550);}.ds-languages button:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-languages button{transition:none;}}"
+    },
+    {
+      "name": "Source label",
+      "kind": "chip",
+      "refersTo": "source-label",
+      "description": "Functional noninteractive provenance label.",
+      "html": "<span class=\"ds-source\">SIMULATION</span>",
+      "css": ".ds-source{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #a3a9b8;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;letter-spacing:.055em;line-height:1.4;padding:5px 8px;width:fit-content;color:var(--muted, #4a5378);}"
+    },
+    {
+      "name": "Commitment row",
+      "kind": "card",
+      "refersTo": "commitment-row",
+      "description": "A named person, explicit status and original quote in a ruled container.",
+      "html": "<article class=\"ds-commitment\"><b>Linh</b><span class=\"ds-commitment-state\">On the way</span><q>I am on my way, about 10 minutes.</q></article>",
+      "css": ".ds-commitment{display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--rule, #c8ccd4);padding:16px 0;font-family:'Be Vietnam Pro',sans-serif;color:var(--ink, #1b2550);}.ds-commitment b{font-size:14px;}.ds-commitment-state{font-size:12px;color:var(--blue, #2a4cc0);}.ds-commitment q{font-size:12px;line-height:1.8;font-style:italic;overflow-wrap:anywhere;color:var(--muted, #4a5378);}.ds-commitment.ds-revoked b{text-decoration:line-through;text-decoration-color:var(--red, #d22f27);}.ds-commitment.ds-revoked .ds-commitment-state{color:#8f1d17;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Paper and Blue Ink",
+    "overview": "Guardian AI presents human support as a record that can be read and checked. Cool paper, blue-black text, explicit rules and quoted commitments connect the public introduction, operational workspace and recipient page. The companion surface inverts the same family into a restrained night palette.\n\nThe public introduction is spacious and editorial; operational surfaces are denser, with clear separation between a person's next action, the map and the people offering help. Original statements stay visibly distinct from status and proposed actions. Vietnamese and English share one type family and the same component structure.",
+    "keyCharacteristics": [
+      "Cool paper and blue ink, with a dark companion surface.",
+      "Flat, ruled containers and nearly square controls.",
+      "Quoted human commitments beside explicit status text.",
+      "One Vietnamese-capable family across both interface languages."
+    ],
+    "rules": [
+      {
+        "name": "The Source Before Status Rule",
+        "body": "Keep the simulation or device-trial label and original response visible alongside derived status; color does not replace that text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat Paper Rule",
+        "body": "Use borders and tonal surfaces for record structure; the authored containers do not rely on floating shadows.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep source labels, human quotes and derived status visually distinct.",
+      "Do use blue ink on paper for records and the night palette for the companion.",
+      "Do retain visible keyboard focus and reduced-motion behavior.",
+      "Do preserve Vietnamese diacritics and allow both interface languages to wrap.",
+      "Do retain the base 44px action and field target when extending the interface."
+    ],
+    "donts": [
+      "Don't use action red as a verified-commitment seal.",
+      "Don't infer a rounded phone frame, numbered clause system or stamp motif from the superseded direction document.",
+      "Don't replace explicit state text and original quotes with color alone.",
+      "Don't treat this source extraction as completed visual or responsive QA."
+    ]
+  }
+}

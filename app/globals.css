@@ -155,7 +155,7 @@ p {
   line-height: 1.8;
 }
 small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.7;
 }
@@ -232,7 +232,7 @@ svg {
   justify-content: center;
   white-space: nowrap;
   border: 1px solid #a3a9b8;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.055em;
   line-height: 1.4;
@@ -291,7 +291,7 @@ svg {
   margin-bottom: 13px;
 }
 .hero-request span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--night-muted);
 }
 .record-entry {
@@ -324,7 +324,7 @@ svg {
   font-size: 13px;
 }
 .record-result p {
-  font-size: 11px;
+  font-size: 12px;
   margin: 6px 0 0;
   color: var(--muted);
 }
@@ -407,7 +407,7 @@ svg {
 }
 .workspace-source p {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
 }
 .connection {
@@ -415,7 +415,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .director {
@@ -468,7 +468,7 @@ svg {
   margin-bottom: 5px;
 }
 .stage-track b {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   display: block;
   line-height: 1.5;
@@ -533,6 +533,10 @@ svg {
   color: var(--ink);
   border-color: #eef0f8;
 }
+.companion .primary:hover {
+  background: var(--wash);
+  border-color: var(--wash);
+}
 .companion .sos {
   width: 100%;
   min-height: 58px;
@@ -550,7 +554,7 @@ svg {
   color: var(--night-muted);
 }
 .subtle {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   color: var(--muted);
 }
@@ -575,7 +579,7 @@ svg {
   align-items: center;
   gap: 9px;
   color: #a9c0ff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
 }
@@ -595,20 +599,20 @@ svg {
   background: transparent;
   border-color: #6473a3;
   color: var(--night-text);
-  font-size: 11px;
+  font-size: 12px;
 }
 .companion :focus-visible {
   outline-color: #a9c0ff;
 }
 .companion .check {
-  font-size: 11px;
+  font-size: 12px;
 }
 details {
   border-top: 1px solid var(--rule);
   padding: 16px 0;
 }
 summary {
-  min-height: 30px;
+  min-height: 44px;
   cursor: pointer;
   font-size: 13px;
   line-height: 1.7;
@@ -631,7 +635,7 @@ details p {
   margin: 18px 0;
 }
 .emergency p {
-  font-size: 11px;
+  font-size: 12px;
   margin: 6px 0 12px;
 }
 .map-area {
@@ -657,7 +661,7 @@ details p {
   background: white;
   border: 1px solid var(--ink);
   padding: 8px 10px;
-  font-size: 10px;
+  font-size: 12px;
   pointer-events: none;
   max-width: calc(100% - 70px);
 }
@@ -678,7 +682,7 @@ details p {
   font-size: 16px;
 }
 .map-plan span {
-  font-size: 11px;
+  font-size: 12px;
 }
 .map-wait {
   position: absolute;
@@ -696,15 +700,15 @@ details p {
   padding: 9px;
   background: #fbf1dc;
   color: #6e4100;
-  font-size: 10px;
+  font-size: 12px;
   border: 1px solid #a86200;
 }
 .venue-pin {
   border: 2px solid white;
-  min-height: 30px;
-  min-width: 30px;
-  width: 30px;
-  height: 30px;
+  min-height: 44px;
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border-radius: 50%;
   background: var(--blue);
@@ -714,12 +718,18 @@ details p {
 .venue-pin:hover {
   color: var(--blue);
 }
+.delete-confirm {
+  padding: 20px;
+  margin-top: 20px;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+}
 .map-under {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   margin-top: 10px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .map-under > span:first-child {
@@ -765,7 +775,7 @@ details p {
   color: var(--blue);
 }
 .commitment-state {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--blue);
 }
 .commitment q {
@@ -844,7 +854,7 @@ details p {
   gap: 4px;
 }
 .member-list span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--blue);
 }
 .readiness {
@@ -960,13 +970,13 @@ details p {
 .error-box small {
   display: block;
   color: #8f1d17;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 5px;
 }
 .error-box .icon-button {
   padding: 8px;
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 44px;
+  min-height: 44px;
 }
 .workspace-footer {
   display: flex;
@@ -974,7 +984,7 @@ details p {
   gap: 25px;
   border-top: 1px solid var(--rule);
   padding: 20px 24px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .loading {
@@ -1084,7 +1094,7 @@ details p {
   margin: 0;
 }
 .receiver-title > span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--blue);
 }
 .partner-setup {
@@ -1127,7 +1137,7 @@ details p {
   margin: 25px 0;
 }
 .receiver-plan > b {
-  font-size: 11px;
+  font-size: 12px;
 }
 .receiver-plan h3 {
   margin: 12px 0;
@@ -1158,7 +1168,7 @@ details p {
 .receiver > footer {
   border-top: 1px solid var(--rule);
   padding: 20px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .receiver .error-box {
@@ -1297,7 +1307,7 @@ details p {
     gap: 10px;
   }
   .workspace-source p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .connection {
     display: none;
@@ -1323,7 +1333,7 @@ details p {
     display: none;
   }
   .stage-track span {
-    font-size: 11px;
+    font-size: 12px;
   }
   .workspace-tabs {
     padding: 8px;
@@ -1362,7 +1372,7 @@ details p {
     font-size: 14px;
   }
   .map-under {
-    font-size: 9px;
+    font-size: 12px;
   }
   .coordination {
     display: block;

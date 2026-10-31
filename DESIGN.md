@@ -1,303 +1,236 @@
 ---
-name: Guardian AI
-description: A sealed minute of who helped, what they promised, and where to go next.
+name: "Guardian AI"
+description: "Practical human support, recorded in paper and blue ink."
 colors:
   paper: "#f6f7f5"
-  sheet: "#ffffff"
-  sheet-tint: "#eef0ec"
-  rule-grey: "#e6e8e3"
-  hairline: "#c8ccd4"
-  steel-rule: "#a3a9b8"
+  sheet: "#fff"
   ink: "#1b2550"
-  ink-muted: "#4a5378"
-  ink-struck: "#8a90a8"
-  ballpoint-blue: "#2a4cc0"
-  ballpoint-deep: "#1e3a8a"
-  ballpoint-wash: "#e8edfb"
-  seal-red: "#d22f27"
-  seal-deep: "#8f1d17"
-  support-amber: "#a86200"
-  support-amber-deep: "#6e4100"
-  support-amber-wash: "#fbf1dc"
-  night-ground: "#141c3f"
-  night-shell: "#0f1533"
+  muted: "#4a5378"
+  blue: "#2a4cc0"
+  wash: "#e8edfb"
+  rule: "#c8ccd4"
+  control-rule: "#a3a9b8"
+  red: "#d22f27"
+  night: "#141c3f"
   night-sheet: "#1a2350"
-  night-raised: "#212b5e"
-  night-rule: "#2c3770"
   night-text: "#eef0f8"
   night-muted: "#a9b2d6"
-  night-blue: "#7f9cff"
-  night-amber: "#f0b44c"
-  night-red: "#ff5a4c"
+  night-rule: "#6473a3"
+  night-confirmation: "#a9c0ff"
+  warning-wash: "#fbf1dc"
+  warning-ink: "#6e4100"
+  warning-rule: "#a86200"
+  error-ink: "#8f1d17"
 typography:
   display:
-    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
-    fontSize: "28px"
+    fontFamily: "Be Vietnam Pro"
+    fontSize: "clamp(42px, 4.5vw, 70px)"
     fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "-0.7px"
+    lineHeight: 1.18
+    letterSpacing: "-0.035em"
   headline:
-    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
-    fontSize: "21px"
-    fontWeight: 600
-    lineHeight: 1.25
-    letterSpacing: "-0.3px"
+    fontFamily: "Be Vietnam Pro"
+    fontSize: "26px"
+    fontWeight: 700
+    lineHeight: 1.35
+    letterSpacing: "-0.02em"
   title:
-    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    fontFamily: "Be Vietnam Pro"
     fontSize: "18px"
-    fontWeight: 600
-    lineHeight: 1.3
+    fontWeight: 700
+    lineHeight: 1.4
   body:
-    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    fontFamily: "Be Vietnam Pro"
     fontSize: "14px"
     fontWeight: 400
-    lineHeight: 1.5
-    fontFeature: "tnum"
-  clause:
-    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    lineHeight: 1.6
+  label:
+    fontFamily: "Be Vietnam Pro"
     fontSize: "13px"
     fontWeight: 400
-    lineHeight: 1.5
-    fontFeature: "tnum"
-  minute-title:
-    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
-    fontSize: "13px"
-    fontWeight: 700
-    letterSpacing: "0.14em"
-  label:
-    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
-    fontSize: "10.5px"
-    fontWeight: 700
-    letterSpacing: "0.1em"
+    lineHeight: 1.6
+  button:
+    fontFamily: "Be Vietnam Pro"
+    fontSize: "14px"
+    fontWeight: 500
+    lineHeight: 1.6
 rounded:
-  sheet: "2px"
-  code: "0px"
-  device: "28px"
-  mark: "50%"
+  control: "2px"
+  circle: "50%"
 spacing:
-  xs: "4px"
-  sm: "8px"
-  md: "14px"
-  lg: "20px"
-  xl: "28px"
+  compact: "8px"
+  action-gap: "10px"
+  field: "12px"
+  inset: "16px"
+  grid-gap: "18px"
+  mobile-page: "20px"
+  panel: "22px"
+  page: "24px"
 components:
   button-default:
     backgroundColor: "{colors.sheet}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.sheet}"
-    padding: "9px 14px"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+    typography: "{typography.button}"
   button-default-hover:
-    backgroundColor: "{colors.sheet-tint}"
+    backgroundColor: "{colors.wash}"
   button-primary:
     backgroundColor: "{colors.ink}"
     textColor: "{colors.sheet}"
-    rounded: "{rounded.sheet}"
-    padding: "9px 14px"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+    typography: "{typography.button}"
   button-primary-hover:
-    backgroundColor: "{colors.ballpoint-blue}"
-  button-sos:
-    backgroundColor: "{colors.seal-red}"
+    backgroundColor: "{colors.blue}"
+  button-danger:
+    backgroundColor: "{colors.red}"
     textColor: "{colors.sheet}"
-    rounded: "{rounded.sheet}"
-    padding: "12px 14px"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+  button-night-primary:
+    backgroundColor: "{colors.night-text}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+  button-sos:
+    backgroundColor: "{colors.red}"
+    textColor: "{colors.sheet}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+    width: "100%"
   input-field:
     backgroundColor: "{colors.sheet}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.sheet}"
-    padding: "10px"
-  panel:
-    backgroundColor: "{colors.sheet}"
+    rounded: "{rounded.control}"
+    padding: "11px 12px"
+  workspace-tab-active:
+    backgroundColor: "{colors.wash}"
+    textColor: "{colors.blue}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+  language-active:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.sheet}"
+    rounded: "{rounded.control}"
+    padding: "8px"
+  source-label:
+    textColor: "{colors.muted}"
+    padding: "5px 8px"
+  commitment-row:
     textColor: "{colors.ink}"
-    rounded: "{rounded.sheet}"
-  venue-code:
-    textColor: "{colors.ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.code}"
-    padding: "0 4px"
-  tab-active:
-    textColor: "{colors.ballpoint-blue}"
-    padding: "10px 0 12px"
-  night-screen:
-    backgroundColor: "{colors.night-ground}"
-    textColor: "{colors.night-text}"
-    rounded: "{rounded.device}"
-  night-button:
-    backgroundColor: "{colors.night-sheet}"
-    textColor: "{colors.night-text}"
-    rounded: "{rounded.sheet}"
+    padding: "16px 0"
 ---
 
 # Design System: Guardian AI
 
 ## Overview
 
-**Creative North Star: "The Sealed Minute"** (Biên bản niêm phong)
+**Creative North Star: "Paper and Blue Ink"**
 
-Every incident is a minute being drawn up in real time. The command center reads as an official record on cool white paper: ballpoint blue-black ink for text and rules, ballpoint blue for quotes, routes and live state, and one vermilion seal that appears only when a place has actually agreed to take the person in. Each offer from a helper becomes a numbered clause ("Điều 2 · Nơi đến") with the helper's own words quoted beneath it, so a viewer can check every AI conclusion against what was said.
+Guardian AI presents human support as a record that can be read and checked. Cool paper, blue-black text, explicit rules and quoted commitments connect the public introduction, operational workspace and recipient page. The companion surface inverts the same family into a restrained night palette.
 
-Density is high and deliberate: three columns of record (minute, map, call register) sit on one screen for a projector audience, framed by 1px ink rules rather than cards floating on shadows. States are printed marks rather than colored badges: a confirmed clause is stamped, a withdrawn one is struck through in red, and an unanswered one is a dotted blank line waiting to be filled.
+The public introduction is spacious and editorial; operational surfaces are denser, with clear separation between a person's next action, the map and the people offering help. Original statements stay visibly distinct from status and proposed actions. Vietnamese and English share one type family and the same component structure.
 
-The phone companion is the same document carried at night. Inside the phone screen the ground inverts to deep ink and the paper palette shifts to its night equivalents, so the person alone in the street gets a dark, low-glare screen while the record stays recognisably the same system. The world explicitly rejects the near-black neon command console it replaced.
+This is a source-derived snapshot of the new local demo implementation, based on `app/globals.css`, `app/layout.tsx`, and the home, workspace and receiver components. It reconciles the earlier direction document with current code. No approved raster composition or rendered captures were available; this document does not certify visual QA. Sidecar tonal ramps are generated swatch previews, not extra runtime color tokens.
 
 **Key Characteristics:**
-- Cool paper ground, ink text, 1px ink frames, 2px corners everywhere.
-- One seal red, reserved for SOS, danger and the confirmation stamp.
-- States drawn as marks on paper: sealed, struck through, dotted blank.
-- Venue codes (Q-27, T-01, K-02) shared verbatim by map labels and minute clauses.
-- Tabular numerals throughout; times and counters never jitter.
-- Night inversion scoped to the phone screen only.
+- Cool paper and blue ink, with a dark companion surface.
+- Flat, ruled containers and nearly square controls.
+- Quoted human commitments beside explicit status text.
+- One Vietnamese-capable family across both interface languages.
 
 ## Colors
 
-A paper-and-ballpoint palette: near-neutral cool greys, two inks of blue, one red reserved for authority and danger, and a narrow amber for one specific meaning.
+The palette pairs cool paper with blue ink; warning and error colors carry operational meaning. Normative values are in frontmatter.
 
 ### Primary
-- **Ballpoint Blue-Black** (ink): all body text, panel frames, the top bar rule, primary buttons, the venue code box. It is the color of the record itself.
-- **Ballpoint Blue** (ballpoint-blue): verbatim quotes, clause numbers, the route line (graded from ink to blue along its length), live dots, focus rings, active tabs, primary-button hover. Blue means "said" or "live".
-- **Deep Ballpoint** (ballpoint-deep) and **Blue Wash** (ballpoint-wash): text and fill for confirmed venue markers, confirmed candidate letters and status chips.
+- **Blue ink** (`ink`): primary text, strong boundaries and primary buttons on light surfaces.
+- **Ballpoint blue** (`blue`): active tabs, confirmations, links, focus and primary-button hover.
+- **Blue wash** (`wash`): selected navigation, proposed-plan blocks and supporting information.
 
 ### Secondary
-- **Seal Vermilion** (seal-red): the SOS button and timer, the round seal on the confirmed clause, the strike-through line on withdrawn clauses, risky-route dashes and incident markers on the map. **Seal Deep** (seal-deep) carries declined and failed text where the bright red would be too loud at small sizes.
-
-### Tertiary
-- **Support Amber** (support-amber, with support-amber-deep text and support-amber-wash fill): markers for venues on the partner support list, observed dark streets on the map, connection and real-call warnings, the demo-mode badge. Nothing else.
+- **Action red** (`red`): SOS, emergency and destructive actions; it is not a confirmation seal.
+- **Warning paper, ink and rule** (`warning-wash`, `warning-ink`, `warning-rule`): warning and check-in surfaces.
+- **Error ink** (`error-ink`): error text and withdrawn-commitment status.
 
 ### Neutral
-- **Paper** (paper): page ground.
-- **Sheet** (sheet): panels, inputs, buttons, map overlays.
-- **Sheet Tint** (sheet-tint): button hover, agent cards, metric tiles, call lanes.
-- **Rule Grey** (rule-grey): inner dividers inside lists and lanes.
-- **Hairline** (hairline): clause separators, input strokes, secondary borders.
-- **Steel Rule** (steel-rule): default button and pill strokes, idle dots.
-- **Ink Muted** (ink-muted): secondary text, pending clauses, timestamps.
-- **Ink Struck** (ink-struck): text of struck-through clauses and superseded routes.
+- **Cool paper** (`paper`) and **white sheet** (`sheet`): page ground and bordered content surfaces.
+- **Muted ink** (`muted`), **divider rule** (`rule`) and **control rule** (`control-rule`): secondary text, section divisions and field boundaries.
+- **Night ground** (`night`) and **night sheet** (`night-sheet`): companion background and its text fields.
+- **Night text**, **night muted**, **night rule** and **night confirmation**: corresponding text, field-border and focus/confirmation roles on the dark companion.
 
-### Night (phone screen only)
-- **Night Ground** (night-ground) under **Night Text** (night-text), with **Night Blue** (night-blue) as the accent, **Night Muted** (night-muted) for secondary text, **Night Rule** (night-rule) for borders, **Night Sheet** / **Night Raised** for message cards and buttons, **Night Shell** for the device bezel. **Night Amber** and **Night Red** replace the day amber and red so warnings stay legible on ink.
-
-### Named Rules
-**The One Seal Rule.** Seal red appears only for SOS, danger, strike-throughs and the confirmation stamp. A red element that is not one of those dilutes the stamp.
-
-**The Amber Means Support-List Rule.** Amber marks partner support-list venues and warnings, nothing decorative. If it is not a support-list marker or a caution, it is not amber.
-
-**The Scoped Night Rule.** The night palette is applied by redefining the same tokens on the phone screen and standalone phone root, never by inverting the whole page. The command center stays on paper.
+**The Source Before Status Rule.** Keep the simulation or device-trial label and original response visible alongside derived status; color does not replace that text.
 
 ## Typography
 
-**Display Font:** Be Vietnam Pro (with Segoe UI, system-ui, sans-serif)
-**Body Font:** Be Vietnam Pro
-**Label Font:** Be Vietnam Pro, uppercase with wide tracking
+Be Vietnam Pro is loaded through `next/font/google` with Latin and Vietnamese subsets and weights 400, 500, 600 and 700. The framework supplies its generated fallback; no separate display or monospace face is declared.
 
-**Character:** One humanist sans with full Vietnamese diacritics, loaded through next/font at weights 400 to 700. Hierarchy comes from weight, tracking and case, the way a typed official form separates its headings from its entries.
+The display role is the landing headline. Its fluid size is overridden to 48px at widths up to 1200px and 43px at widths up to 760px. The base headline and title roles correspond to h2 and h3; individual surfaces adjust these: the demo director uses a 29px h1, setup and record headings use 36px, and the receiver uses 31px. The companion heading is 26px at weight 500.
 
-### Hierarchy
-- **Display** (600, 28px, -0.7px): page and receiver headings ("Cửa hàng").
-- **Headline** (600, 21px, -0.3px): panel titles, the selected venue name on the right column.
-- **Title** (600, 18px): card headings on the receiver page.
-- **Body** (400, 14px, 1.5): default text; 16px at 1650px and wider for projector viewing.
-- **Clause** (400, 13px, 1.5): minute entries; names in 700.
-- **Minute Title** (700, 13px, 0.14em, uppercase): "BIÊN BẢN ĐIỀU PHỐI", centered over a 96px ink rule.
-- **Label** (700, 10.5px, 0.1em, uppercase): clause numbers ("ĐIỀU 1 · DỰ PHÒNG") and venue codes.
-
-### Persuade scale (landing `/` only)
-The public landing (`app/landing.css`) adds a display scale the working screens never use: hero 800 `clamp(38px, 4.6vw, 68px)` at -0.035em; section heads 800 `clamp(30px, 3.4vw, 48px)` at -0.03em; night-band line 700 `clamp(26px, 3.4vw, 46px)`; step numerals 800 56px in ballpoint blue; lead copy `clamp(17px, 1.5vw, 20px)`; body 16px. Everything below 16px follows the ramp above.
-
-### Named Rules
-**The Tabular Record Rule.** `font-variant-numeric: tabular-nums` is set at the root. Timers, clause numbers, ETAs and timestamps must line up column to column.
-
-**The Quote Is Italic Blue Rule.** A helper's own words render in italic ballpoint blue inside curly quotes, directly beneath the clause they support. AI paraphrase stays upright ink.
+Body text uses the frontmatter role; paragraphs have a more open line height of 1.8. Introductory copy is 16px with a 61ch limit, while setup lead text is 15px with a 75ch limit. Labels sit above controls. Time elements and record totals use tabular numerals. Functional source tags and secondary metadata use 12px text; they are not a display-heading pattern.
 
 ## Layout
 
-The command center is a full-width record (max 2300px, 30px gutters; 42px at 1650px and wider; 20px under 1200px; 14px under 800px). Above the work area sit stacked ink-ruled bars: the showcase head (brand and minute number, act title, SOS timer in seal red, demo controls), a one-line narration, the venue directory summary and the agent activity strip.
+The landing page uses 4vw side gutters and a two-column hero with a 1.15:1 ratio. Its content becomes a single column at 760px. At widths of 1550px and above, the landing container is capped at 1700px. Hero actions provide direct access to simulation and companion routes; the adjacent sample record is explicitly labeled as simulated.
 
-The work row is three columns: the phone companion on the left, the light map in the center with its legend and an ink-ruled simulation bar along the bottom, and on the right a fixed column holding the selected venue and the minute of clauses. Under 1200px the operations panel drops below as a full-width row. Under 800px everything stacks.
+The default operational grid is 330px / flexible map / 270px, with an 18px gap and 22px by 24px outer padding. The walk variant uses 380px / flexible map / 280px. Above 1550px, the demo grid becomes 380px / flexible map / 320px. At 1200px and below, both use a 320px companion and flexible map, followed by a full-width coordination region.
 
-The receiver page (`/r/<token>`) is a single 520px column of stacked bordered cards with 12px gaps, built for a phone held in one hand.
+At 760px and below, the workspace stacks with 16px gutters. The demo places the map before the companion; the walk route keeps the companion first. The map is no longer sticky. Map height is 630px by default, 700px on large screens, 650px in the intermediate layout, and 330px on small screens; the small walk map is 300px. These are current source rules, not measurements from rendered captures.
 
-Spacing is tight and utilitarian (most gaps 8 to 20px). Clauses are separated by hairline rules with 10px vertical padding, not by gaps.
+Setup and record views cap at 1060px; the receiver caps at 520px. Setup's two columns collapse at 760px. Repeated gaps and insets appear in frontmatter; they describe observed values rather than an invented mathematical spacing scale. Printing removes workspace navigation and action chrome around the record.
 
 ## Elevation & Depth
 
-Flat by default. Depth comes from 1px ink frames and hairline dividers, the way a printed form separates its fields. The map is the only layered surface: a light positron basemap with pale extruded buildings (#dfe2e8 at 0.9 opacity) and route lines drawn above it.
+The authored stylesheet has no box-shadow vocabulary. Rules, background changes and content hierarchy establish depth. The landing sample record alone rotates by minus one degree at wide widths and returns upright at 1200px; that is a surface-specific composition, not a universal card treatment. The map is sticky on wider layouts. External map-library styling is outside this extracted system.
 
-### Shadow Vocabulary
-- **Device bezel** (`box-shadow: 0 15px 40px rgba(8,12,36,0.15), 0 0 0 3px #141c3f`): only on the phone shell, so the phone reads as an object placed on the paper.
-- **Modal lift** (`box-shadow: 0 30px 120px rgba(27,37,80,0.22)`): only on modal sheets over a blue-wash backdrop.
-- **SOS lift** (`box-shadow: 0 4px 14px rgba(8,12,36,0.3)`): only on the phone's SOS button.
-
-### Named Rules
-**The Ruled Not Raised Rule.** Panels, cards, lanes and map controls carry a 1px border and no shadow. A shadow on a panel turns the record back into a dashboard.
+**The Flat Paper Rule.** Use borders and tonal surfaces for record structure; the authored containers do not rely on floating shadows.
 
 ## Shapes
 
-Corners are 2px on every sheet, input, button, pill, chip and map label: square enough to read as cut paper, soft enough not to look broken. The venue code box is the one fully square element (0px), like a stamped registration number. Circles are reserved for marks: map pins, live dots, the voice orb and the seal. The phone shell (35px) and screen (28px) are the only large radii, because they depict a physical device. Receiver-page ring buttons are pill-shaped (40px) as a phone call-screen convention.
+Buttons and inputs have the slight control radius in frontmatter. Major panels, records, dividers and source labels remain rectangular. Circular shapes belong to map markers, the covert-call avatar and the call-ending control. The companion is a rectangular dark panel; the old document's rounded phone shell is not implemented here.
 
 ## Components
 
 ### Buttons
-- **Shape:** gently squared (2px).
-- **Default:** white sheet, ink text, 1px steel-rule stroke, 9px 14px, weight 500. Hover tints the sheet and turns the stroke to ink.
-- **Primary:** ink fill with white text, weight 600. Hover shifts fill and stroke to ballpoint blue.
-- **SOS:** seal-red fill, white 16px 700 label tracked 1.4px, small pale-red subline. Hover brightens to night red.
-- **Focus:** 2px ballpoint-blue outline, 3px offset, on every interactive element.
-- **Disabled:** 40% opacity, not-allowed cursor.
 
-### Chips and Pills
-- **Style:** 11px weight 500 text, white sheet, 1px steel-rule stroke, 2px corners, 3px 8px.
-- **Status chips:** confirmed uses blue wash with ballpoint text; declined uses rule grey with seal-deep text.
+Buttons are compact actions with a base minimum height of 44px, an 8px icon gap and the padding defined in frontmatter. Default buttons use a white surface and control rule; hover changes the fill to blue wash and the border to blue. Primary buttons use blue ink and turn blue on hover. Danger buttons use action red. Disabled buttons use 0.45 opacity and a not-allowed cursor.
+
+The companion's primary action uses night text as a light fill with ink text and a 12px label; hover changes its fill and border to blue wash. SOS is full width, at least 58px high, with a 16px bold label and a darker red hover. Preserve its prominence within the companion rather than applying it to ordinary actions.
+
+Global keyboard focus uses a 3px blue outline offset by 3px; companion focus uses night confirmation. Background and border changes transition over 0.15s. Reduced-motion preferences disable transitions and animations and remove smooth scrolling. Disclosure summaries and error-dismiss controls also carry a 44px minimum target in the current source.
+
+### Chips
+
+The source label is a noninteractive rectangular tag with a control-rule border, muted text, 12px bold lettering and 0.055em tracking. It identifies simulation or device trial; it is neither a decorative eyebrow nor a selectable filter. Do not give it fabricated interactive states.
 
 ### Cards / Containers
-- **Corner Style:** 2px.
-- **Background:** white sheet on paper; agent cards and call lanes on sheet tint.
-- **Shadow Strategy:** none (see Elevation).
-- **Border:** 1px ink for top-level panels and bars; 1px hairline for inner cards.
-- **Internal Padding:** 11 to 20px.
+
+The coordination panel is a white, ink-bordered rectangle padded 22px vertically and 18px horizontally. The companion uses night ground and 26px by 22px padding. Receiver plan summaries use blue wash with 20px padding. Rows and sections use fine rules, without shadows or an assumed all-purpose card radius.
 
 ### Inputs / Fields
-- **Style:** white sheet, 1px hairline stroke, 2px corners, 10px padding, ballpoint-blue caret.
-- **Focus:** 2px ballpoint-blue outline at 3px offset.
-- **Labels:** 12px ink, stacked 8px above the field.
+
+Fields use white, ink text, a control-rule border and the frontmatter padding, with a minimum height of 44px. Textareas start at 100px high, resize vertically and use line height 1.7. The companion substitutes night sheet, night text, night rule and night-muted placeholders. Visible labels remain outside fields; a placeholder is supporting copy. Errors appear in separate alert boxes.
 
 ### Navigation
-- **Tabs:** 11px muted text with a 2px transparent bottom rule; active tab turns ballpoint blue with a blue underline.
-- **Top bar:** brand mark in a 1px ink frame, a vertical rule before the minute number, SOS timer, then demo controls as square icon buttons.
 
-### The Minute (signature component)
-The right column's record. A centered uppercase title over a short ink rule, the "Lập lúc 10:00 · kế hoạch v1" line, then an ordered list of clauses separated by hairlines. Each clause has a head line (clause number and role in uppercase blue label on the left, status in 11px bold ink on the right), the helper's name in bold preceded by its venue code box, the instruction text, and when sealed the verbatim quote in italic blue. Clauses sort sealed, then accepted, then pending, then struck.
+The header carries a bold wordmark, route links and the VI/EN switch. Header route links change to blue on hover and are hidden at the small breakpoint; direct landing actions remain. Workspace tabs use transparent rest states and blue text, a blue border and blue wash when `aria-pressed` is true. On small screens they share the available width. The language switch gives each language a minimum 44px width; the active language has ink fill and white text.
 
-- **Sealed:** clause number turns seal red; a round red SVG seal (two concentric rings, "ĐÃ / XÁC NHẬN / time") sits at the right, rotated -11deg at 90% opacity, and stamps in over 260ms (`cubic-bezier(0.16, 1, 0.3, 1)`, from scale 1.35 and zero opacity). Reduced motion removes the animation.
-- **Accepted (ok):** ink text, instruction clamped to two lines.
-- **Pending:** muted text with a dotted blank line where the answer will go.
-- **Struck:** name and text in ink-struck grey with a 1px seal-red line-through, status in seal red, code box stroke softened to steel.
+### Commitment Rows
 
-### Venue Codes
-A letter for venue kind plus a two-digit index (Q-27 quán, T-01 cửa hàng tiện lợi, K-02 khách sạn). The same code labels the map pin ("Q-27 · Quán Cháo Ấm") and the minute clause, so the eye can jump between the map and the record.
-
-### Map
-Light positron basemap. The active route is a 5px line graded from ink to ballpoint blue over an 11px white casing; superseded routes are 3px dashed ink-struck; the free-walk route is dashed blue; risky segments are 2px dashed seal red with a faint red blur; observed dark streets are dashed amber. Pins are 21px circles: blue wash for confirmed, amber wash for support-list, rule grey with a dashed stroke for unknown or closed. Map controls and overlays use the 1px ink frame and 2px corners.
-
-### Phone Companion (night)
-The phone screen redefines the ink, muted, blue, amber, red and hairline tokens to their night values. Message cards sit on night sheet with night-rule borders; the voice orb is a ballpoint-blue disc with a night-blue ring; buttons inside the screen take night sheet fill and night-rule strokes, with a night-blue stroke on hover.
-
-### Evidence Dossier
-The exported HTML dossier carries its own inline stylesheet using the same values (ink, blue, muted, hairline line, paper soft, red for critical, amber for warnings) and the same seal SVG, so the printed record matches the screen.
+Each ruled row places a person's name above explicit status and an original quote. The row uses 16px vertical padding and a 7px internal gap. Names use 14px bold text; status uses 12px blue text; quotes use 12px italic muted text with line height 1.8 and wrap long content. Withdrawn names are struck through in red, and their status uses error ink. This text-based state treatment replaces the legacy document's numbered clauses and confirmation stamps.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** frame top-level panels with a 1px ink border and 2px corners on a white sheet over the paper ground.
-- **Do** show every AI conclusion next to the quote that supports it, in italic ballpoint blue.
-- **Do** express state as a printed mark: the seal for confirmed, a red strike-through for withdrawn, a dotted blank for waiting.
-- **Do** give every venue its code and use the same code on the map and in the minute.
-- **Do** keep tabular numerals on anything that counts or tells time.
-- **Do** scope the night palette by redefining tokens on the phone screen root.
-- **Do** respect reduced motion: the seal appears without the stamp animation.
+- Do keep source labels, human quotes and derived status visually distinct.
+- Do use blue ink on paper for records and the night palette for the companion.
+- Do retain visible keyboard focus and reduced-motion behavior.
+- Do preserve Vietnamese diacritics and allow both interface languages to wrap.
+- Do retain the base 44px action and field target when extending the interface.
 
 ### Don't:
-- **Don't** use seal red for anything except SOS, danger, strike-throughs and the confirmation stamp.
-- **Don't** use amber except for support-list venue markers and warnings.
-- **Don't** return to a near-black neon console look on the command center: no dark page ground, no glowing accents, no cyan on black.
-- **Don't** put shadows on panels or cards; only the phone bezel, modal and SOS button lift.
-- **Don't** round sheets past 2px or square off the round marks (pins, dots, seal).
-- **Don't** show a confirmation as a colored pill when the seal is available; the stamp is the confirmation.
+- Don't use action red as a verified-commitment seal.
+- Don't infer a rounded phone frame, numbered clause system or stamp motif from the superseded direction document.
+- Don't replace explicit state text and original quotes with color alone.
+- Don't treat this source extraction as completed visual or responsive QA.

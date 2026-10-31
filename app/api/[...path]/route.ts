@@ -15,6 +15,7 @@ import { aiConfigured, realtimeSecret } from "@/lib/ai";
 import { digest } from "@/lib/repository";
 import type { Account, Incident, Member } from "@/lib/types";
 import { reportHtml } from "@/lib/report";
+import { emergency } from "@/lib/rules";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const globals = globalThis as unknown as {
@@ -30,6 +31,17 @@ const secret = () => {
 };
 const sign = (id: string) =>
   createHmac("sha256", secret()).update(id).digest("hex");
+function aiAccess(req: NextRequest) {
+  const code = process.env.AI_ACCESS_CODE;
+  if (
+    code &&
+    !timingSafeEqual(
+      Buffer.from(digest(code)),
+      Buffer.from(digest(req.headers.get("x-guardian-ai-code") || "")),
+    )
+  )
+    throw new Error("AI_ACCESS_CODE_REQUIRED");
+}
 function owner(req: NextRequest) {
   const value = req.cookies.get("guardian_v2")?.value;
   const [id, sig] = value?.split(".") || [];
@@ -131,6 +143,12 @@ const input = z.discriminatedUnion("action", [
     })
     .strict(),
   z.object({ action: z.literal("voice"), consent: z.literal(true) }).strict(),
+  z
+    .object({
+      action: z.literal("recording-consent"),
+      consent: z.literal(true),
+    })
+    .strict(),
   z.object({ action: z.literal("delete-transcript") }).strict(),
 ]);
 const memberInput = z.discriminatedUnion("action", [
@@ -160,6 +178,7 @@ const publicAccount = (a: Account) => ({
   members: a.members.map(({ tokenHash: _, ...m }) => m),
   config: {
     ai: aiConfigured(),
+    aiAccessRequired: Boolean(process.env.AI_ACCESS_CODE),
     maps: !!process.env.GOOGLE_MAPS_API_KEY,
     storage: process.env.DATABASE_URL ? "postgres" : "sqlite",
   },
@@ -399,7 +418,18 @@ export async function POST(req: NextRequest, context: Context) {
         }
         if (!member.joined) throw new Error("CONSENT_REQUIRED");
         if (d.action === "location") {
+          if (member.role !== "PARTNER") throw new Error("FORBIDDEN");
           member.location = { lat: d.lat, lng: d.lng };
+          const reply = i.replies.find((r) => r.memberId === member.id);
+          if (reply) {
+            reply.location = member.location;
+            if (activePlan(i)?.replyId === reply.id)
+              invalidate(i, [
+                "Địa điểm tiếp nhận đã đổi; cần chấp nhận lại tuyến.",
+                "The receiving location changed; the route needs acceptance again.",
+              ]);
+            await e.plan(i);
+          }
           return;
         }
         if (d.action === "duty") {
@@ -459,32 +489,32 @@ export async function POST(req: NextRequest, context: Context) {
         const i = a.incident;
         if (terminal(i)) throw new Error("SESSION_ENDED");
         if (path[1] !== i.id) throw new Error("STALE_SESSION");
+        if (!i.recordingConsentAt)
+          throw new Error("RECORDING_CONSENT_REQUIRED");
         const rows = await e.repo.query(
           "SELECT * FROM guardian_audio WHERE incident=$1 AND id=$2 ORDER BY seq",
           [i.id, audioId],
         );
         if (rows[seq]) {
-          if (rows[seq].hash !== digest(bytes.toString("base64")))
+          if (rows[seq].hash !== digest(bytes) || rows[seq].mime !== mime)
             throw new Error("AUDIO_RETRY_MISMATCH");
           return;
         }
         if (seq !== rows.length) throw new Error("AUDIO_OUT_OF_ORDER");
+        if (rows.length && rows[0].mime !== mime)
+          throw new Error("AUDIO_TYPE_CHANGED");
         if (
           i.recordings.reduce((n, r) => n + r.bytes, 0) + bytes.length >
           80 * 1024 * 1024
         )
           throw new Error("RECORDING_LIMIT");
-        await e.repo.query(
-          "INSERT INTO guardian_audio VALUES($1,$2,$3,$4,$5,$6)",
-          [
-            i.id,
-            audioId,
-            seq,
-            mime,
-            bytes.toString("base64"),
-            digest(bytes.toString("base64")),
-          ],
-        );
+        e.repo.stageAudio(a, {
+          id: audioId,
+          seq,
+          mime: mime!,
+          payload: bytes.toString("base64"),
+          hash: digest(bytes),
+        });
         const all = [...rows, { payload: bytes.toString("base64") }];
         const total = Buffer.concat(
           all.map((r) => Buffer.from(String(r.payload), "base64")),
@@ -494,7 +524,7 @@ export async function POST(req: NextRequest, context: Context) {
           mime: mime!,
           chunks: all.length,
           bytes: total.length,
-          hash: digest(total.toString("base64")),
+          hash: digest(total),
         };
         i.recordings = i.recordings
           .filter((r) => r.id !== audioId)
@@ -503,7 +533,8 @@ export async function POST(req: NextRequest, context: Context) {
       return json({ ok: true });
     }
     if (path[0] !== "action") throw new Error("NOT_FOUND");
-    const d = input.parse(await req.json());
+    const { incidentId, ...body } = await req.json();
+    const d = input.parse(body);
     let extra: unknown;
     const result = await e.with(id, async (a) => {
       const i = a.incident;
@@ -512,11 +543,14 @@ export async function POST(req: NextRequest, context: Context) {
         return publicAccount(a);
       }
       if (d.action === "demo") {
+        if (d.ai) aiAccess(req);
         if (d.ai && !d.consent) throw new Error("AI_CONSENT_REQUIRED");
         if (d.ai && !aiConfigured()) throw new Error("AI_NOT_CONFIGURED");
         await e.startDemo(a, d.locale, d.ai);
         return publicAccount(a);
       }
+      if (d.action !== "locale" && incidentId !== i.id)
+        throw new Error("STALE_SESSION");
       if (terminal(i) && !["locale", "delete-transcript"].includes(d.action))
         throw new Error("SESSION_ENDED");
       switch (d.action) {
@@ -543,6 +577,7 @@ export async function POST(req: NextRequest, context: Context) {
           seal(i, ["Người dùng kết thúc phiên", "User ended the session"]);
           break;
         case "ai":
+          if (d.enabled) aiAccess(req);
           if (d.enabled && (!d.consent || !aiConfigured()))
             throw new Error("AI_CONSENT_REQUIRED");
           i.ai.enabled = d.enabled;
@@ -638,10 +673,27 @@ export async function POST(req: NextRequest, context: Context) {
         case "transcript":
           if (!i.ai.enabled) throw new Error("AI_CONSENT_REQUIRED");
           original(i, d.who, d.text, d.id);
+          if (d.who === "You") {
+            const urgent = emergency(d.text);
+            if (urgent) {
+              i.risk = urgent.risk;
+              event(i, "URGENT_TRANSCRIPT", [
+                "Hội thoại có dấu hiệu khẩn cấp; bạn có thể chọn SOS hoặc gọi hỗ trợ.",
+                "Urgent content in conversation; you can choose SOS or call for help.",
+              ]);
+            }
+          }
           break;
         case "voice":
           rate("voice:" + id, 6, 600000);
           extra = await realtimeSecret(i, "USER");
+          break;
+        case "recording-consent":
+          i.recordingConsentAt = nowDate();
+          event(i, "RECORDING_CONSENT", [
+            "Bạn đồng ý lưu âm thanh của cuộc trò chuyện AI.",
+            "You consented to storing audio of the AI conversation.",
+          ]);
           break;
         case "delete-transcript":
           if (!terminal(i)) throw new Error("END_SESSION_FIRST");
@@ -654,12 +706,7 @@ export async function POST(req: NextRequest, context: Context) {
           i.events = [];
           i.seals = [];
           i.sharedAt = null;
-          await e.repo.query("DELETE FROM guardian_records WHERE incident=$1", [
-            i.id,
-          ]);
-          await e.repo.query("DELETE FROM guardian_audio WHERE incident=$1", [
-            i.id,
-          ]);
+          e.repo.erasePrivateHistory(a);
           event(i, "REDACTED", [
             "Đã xóa lời nói và ghi âm theo yêu cầu.",
             "Statements and recordings deleted on request.",

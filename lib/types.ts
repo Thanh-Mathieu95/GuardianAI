@@ -18,6 +18,7 @@ export type Reply = {
   role: Member["role"];
   state:
     | "RINGING"
+    | "NO_ANSWER"
     | "ACCEPTED"
     | "DECLINED"
     | "CLARIFY"
@@ -100,6 +101,7 @@ export type Incident = {
     calls: number;
     error: string | null;
   };
+  recordingConsentAt: string | null;
   trip: {
     label: string;
     dueAt: string;
@@ -135,7 +137,12 @@ export type Account = {
 };
 export type PublicAccount = Omit<Account, "members" | "history"> & {
   members: Omit<Member, "tokenHash">[];
-  config: { ai: boolean; maps: boolean; storage: "sqlite" | "postgres" };
+  config: {
+    ai: boolean;
+    aiAccessRequired: boolean;
+    maps: boolean;
+    storage: "sqlite" | "postgres";
+  };
   integrity?: { valid: boolean; count: number; head: string };
 };
 export const choose = (pair: Pair, locale: Locale) =>

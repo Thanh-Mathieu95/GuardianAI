@@ -80,11 +80,34 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
       for (const p of locations) {
         const el = document.createElement("button");
         el.className = "venue-pin";
-        el.textContent = p.confirmed
-          ? "✓"
-          : p.label === t("Bạn", "You")
-            ? "●"
-            : "○";
+        const svg = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg",
+        );
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("width", "20");
+        svg.setAttribute("height", "20");
+        svg.setAttribute("aria-hidden", "true");
+        const mark = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          p.confirmed ? "path" : "circle",
+        );
+        if (p.confirmed) {
+          mark.setAttribute("d", "m5 12 4 4 10-10");
+          mark.setAttribute("fill", "none");
+        } else {
+          mark.setAttribute("cx", "12");
+          mark.setAttribute("cy", "12");
+          mark.setAttribute("r", "5");
+          mark.setAttribute(
+            "fill",
+            p.label === t("Bạn", "You") ? "currentColor" : "none",
+          );
+        }
+        mark.setAttribute("stroke", "currentColor");
+        mark.setAttribute("stroke-width", "2");
+        svg.appendChild(mark);
+        el.appendChild(svg);
         el.setAttribute("aria-label", p.label);
         el.title = p.label;
         const popup = new lib.Popup({ offset: 20 }).setText(p.label);
@@ -124,7 +147,13 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
             : 900,
         });
       } else if (i.location)
-        m.easeTo({ center: [i.location.lng, i.location.lat], duration: 600 });
+        m.easeTo({
+          center: [i.location.lng, i.location.lat],
+          duration: window.matchMedia("(prefers-reduced-motion: reduce)")
+            .matches
+            ? 0
+            : 600,
+        });
     });
   }, [ready, i.updatedAt]);
   return (

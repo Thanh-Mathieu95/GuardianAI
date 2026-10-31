@@ -10,6 +10,7 @@ export const states: Record<string, Pair> = {
   COMPLETE: ["Hai bên đã gặp nhau", "Handoff confirmed"],
   CANCELLED: ["Phiên đã kết thúc", "Session ended"],
   RINGING: ["Đang báo trong app", "Alerting in the app"],
+  NO_ANSWER: ["Chưa trả lời", "No answer yet"],
   ACCEPTED: ["Đã đồng ý", "Confirmed"],
   DECLINED: ["Không thể giúp", "Cannot help"],
   CLARIFY: ["Cần làm rõ", "Needs clarification"],
@@ -30,6 +31,18 @@ export const stages: Pair[] = [
   ["Mất liên lạc, giữ lại hồ sơ", "Contact lost, record preserved"],
 ];
 export const errors: Record<string, Pair> = {
+  AI_ACCESS_CODE_REQUIRED: [
+    "Nhập mã truy cập AI do người tổ chức demo cung cấp rồi thử lại.",
+    "Enter the AI access code provided by the demo host, then retry.",
+  ],
+  VOICE_TIME_LIMIT: [
+    "Cuộc trò chuyện đã đủ 10 phút. Bạn có thể bật lại khi cần.",
+    "The conversation reached 10 minutes. You can start another when needed.",
+  ],
+  STALE_SESSION: [
+    "Thao tác thuộc phiên trước. Hãy thử lại ở phiên hiện tại.",
+    "That action belongs to a previous session. Retry in the current session.",
+  ],
   CURRENT_LOCATION_REQUIRED: [
     "Cần vị trí GPS mới. Bật chia sẻ vị trí rồi thử lại.",
     "A current GPS location is required. Enable location and retry.",
