@@ -156,7 +156,16 @@ async function initialize(): Promise<Runtime> {
 
 export async function durableRuntime() {
   if (!process.env.GUARDIAN_POSTGRES_URL) return undefined;
-  state.guardianDurableRuntime ??= initialize();
+  if (!state.guardianDurableRuntime) {
+    const pending = initialize();
+    state.guardianDurableRuntime = pending;
+    void pending.catch(() => {
+      const cache = globalThis as unknown as { guardianEngine?: GuardianEngine };
+      // A transient startup failure before a cache was built can be retried.
+      // A failed active writer remains unavailable until an explicit restart.
+      if (!cache.guardianEngine && state.guardianDurableRuntime === pending) state.guardianDurableRuntime = undefined;
+    });
+  }
   return state.guardianDurableRuntime;
 }
 

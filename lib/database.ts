@@ -34,13 +34,21 @@ export class Database {
     try {
       this.lease = await this.pool!.connect();
       this.lease.on("error", () => { this.unavailable = true; });
-      const lock = await this.lease.query("select pg_try_advisory_lock(742918603) as acquired");
-      if (!lock.rows[0].acquired) throw new Error("Another backend holds the runtime lease");
+      let acquired = false;
+      // Render briefly overlaps old/new processes during a deploy. Health can
+      // pass while the previous instance is still closing its DB connection.
+      for (let attempt = 0; attempt < 60; attempt++) {
+        const lock = await this.lease.query("select pg_try_advisory_lock(742918603) as acquired");
+        if (lock.rows[0].acquired) { acquired = true; break; }
+        await new Promise(resolve => setTimeout(resolve,500));
+      }
+      if (!acquired) throw new Error("Another backend holds the runtime lease");
       await this.lease.query("select id from guardian_ai.incidents limit 0");
     } catch {
       this.unavailable = true;
       this.lease?.release(true);
       this.lease = undefined;
+      await this.pool!.end().catch(() => {});
       throw new Error("Kho PostgreSQL chưa sẵn sàng; kiểm tra kết nối, migration và instance backend.");
     }
   }
@@ -92,6 +100,7 @@ export class Database {
 
   async close() {
     await this.ready.catch(() => {});
+    if (this.lease) await this.lease.query("select pg_advisory_unlock(742918603)").catch(() => {});
     this.lease?.release(true);
     this.lease = undefined;
     if (this.pool) await this.pool.end();
