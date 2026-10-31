@@ -4,6 +4,8 @@ Một người đồng hành khi đi bộ ban đêm: kiểm tra tình trạng, k
 
 ## Demo trên máy
 
+Trên máy đang trình diễn có hai nút Desktop: **GuardianAI – Mở demo** và **GuardianAI – Điện thoại**. Bấm để tự khởi động máy chủ rồi mở giao diện. Máy chủ tiếp tục chạy sau khi cửa sổ khởi động đóng. Trong thư mục dự án cũng có `Open-GuardianAI.cmd` và `Open-Phone.cmd` để mở bằng một lần bấm đúp.
+
 Yêu cầu Node.js 24 trở lên. API key chỉ nằm trong `.env.local`, không nằm trong Git hay trình duyệt. Máy của chủ dự án đã được cấu hình key riêng.
 
 ```powershell
@@ -13,7 +15,7 @@ npm run build
 npm run demo
 ```
 
-Mở **http://localhost:3131/demo** rồi bấm **Chạy demo**. Chuyển **VI / EN** ở đầu trang. Mỗi chặng chạy sau khoảng 12 giây; có tạm dừng, bước tiếp, chạy lại và lời dẫn tùy chọn. [Kịch bản trình diễn](docs/LOCAL-DEMO.md).
+Mở **http://localhost:3131/demo/command-center** rồi bấm **Chạy demo**. Chuyển **VI / EN** ở đầu trang. Mỗi chặng chạy sau khoảng 12 giây; có tạm dừng, bước tiếp, chạy lại và lời dẫn tùy chọn. [Kịch bản trình diễn](docs/LOCAL-DEMO.md).
 
 Để thử AI thật, mở **Nói chuyện với AI thật**, đồng ý gửi nội dung tới OpenAI, rồi bật AI hoặc bắt đầu thoại. Bật AI trước khi chạy demo để phần phân tích lời đáp và lựa chọn phương án dùng API thật. Thoại cần quyền micro; ghi âm là lựa chọn riêng, mặc định tắt.
 
@@ -29,9 +31,9 @@ Mở **http://localhost:3131/demo** rồi bấm **Chạy demo**. Chuyển **VI /
 
 Địa điểm và con người trong demo là giả định. Các thông báo tới người nhận là **trong app**, cần trang mở; chưa có gọi điện PSTN, SMS hay thông báo nền. Trình duyệt có thể ngừng cập nhật GPS khi khóa màn hình. Ứng dụng không phải dịch vụ cứu hộ và không tự gọi số khẩn cấp.
 
-LIVE có thể chia sẻ vị trí và phối hợp phản hồi. Chỉ đường đi bộ thật cần `GOOGLE_MAPS_API_KEY` với Routes API; nếu thiếu, ứng dụng không dựng tuyến thay thế. Tuyến do Google trả về cũng không xác minh ánh sáng hoặc bảo đảm an toàn.
+LIVE có thể chia sẻ vị trí và phối hợp phản hồi. Đồ thị OSM lưu cục bộ hỗ trợ chỉ đường trong khu dữ liệu; ngoài khu đó cần cấu hình bộ định tuyến khác. Google Routes là tùy chọn. Bản đồ không xác minh ánh sáng hoặc bảo đảm an toàn.
 
-Đây là bản local để trình diễn và thử nghiệm có giám sát. Chưa công bố URL internet. Chưa xác minh giao diện trực tiếp / thoại micro trên trình duyệt trong lượt kiểm tra tự động vì công cụ điều khiển trình duyệt trên Windows bị dừng.
+Đây là bản local để trình diễn và thử nghiệm có giám sát. Chưa công bố URL internet. Kiểm thử trình duyệt đã xác minh bản đồ, 10 chặng demo, phân vai, tuyến tham khảo, giao diện 390 px và các tab trong điện thoại. Cuộc trò chuyện bằng micro thật và P2P giữa hai điện thoại chưa được xác minh.
 
 ## Kiểm thử
 
@@ -50,6 +52,6 @@ Kiểm thử HTTP tự tạo máy chủ với cơ sở dữ liệu trong bộ nh
 
 Guardian AI is a bilingual night-walk coordination prototype. The new implementation and Git history begin on October 31, 2026.
 
-Run `npm ci`, configure `.env.local`, then `npm run build` and `npm run demo`. Open **http://localhost:3131/demo**, select **EN**, and press **Run demo**. The ten-stage simulation exercises the actual coordination engine. Enable AI with consent to use real Responses and Realtime APIs; microphone access is optional and recording requires separate consent.
+Run `npm ci`, configure `.env.local`, then `npm run build` and `npm run demo`. Open **http://localhost:3131/demo/command-center**, select **EN**, and press **Run demo**. The ten-stage simulation exercises the actual coordination engine. Enable AI with consent to use real Responses and Realtime APIs; microphone access is optional and recording requires separate consent.
 
-Live device sessions use actual GPS and consenting recipients. There is no background notification or telephone gateway. Real walking directions require a Google Routes API key. Simulated venues and routes never become live navigation. This local preview has backend and API checks; visual browser and microphone verification remain pending. See [the demo walkthrough](docs/LOCAL-DEMO.md).
+Live device sessions use actual GPS and consenting recipients. There is no background notification or telephone gateway. The cached OSM graph covers a limited area; Google Routes is optional for broader coverage. Simulated venues never become live destinations. Browser tests cover the map, ten-stage demo, 390px overflow, phone tabs and invitations. Real microphone and two-device P2P verification remain pending. See [the demo walkthrough](docs/LOCAL-DEMO.md).

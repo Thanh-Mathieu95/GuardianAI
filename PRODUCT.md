@@ -10,6 +10,6 @@ New implementation. /walk for phone, /demo for an engine-driven simulation, /joi
 ## Capabilities and Constraints
 Next 16, React 19, TypeScript, Zod, MapLibre, SQLite locally, optional Postgres for cloud. Durable state before success responses. No fabricated live routes. Real API failures remain visible. API key stays server-side.
 ## Brand Commitments
-Guardian AI, paper and blue ink, a restrained dark phone surface. Clear source labels.
+Guardian AI uses a dark command center and an interactive phone simulator: cyan confirmed support, blue references, amber tentative offers and red urgent states. The landing page retains its paper presentation. Clear source labels and visible VI/EN controls.
 ## Accessibility & Inclusion
 One-handed controls, 44px targets, high contrast, reduced motion, VI/EN switching. Original evidence remains untranslated.

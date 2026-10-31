@@ -1,7 +1,9 @@
+import { places, isOpen } from "./city";
 import { randomBytes, randomUUID } from "node:crypto";
 import { Repository, digest } from "./repository";
 import {
   admission,
+  parseNeeds,
   demoStart,
   distance,
   routeDistance,
@@ -211,6 +213,7 @@ export class Engine {
     )
       throw new Error("CURRENT_LOCATION_REQUIRED");
     original(i, "You", text);
+    i.needs = parseNeeds(text, i.needs);
     const hit = emergency(text);
     i.risk = hit?.risk || 3;
     i.sosAt = now();
@@ -231,19 +234,19 @@ export class Engine {
         id: "venue-cafe",
         name: "Café Đèn Vàng",
         role: "PARTNER",
-        location: { lat: 10.7723, lng: 106.706 },
+        location: places[0].point,
       },
       {
         id: "venue-hotel",
         name: "Khách sạn Bến Sông",
         role: "PARTNER",
-        location: { lat: 10.773, lng: 106.7068 },
+        location: places[1].point,
       },
       {
         id: "venue-shop",
         name: "Cửa hàng Sao Mai",
         role: "PARTNER",
-        location: { lat: 10.772, lng: 106.7075 },
+        location: places[2].point,
       },
       { id: "contact-linh", name: "Linh", role: "CONTACT", location: null },
       { id: "contact-minh", name: "Minh", role: "CONTACT", location: null },
@@ -330,6 +333,7 @@ export class Engine {
         !admission(i, r, time).length &&
         current.route.meters <= i.needs.maxWalk
       ) {
+        this.coordinate(i);
         return;
       }
       invalidate(i, [
@@ -346,7 +350,13 @@ export class Engine {
       return;
     }
     const eligible = i.replies
-      .filter((r) => !admission(i, r, time).length)
+      .filter(
+        (r) =>
+          !admission(i, r, time).length &&
+          (i.mode !== "DEMO" ||
+            !places.some((p) => p.id === r.memberId) ||
+            isOpen(places.find((p) => p.id === r.memberId)!)),
+      )
       .sort(
         (a, b) =>
           distance(i.location!, a.location!) -
@@ -399,6 +409,7 @@ export class Engine {
           userArrived: false,
         });
         i.status = "REVIEW";
+        this.coordinate(i);
         event(
           i,
           "PLAN_PROPOSED",
@@ -422,6 +433,39 @@ export class Engine {
       }
     }
     if (i.sosAt) i.status = "NO_SUPPORT";
+  }
+  coordinate(i: Incident) {
+    const p = activePlan(i);
+    if (!p) return;
+    p.coordination = i.replies.map((r) => ({
+      ref: r.id,
+      who: r.name,
+      role:
+        r.id === p.replyId
+          ? ("PRIMARY" as const)
+          : r.role === "CONTACT" &&
+              ["ON_THE_WAY", "KEEP_CONTACT"].includes(r.state)
+            ? ("SUPPORT" as const)
+            : r.role === "PARTNER" && !admission(i, r).length
+              ? ("BACKUP" as const)
+              : ("UNUSED" as const),
+      instruction:
+        r.id === p.replyId
+          ? [`Tiếp nhận tại ${p.destination}`, `Receive at ${p.destination}`]
+          : r.state === "ON_THE_WAY"
+            ? [
+                `Tự báo ${r.minutes ?? "?"} phút; hẹn gặp tại ${p.destination}`,
+                `Reported ${r.minutes ?? "?"} minutes; meet at ${p.destination}`,
+              ]
+            : r.state === "KEEP_CONTACT"
+              ? ["Giữ liên lạc với người dùng", "Stay in touch with the walker"]
+              : r.role === "PARTNER" && !admission(i, r).length
+                ? [
+                    "Dự phòng khi phương án chính mất hiệu lực",
+                    "Backup if the primary offer becomes invalid",
+                  ]
+                : ["Chưa có cam kết phù hợp", "No eligible commitment yet"],
+    }));
   }
   accept(i: Incident, id: string) {
     const p = activePlan(i),
@@ -500,6 +544,7 @@ export class Engine {
       throw new Error("AI_CONSENT_REQUIRED");
     if (i.ai.calls >= 40) throw new Error("AI_SESSION_LIMIT");
     original(i, "You", text);
+    i.needs = parseNeeds(text, i.needs);
     const hit = emergency(text);
     if (hit) {
       i.risk = hit.risk;

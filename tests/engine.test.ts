@@ -24,6 +24,9 @@ test("demo runs through real reply, admission, acceptance, revocation and eviden
   assert.ok(i.sharedAt);
   assert.equal(i.seals.length, 3);
   assert.equal(i.replies.length, 5);
+  const alleyOffer=i.plans.at(-1)?.coordination?.find(a=>a.who==='Khách sạn Bến Sông');
+  assert.equal(alleyOffer?.role,'UNUSED');
+  assert.ok(!alleyOffer?.instruction[1].includes('Backup'));
   await e.repo.close();
 });
 test("simulation never alerts real joined members", async () => {

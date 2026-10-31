@@ -9,3 +9,5 @@ test-results/
 .impeccable/review/
 **/.impeccable/config.local.json
 **/.impeccable/hook.cache.json
+docs/*BUILD-PROMPT.md
+work/

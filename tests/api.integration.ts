@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 import { randomBytes, randomUUID, createHash } from "node:crypto";
 import { createServer } from "node:net";
 import { setTimeout as delay } from "node:timers/promises";
+import { readdirSync } from "node:fs";
 
 async function main() {
   const socket = createServer();
@@ -91,6 +92,23 @@ async function main() {
     assert.equal((await fetch(base)).status, 200);
     assert.equal((await fetch(base + "/demo")).status, 200);
     assert.equal((await fetch(base + "/walk")).status, 200);
+    const workers = readdirSync(".next/static/media").filter((name) =>
+      /^maplibre-gl-worker\.[^.]+\.mjs$/.test(name),
+    );
+    assert.ok(
+      workers.length,
+      "production build must emit MapLibre's module worker",
+    );
+    for (const worker of workers) {
+      const resource = await fetch(`${base}/_next/static/media/${worker}`);
+      assert.equal(
+        resource.status,
+        200,
+        "worker must be served rather than an HTML 404",
+      );
+      assert.match(resource.headers.get("content-type") || "", /javascript/);
+      assert.ok((await resource.text()).includes("MapLibre"));
+    }
     assert.equal((await request("state")).status, 401);
     const user = await client(),
       stranger = await client();
@@ -191,6 +209,15 @@ async function main() {
     );
     const oldId = user.state.incident.id;
     await action(user, "new", { mode: "DEMO", locale: "vi" });
+    await action(user, "sos", { text: "Có người theo tôi. Đây là kiểm thử." });
+    assert.equal(user.state.incident.demo.status, "RUNNING");
+    assert.equal(user.state.incident.demo.step, 1);
+    await action(user, "next");
+    assert.ok(
+      user.state.incident.replies.some(
+        (r: { state: string }) => r.state !== "RINGING",
+      ),
+    );
     await action(user, "covert", { enabled: true, incidentId: oldId }, 400);
     await action(user, "ai", { enabled: true, consent: true }, 400);
     await action(user, "demo", { locale: "en", ai: false });
