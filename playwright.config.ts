@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests",
   testMatch: "ui.spec.ts",
   workers: 1,
-  globalTimeout: 90000,
+  globalTimeout: 180000,
   use: {
     baseURL: "http://127.0.0.1:3132",
     headless: false,

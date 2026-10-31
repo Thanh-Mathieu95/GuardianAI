@@ -22,7 +22,7 @@ Mở **http://localhost:3131/demo/command-center** rồi bấm **Chạy demo**. 
 ## Có gì hoạt động
 
 - `/demo`: 10 chặng thực sự chạy qua engine — chờ phản hồi, loại lời hứa mơ hồ / lối qua hẻm, đề xuất tuyến, chấp nhận, rút cam kết, đổi phương án, báo đường không phù hợp, tình huống thương tích và mất liên lạc.
-- `/walk`: phiên thiết bị thật, GPS có đồng ý, hẹn giờ kiểm tra, SOS do người dùng chọn, chat / thoại OpenAI Realtime, chế độ kín đáo.
+- `/walk`: phiên thiết bị thật, GPS có đồng ý, hẹn giờ kiểm tra, SOS thủ công hoặc do AI kích hoạt khi có đồng ý và GPS mới, chat / thoại OpenAI Realtime, chế độ kín đáo.
 - `/join/<token>`: người thân hoặc đối tác tham gia qua link riêng; khai báo trực, vị trí điểm tiếp nhận, phản hồi bằng chữ hoặc giọng nói, xác nhận đã gặp. Người dùng tự gửi link mời.
 - Bộ lọc điều kiện bằng code chạy trước AI planner. Chỉ chọn trong lời đồng ý có nguồn; đổi tuyến cần chấp nhận lại. Không dùng tuyến mô phỏng cho LIVE.
 - SQLite lưu trạng thái, phiên bản, transcript và các đoạn ghi âm. Kiểm tra băm SHA-256, xuất JSON / HTML để in PDF. PostgreSQL có adapter, chưa được thử với một dịch vụ cloud thật.
@@ -47,6 +47,12 @@ npm run test:ai
 ```
 
 Kiểm thử HTTP tự tạo máy chủ với cơ sở dữ liệu trong bộ nhớ, tắt AI và không gửi thông báo ngoài. Kiểm tra quyền sở hữu, Origin, dữ liệu cũ, riêng tư của người nhận, 10 chặng demo, ghi âm và báo cáo. [Kiến trúc và giới hạn triển khai](docs/ARCHITECTURE.md).
+
+## In-app call coordinator
+
+Use **Parallel-call demo** for the competition walkthrough: three simultaneous in-app calls, private recipient conversations, sourced commitments, an early plan, user acceptance, task-notification calls and two-sided handoff. The original ten-stage director remains available. Demo and live sessions are isolated.
+
+For a real recipient flow, open `/phone`, enable GPS, invite someone and open their link in another tab. They must join and explicitly allow in-app calls. Partners provide their venue profile and on-duty status. No Twilio or phone-number gateway is required. See [implementation and boundaries](docs/IN-APP-COORDINATION.md) and [judge walkthrough](docs/LOCAL-DEMO.md).
 
 ## English
 

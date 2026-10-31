@@ -8,6 +8,8 @@ Turn a request for help into verified human commitments and a clear next action,
 ## Operating Context
 New implementation. /walk for phone, /demo for an engine-driven simulation, /join/token for recipients. Real voice uses OpenAI with consent. Pages must stay open. No native push or emergency dispatch.
 ## Capabilities and Constraints
+
+The in-app call coordinator maintains separate recipient conversations, parallel delivery limits, expanding partner discovery and sourced case files. DEMO uses synthetic participants in its own session; LIVE requires recipients to join, consent to calls and keep their page open. The live companion can activate SOS autonomously with AI consent and fresh GPS; route acceptance and emergency dialing remain user actions. No phone gateway is used. See docs/IN-APP-COORDINATION.md.
 Next 16, React 19, TypeScript, Zod, MapLibre, SQLite locally, optional Postgres for cloud. Durable state before success responses. No fabricated live routes. Real API failures remain visible. API key stays server-side.
 ## Brand Commitments
 Guardian AI uses a dark command center and an interactive phone simulator: cyan confirmed support, blue references, amber tentative offers and red urgent states. The landing page retains its paper presentation. Clear source labels and visible VI/EN controls.

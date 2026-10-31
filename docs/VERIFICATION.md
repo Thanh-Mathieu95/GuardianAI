@@ -3,7 +3,7 @@
 | Check | Result |
 | --- | --- |
 | TypeScript and production Next build | Passed |
-| Unit/regression suite | 23 passed |
+| Unit/regression suite | 33 passed |
 | Isolated production HTTP integration | Passed |
 | OpenAI companion, extraction, bounded planner | Real synthetic requests passed |
 | Realtime client secret | Real mint passed; credential not logged |
@@ -13,10 +13,15 @@
 | Client asset secret scan | User key absent |
 | Local environment files in standalone artifact | Absent |
 | npm dependency audit | 0 vulnerabilities at installation |
-| Browser integration | Two scenarios passed: full command-center demo and interactive phone at 390px |
+| Browser integration | Five scenarios passed: parallel-call demo, live recipient in a second tab, full director, SOS map/new sessions, interactive phone at 390px |
 | Desktop one-click launcher | Starts a detached local server and reuses it on subsequent invocations |
 | Hosted PostgreSQL / optional Google Routes | Not tested; credentials not supplied |
 
 The HTTP integration uses its own in-memory database, disables AI and creates synthetic participants. It covers unauthenticated access, same-origin writes, cross-owner report denial, recipient consent, hiding a walker's position from an unconfirmed partner, stale session rejection, missing live maps, the ten-stage demo, audio consent and idempotent retries, raw-byte hashes, HTML/JSON export, SSE and record deletion.
 
 Current desktop, mobile and dedicated-phone captures exist. Browser checks include all ten demo steps, sourced role assignments, reference-route labeling, column collapse, 390px overflow, VI/EN inside the phone, invitation creation and returning between phone tabs. The Impeccable verdict pass scored all five listed fixes resolved and returned `ship` at that scope; it is not a whole-product certification. The command-center Desktop shortcut was opened through Explorer and its destination checked; the phone launcher's URL and shared server reuse were checked through its command interface. Real microphone and two-device P2P behavior remain outside these automated checks.
+
+
+Call extension verification: expanding directory and timezone/overnight hours; opt-in/presence delivery; three-call concurrency and deduplication; stale/duplicate/foreign recipient events; source IDs; early plan; acceptance before task calls; no handoff inferred from completed calls; persisted attempts and deadlines across restart. HTTP tests cover private recipient call views and real call answer/message endpoints with AI disabled. The five Edge scenarios use isolated in-memory storage and synthetic GPS; the live flow uses a real joined test recipient in a second tab, not a scripted acceptance. Microphone conversation and remote-device connectivity remain unverified.
+
+The Impeccable source detector was run once for the extension: one font warning (Arial pinned by the supplied brief) and 100 token advisories. A fresh finish review is recorded separately after captures.

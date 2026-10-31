@@ -1,5 +1,22 @@
 # Trình diễn Guardian AI trên máy
 
+## Demo cuộc gọi để thi
+
+1. Mở **GuardianAI - Mở demo** trên Desktop hoặc `http://localhost:3131/demo/command-center`. Chọn VI/EN.
+2. Bấm **Demo gọi song song / Parallel-call demo**. Ba cuộc gọi mô phỏng bắt đầu, hai cuộc chờ lượt. Không cần micro hoặc cấu hình nhà cung cấp điện thoại.
+3. Mở một hàng trong **Cuộc gọi trong app** để xem AI hỏi riêng, lời người nhận và nhật ký kết nối. Nút **Nghe lời thoại mô phỏng** dùng giọng đọc trình duyệt.
+4. Chỉ ra một nơi qua hẻm bị loại. Một lời đồng ý đủ điều kiện tạo phương án trong khi các cuộc khác vẫn tiếp tục. Lời đồng ý luôn có nguồn.
+5. Trong màn hình điện thoại, bấm **Chấp nhận phương án**. Quan sát các cuộc gọi **Thông báo nhiệm vụ** gắn với phương án đã chọn.
+6. Bấm **Tôi đã gặp người giúp**, sau đó **Mô phỏng: điểm tiếp nhận xác nhận gặp**. Hai xác nhận mới hoàn tất sự cố; cuộc gọi kết thúc không tự đồng nghĩa đã cứu giúp xong.
+7. Mở **Hồ sơ**, xuất HTML/JSON. Phần **Tổng hợp có dẫn nguồn** dẫn tới lời nói và cuộc gọi gốc.
+8. Bấm **Tạo phiên mới** để thử lại. Dùng **Chạy demo** cho kịch bản mười chặng có rút cam kết và mất liên lạc.
+
+## Trình diễn luồng người nhận thật trong hai tab
+
+Mở `http://localhost:3131/phone` hoặc nút **GuardianAI - Điện thoại**. Bật GPS, mời người nhận, sao chép link và mở trong tab thứ hai. Tab người nhận bấm **Đồng ý tham gia**, bật **Đồng ý nhận cuộc gọi AI trong app khi trang đang mở**. Đối tác cần tự lưu hồ sơ, đặt vị trí và bật đang trực. Quay lại tab người đi bộ và gửi SOS: người nhận thật bấm **Nhận cuộc gọi**, trả lời bằng chữ hoặc dùng micro khi cả hai phía đã đồng ý dùng AI. Cam kết quay về bộ điều phối. Luồng này không dùng câu trả lời giả từ kịch bản demo.
+
+Demo và LIVE dùng phiên riêng. Muốn bật AI thật, chọn đồng ý xử lý nội dung rồi bật AI trong phần cài đặt thoại. API key chỉ nằm trên máy chủ. Chưa kiểm thử cuộc nói chuyện bằng micro thật; có thể trình diễn chữ trước và thử micro riêng trước giờ thi.
+
 ## Chuẩn bị
 
 1. Giữ cửa sổ máy chủ đang chạy. Mở `http://localhost:3131/demo/command-center`.

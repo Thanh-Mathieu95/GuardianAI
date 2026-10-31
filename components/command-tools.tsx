@@ -3,6 +3,7 @@ import { useState } from "react";
 import { places, isOpen, kinds } from "@/lib/city";
 import type { Incident } from "@/lib/types";
 import { useLanguage } from "./language";
+import { PlaceDetails } from "./place-details";
 export function CommandTools({
   incident: i,
   action,
@@ -13,9 +14,11 @@ export function CommandTools({
   const { t, locale } = useLanguage(),
     [kind, setKind] = useState("all"),
     [closed, setClosed] = useState(false),
-    [hour, setHour] = useState("22:15"),
     [tab, setTab] = useState("overview");
-  const minute = Number(hour.slice(0, 2)) * 60 + Number(hour.slice(3)),
+  const minute = i.scenarioMinute ?? 1335,
+    hour = `${Math.floor(minute / 60)
+      .toString()
+      .padStart(2, "0")}:${(minute % 60).toString().padStart(2, "0")}`,
     open = places.filter((p) => isOpen(p, minute));
   const list = places.filter(
     (p) =>
@@ -50,7 +53,14 @@ export function CommandTools({
               <input
                 type="time"
                 value={hour}
-                onChange={(e) => setHour(e.target.value)}
+                onChange={(e) => {
+                  if (/^\d{2}:\d{2}$/.test(e.target.value))
+                    void action("scenario-time", {
+                      minute:
+                        Number(e.target.value.slice(0, 2)) * 60 +
+                        Number(e.target.value.slice(3)),
+                    });
+                }}
               />
             </label>
             <label className="check">
@@ -69,32 +79,7 @@ export function CommandTools({
                   {p.name} · {p.hours} ·{" "}
                   {isOpen(p, minute) ? t("Mở", "Open") : t("Đóng", "Closed")}
                 </summary>
-                <p>
-                  {kinds[p.kind][locale === "vi" ? 0 : 1]} ·{" "}
-                  {p.waiting
-                    ? t("Có chỗ chờ mô phỏng", "Simulated waiting area")
-                    : t("Không có chỗ chờ", "No waiting area")}{" "}
-                  ·{" "}
-                  {p.firstAid
-                    ? t("Có sơ cứu mô phỏng", "Simulated first aid")
-                    : t("Chưa xác minh sơ cứu", "First aid unverified")}
-                </p>
-                <p>
-                  {p.kind === 6
-                    ? t(
-                        "ATM hoạt động không đồng nghĩa có người trực.",
-                        "An operating ATM does not imply staff are present.",
-                      )
-                    : p.kind === 8
-                      ? t(
-                          "Giờ hành chính khác trực ban; cần xác nhận tiếp nhận.",
-                          "Office hours differ from duty coverage; reception must be confirmed.",
-                        )
-                      : t(
-                          "Giờ và khả năng hỗ trợ là dữ liệu giả định; chưa phải lời đồng ý.",
-                          "Hours and support capabilities are synthetic; they are not consent.",
-                        )}
-                </p>
+                <PlaceDetails place={p} minute={minute} />
                 <button
                   disabled={!isOpen(p, minute)}
                   onClick={() => void action("directions", { placeId: p.id })}

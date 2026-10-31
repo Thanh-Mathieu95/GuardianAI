@@ -45,12 +45,15 @@ async function main() {
     fetch(base + "/api/" + url, {
       headers: {
         ...(cookie ? { Cookie: cookie } : {}),
+        "x-guardian-mode": cookie.startsWith("guardian_demo_v3=")
+          ? "demo"
+          : "live",
         ...(body ? { "Content-Type": "application/json", Origin: origin } : {}),
       },
       ...(body ? { method: "POST", body: JSON.stringify(body) } : {}),
     });
-  async function client() {
-    const res = await request("session");
+  async function client(demo = false) {
+    const res = await request("session" + (demo ? "?scope=demo" : ""));
     assert.equal(res.status, 200);
     const c = {
       cookie: res.headers.get("set-cookie")!.split(";")[0],
@@ -110,8 +113,8 @@ async function main() {
       assert.ok((await resource.text()).includes("MapLibre"));
     }
     assert.equal((await request("state")).status, 401);
-    const user = await client(),
-      stranger = await client();
+    let user = await client();
+    const stranger = await client();
     assert.equal(user.state.config.ai, false);
     assert.equal(JSON.stringify(user.state).includes("tokenHash"), false);
     assert.equal(
@@ -172,8 +175,84 @@ async function main() {
       ).status,
       200,
     );
+    for (const invite of [contact, partner]) {
+      assert.equal(
+        (
+          await request("join/" + invite.token, "", {
+            action: "call-consent",
+            enabled: true,
+          })
+        ).status,
+        200,
+      );
+    }
+    assert.equal(
+      (
+        await request("join/" + partner.token, "", {
+          action: "profile",
+          kind: "Cafe",
+          address: "Test address",
+          timezone: "Asia/Ho_Chi_Minh",
+          hours: [{ days: [0, 1, 2, 3, 4, 5, 6], open: 0, close: 0 }],
+          receiving: true,
+          staffed: true,
+          waiting: true,
+          accessible: true,
+          limitations: "",
+          entrance: "Main entrance",
+          meeting: "Staff at entrance",
+        })
+      ).status,
+      200,
+    );
     await action(user, "sos", { text: "Someone is following me." });
     const receiver = await (await request("join/" + partner.token)).json();
+    assert.equal(receiver.incident.calls.length, 1);
+    assert.equal(receiver.incident.calls[0].memberId, receiver.member.id);
+    const call = receiver.incident.calls[0];
+    const answer = {
+      action: "call-event",
+      incidentId: user.state.incident.id,
+      callId: call.id,
+      attempt: call.attempt,
+      seq: call.seq,
+      eventId: randomUUID(),
+      kind: "answer",
+    };
+    assert.equal(
+      (await request("join/" + partner.token, "", answer)).status,
+      200,
+    );
+    assert.equal(
+      (await (await request("join/" + partner.token, "", answer)).json())
+        .duplicate,
+      true,
+    );
+    assert.equal(
+      (
+        await request("join/" + contact.token, "", {
+          ...answer,
+          eventId: randomUUID(),
+        })
+      ).status,
+      400,
+    );
+    const privateView = await (await request("join/" + partner.token)).json();
+    assert.equal(privateView.incident.calls[0].state, "CONVERSING");
+    const sourceId = randomUUID();
+    assert.equal(
+      (
+        await request("join/" + partner.token, "", {
+          action: "call-message",
+          incidentId: user.state.incident.id,
+          callId: call.id,
+          attempt: call.attempt,
+          messageId: sourceId,
+          text: "Maybe, let me ask the manager.",
+        })
+      ).status,
+      200,
+    );
     assert.equal(
       receiver.incident.location,
       null,
@@ -208,15 +287,28 @@ async function main() {
       "live routing must not invent a fallback when maps are absent",
     );
     const oldId = user.state.incident.id;
+    const liveUser = user;
+    user = await client(true);
+    assert.equal(user.state.incident.mode, "DEMO");
+    assert.notEqual(user.state.id, liveUser.state.id);
+    await action(liveUser, "demo", { locale: "en", ai: false }, 400);
+    await action(liveUser, "new", { mode: "DEMO", locale: "vi" }, 400);
+    const combinedCookies = liveUser.cookie + "; " + user.cookie;
+    assert.equal(
+      (await (await request("state", combinedCookies)).json()).incident.id,
+      oldId,
+    );
+    assert.equal(
+      (await (await request("state?scope=demo", combinedCookies)).json())
+        .incident.id,
+      user.state.incident.id,
+    );
     await action(user, "new", { mode: "DEMO", locale: "vi" });
     await action(user, "sos", { text: "Có người theo tôi. Đây là kiểm thử." });
-    assert.equal(user.state.incident.demo.status, "RUNNING");
-    assert.equal(user.state.incident.demo.step, 1);
-    await action(user, "next");
-    assert.ok(
-      user.state.incident.replies.some(
-        (r: { state: string }) => r.state !== "RINGING",
-      ),
+    assert.equal(
+      user.state.incident.demo,
+      null,
+      "SOS must not start judge choreography",
     );
     await action(user, "covert", { enabled: true, incidentId: oldId }, 400);
     await action(user, "ai", { enabled: true, consent: true }, 400);
@@ -231,7 +323,12 @@ async function main() {
         `${base}/api/audio/${user.state.incident.id}?id=${audioId}&seq=${seq}`,
         {
           method: "POST",
-          headers: { Cookie: user.cookie, Origin: base, "Content-Type": mime },
+          headers: {
+            Cookie: user.cookie,
+            Origin: base,
+            "Content-Type": mime,
+            "x-guardian-mode": "demo",
+          },
           body: value,
         },
       );
@@ -276,7 +373,7 @@ async function main() {
     ).text();
     assert.ok(html.includes("Incident record"));
     const sse = await fetch(base + "/api/stream", {
-      headers: { Cookie: user.cookie },
+      headers: { Cookie: user.cookie, "x-guardian-mode": "demo" },
     });
     const reader = sse.body!.getReader();
     assert.ok(
