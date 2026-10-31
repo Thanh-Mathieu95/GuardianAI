@@ -18,5 +18,5 @@ export function useLanguage() {
 }
 export function LanguageSwitch() {
   const { locale, setLocale } = useLanguage();
-  return <div className="language-switch" aria-label="Language / Ngôn ngữ"><button lang="vi" aria-pressed={locale === "vi"} onClick={() => setLocale("vi")}>VI</button><button lang="en" aria-pressed={locale === "en"} onClick={() => setLocale("en")}>EN</button></div>;
+  return <div className="language-switch" aria-label="Language / Ngôn ngữ"><button type="button" lang="vi" aria-label="Tiếng Việt" aria-pressed={locale === "vi"} onClick={() => setLocale("vi")}>VI</button><button type="button" lang="en" aria-label="English" aria-pressed={locale === "en"} onClick={() => setLocale("en")}>EN</button></div>;
 }
