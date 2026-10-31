@@ -32,3 +32,5 @@ work/
 *.log
 .impeccable/mocks/
 docs/*BUILD-PROMPT.md
+cloudflare/.wrangler/
+cloudflare/.dev.vars*
