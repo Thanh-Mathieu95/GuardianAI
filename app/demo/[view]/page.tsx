@@ -8,11 +8,12 @@ export default async function Page({
 }) {
   const { view } = await params;
   if (
-    !["command-center", "phone", "advanced", "control", "calls", "architecture"].includes(
+    !["command-center", "phone", "advanced", "companion", "guided", "control", "calls", "architecture"].includes(
       view,
     )
   )
     notFound();
-  if(view === "command-center" || view === "phone") return <ProductExperience phone={view === "phone"} />;
+  // Keep the same full dashboard and phone at the local demo's public URLs.
+  if (view === "guided" || view === "companion") return <ProductExperience phone={view === "companion"} />;
   return <Dashboard view={view === "advanced" ? "command-center" : view} />;
 }

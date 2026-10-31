@@ -60,9 +60,11 @@ Demo mặc định không yêu cầu đăng nhập, microphone hay API key. Lờ
 | Đường dẫn | Mục đích |
 | --- | --- |
 | `/` | Giới thiệu dự án và mở trải nghiệm |
-| `/demo/command-center` | Trải nghiệm chính: demo, bản đồ, người hỗ trợ và hồ sơ |
-| `/demo/phone` | Trải nghiệm đồng hành trên màn hình điện thoại |
-| `/demo/advanced` | Bàn điều khiển nâng cao và quan sát engine |
+| `/demo/command-center` | Bàn điều khiển đầy đủ giống bản local: điện thoại AI, bản đồ, hoạt động agent, cuộc gọi và hồ sơ |
+| `/demo/phone` | Điện thoại đầy đủ: hội thoại AI, SOS, cuộc gọi giả và đồng hành về nhà |
+| `/demo/advanced` | Đường dẫn thay thế tới bàn điều khiển đầy đủ |
+| `/demo/guided` | Giao diện demo rút gọn với các bước hướng dẫn |
+| `/demo/companion` | Giao diện đồng hành rút gọn |
 | `/demo/control` | Điều khiển kịch bản, adapter và công cụ kiểm thử |
 | `/demo/calls` | Quan sát cuộc gọi, hội thoại và phản hồi |
 | `/demo/architecture` | Kiến trúc và giới hạn hệ thống |
