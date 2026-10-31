@@ -1,0 +1,4 @@
+﻿# Guardian AI — new implementation
+Use docs/REFERENCE-BUILD-PROMPT.md as product requirements, not code to copy. This is a new project, separate from ../GuardianAI. User requires VI/EN, real OpenAI APIs and engine-driven demo. Never print or commit .env.local.
+Keep simulated and live data separate. Never invent confirmations, routes, ETA or calls. Confirmed destinations require recipient evidence. Route changes require acceptance again. All writes check same origin and session; partner coordinates hidden before acceptance. Never auto-dial emergency services.
+Read relevant bundled Next docs before changes. Apply local Impeccable skill to UI. Run typecheck, tests, production build and isolated browser/API verification. Push checkpoints to origin rebuild, preserve existing main history. Credentials are local only.

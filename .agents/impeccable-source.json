@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/pbakaus/impeccable",
+  "commit": "df3a4abe7d0840d5f60324812c432e00b66a4e75",
+  "sourcePath": ".agents/skills/impeccable",
+  "destination": ".agents/skills/impeccable",
+  "skillVersion": "4.8.0",
+  "installation": "skill-installer helper, pinned commit, project scope",
+  "designHookInstalled": false
+}
