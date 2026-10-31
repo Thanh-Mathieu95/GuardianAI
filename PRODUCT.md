@@ -1,4 +1,4 @@
-﻿# Product
+# Product
 ## Platform
 web
 ## Users

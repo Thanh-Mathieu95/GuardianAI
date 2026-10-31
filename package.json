@@ -1,1 +1,34 @@
-{"name":"guardian-ai-new","version":"2.0.0","private":true,"scripts":{"dev":"next dev --hostname 127.0.0.1","build":"next build","start":"next start --hostname 0.0.0.0","typecheck":"tsc --noEmit","test":"tsx --test tests/*.test.ts","test:api":"tsx tests/api.integration.ts"},"dependencies":{"lucide-react":"^0.468.0","maplibre-gl":"^6.16.0","next":"16.4.3","pg":"^8.16.3","react":"19.3.1","react-dom":"19.3.1","zod":"^4.1.0"},"devDependencies":{"@types/node":"^24.0.0","@types/pg":"^8.15.0","@types/react":"^19.0.0","@types/react-dom":"^19.0.0","tsx":"^4.20.0","typescript":"^5.9.0"},"engines":{"node":">=24"}}
+{
+  "name": "guardian-ai-new",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:api": "tsx tests/api.integration.ts"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "maplibre-gl": "^6.16.0",
+    "next": "16.4.3",
+    "pg": "^8.16.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "prettier": "3.6.2",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
