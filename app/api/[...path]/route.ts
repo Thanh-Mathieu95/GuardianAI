@@ -16,6 +16,8 @@ import { digest } from "@/lib/repository";
 import type { Account, Incident, Member } from "@/lib/types";
 import { reportHtml } from "@/lib/report";
 import { emergency } from "@/lib/rules";
+import { places, isOpen, walkingRoute } from "@/lib/city";
+import { distance } from "@/lib/rules";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const globals = globalThis as unknown as {
@@ -67,6 +69,18 @@ const point = {
 const locale = z.enum(["vi", "en"]);
 const text = z.string().trim().min(1).max(2000);
 const input = z.discriminatedUnion("action", [
+  z
+    .object({
+      action: z.literal("directions"),
+      placeId: z.string().min(1).max(80),
+    })
+    .strict(),
+  z
+    .object({
+      action: z.literal("simulate"),
+      kind: z.enum(["move", "offroute", "injury", "signal"]),
+    })
+    .strict(),
   z
     .object({
       action: z.literal("new"),
@@ -554,6 +568,90 @@ export async function POST(req: NextRequest, context: Context) {
       if (terminal(i) && !["locale", "delete-transcript"].includes(d.action))
         throw new Error("SESSION_ENDED");
       switch (d.action) {
+        case "directions": {
+          const place = places.find((p) => p.id === d.placeId);
+          if (!place || !isOpen(place) || !i.location)
+            throw Error("NO_OPEN_DESTINATION");
+          if (i.mode !== "DEMO") throw Error("SIMULATED_PLACE_NOT_LIVE");
+          i.reference = {
+            name: place.name,
+            route: walkingRoute(i.location, place.point, [], true),
+          };
+          event(i, "REFERENCE_ROUTE", [
+            "Tuyến do bạn yêu cầu; nơi này chưa xác nhận tiếp nhận.",
+            "User-requested reference route; this place has not confirmed reception.",
+          ]);
+          break;
+        }
+        case "simulate": {
+          if (i.mode !== "DEMO") throw Error("DEMO_ONLY");
+          if (d.kind === "signal") {
+            e.lose(i);
+            if (i.demo) i.demo.status = "STOPPED";
+            break;
+          }
+          if (d.kind === "injury") {
+            i.risk = 4;
+            original(
+              i,
+              "You",
+              i.locale === "vi"
+                ? "Tình huống mô phỏng: tôi bị thương, đang chảy máu."
+                : "Simulated scenario: I am injured and bleeding.",
+            );
+            invalidate(i, [
+              "Có thương tích; cần đánh giá lại khả năng sơ cứu.",
+              "Injury reported; first-aid capability must be reassessed.",
+            ]);
+            seal(i, [
+              "Ghi nhận thương tích mô phỏng",
+              "Simulated injury recorded",
+            ]);
+            break;
+          }
+          const p = activePlan(i);
+          if (!p?.acceptedAt || !i.location) throw Error("NO_ACCEPTED_PLAN");
+          if (d.kind === "offroute") {
+            i.location = {
+              ...i.location,
+              lat: i.location.lat + 0.001,
+              at: nowDate(),
+            };
+            invalidate(i, [
+              "Mô phỏng lệch tuyến; dừng chỉ dẫn cũ.",
+              "Simulated route deviation; previous guidance stopped.",
+            ]);
+            await e.plan(i);
+            break;
+          }
+          p.progressMeters = Math.min(
+            p.route.meters,
+            (p.progressMeters || 0) + 40,
+          );
+          let left = p.progressMeters,
+            point = p.route.points.at(-1)!;
+          for (let n = 1; n < p.route.points.length; n++) {
+            const a = p.route.points[n - 1],
+              b = p.route.points[n],
+              length = distance(a, b);
+            if (left <= length) {
+              const ratio = left / (length || 1);
+              point = {
+                lat: a.lat + (b.lat - a.lat) * ratio,
+                lng: a.lng + (b.lng - a.lng) * ratio,
+              };
+              break;
+            }
+            left -= length;
+          }
+          i.location = { ...point, at: nowDate(), source: "SIMULATED" };
+          i.track.push({ ...point, at: nowDate() });
+          event(i, "SIMULATED_MOVEMENT", [
+            "Đã tiến 40 m dọc tuyến phố mô phỏng.",
+            "Advanced 40 m along the simulated street route.",
+          ]);
+          break;
+        }
         case "locale":
           i.locale = d.locale;
           break;
@@ -587,6 +685,19 @@ export async function POST(req: NextRequest, context: Context) {
         case "sos":
           rate("sos:" + id, 6, 3600000);
           await e.sos(a, d.text);
+          if (i.mode === "DEMO" && !i.demo) {
+            i.demo = {
+              step: 1,
+              paused: false,
+              nextAt: new Date(Date.now() + 12000).toISOString(),
+              status: "RUNNING",
+              error: null,
+            };
+            event(i, "DEMO_MANUAL_SOS", [
+              "SOS của bạn đã bắt đầu tình huống mô phỏng; các vai sẽ lần lượt phản hồi.",
+              "Your SOS started the simulation; the simulated recipients will now respond.",
+            ]);
+          }
           break;
         case "chat":
           extra = await e.chat(i, d.text);

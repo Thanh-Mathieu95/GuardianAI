@@ -2,7 +2,7 @@
 
 ## Chuẩn bị
 
-1. Giữ cửa sổ máy chủ đang chạy. Mở `http://localhost:3131/demo`.
+1. Giữ cửa sổ máy chủ đang chạy. Mở `http://localhost:3131/demo/command-center`.
 2. Chọn VI hoặc EN. Dữ liệu tình huống là mô phỏng; thông tin gốc được giữ theo ngôn ngữ lúc tạo.
 3. Tùy chọn mở **Nói chuyện với AI thật**, chọn đồng ý gửi nội dung tới OpenAI, bật AI. Có thể chạy toàn bộ demo khi AI tắt.
 4. Bấm **Chạy demo**. Không bật micro nếu chỉ trình diễn luồng tự động.

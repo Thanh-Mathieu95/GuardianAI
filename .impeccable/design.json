@@ -1,26 +1,250 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T04:02:20.481072+00:00",
+  "generatedAt": "2026-10-31T04:27:54.715704+00:00",
   "title": "Design System: Guardian AI",
   "extensions": {
     "colorMeta": {
-      "paper": {
+      "bg": {
+        "displayName": "Bg",
         "role": "neutral",
-        "displayName": "Cool Paper",
         "tonalRamp": [
-          "oklch(15.0% 0.00057 128.49)",
-          "oklch(27.0% 0.00193 128.49)",
-          "oklch(38.0% 0.00284 128.49)",
-          "oklch(50.0% 0.00284 128.49)",
-          "oklch(61.0% 0.00284 128.49)",
-          "oklch(73.0% 0.00256 128.49)",
-          "oklch(84.0% 0.00151 128.49)",
-          "oklch(95.0% 0.00047 128.49)"
+          "oklch(15.0% 0.00442 254.64)",
+          "oklch(27.0% 0.01502 254.64)",
+          "oklch(38.0% 0.02208 254.64)",
+          "oklch(50.0% 0.02208 254.64)",
+          "oklch(61.0% 0.02208 254.64)",
+          "oklch(73.0% 0.01988 254.64)",
+          "oklch(84.0% 0.01178 254.64)",
+          "oklch(95.0% 0.00368 254.64)"
         ]
       },
-      "sheet": {
+      "panel": {
+        "displayName": "Panel",
         "role": "neutral",
-        "displayName": "White Sheet",
+        "tonalRamp": [
+          "oklch(15.0% 0.00605 253.21)",
+          "oklch(27.0% 0.02056 253.21)",
+          "oklch(38.0% 0.03023 253.21)",
+          "oklch(50.0% 0.03023 253.21)",
+          "oklch(61.0% 0.03023 253.21)",
+          "oklch(73.0% 0.02721 253.21)",
+          "oklch(84.0% 0.01612 253.21)",
+          "oklch(95.0% 0.00504 253.21)"
+        ]
+      },
+      "panel2": {
+        "displayName": "Panel2",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00726 252.53)",
+          "oklch(27.0% 0.02469 252.53)",
+          "oklch(38.0% 0.0363 252.53)",
+          "oklch(50.0% 0.0363 252.53)",
+          "oklch(61.0% 0.0363 252.53)",
+          "oklch(73.0% 0.03267 252.53)",
+          "oklch(84.0% 0.01936 252.53)",
+          "oklch(95.0% 0.00605 252.53)"
+        ]
+      },
+      "border": {
+        "displayName": "Border",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00736 252.1)",
+          "oklch(27.0% 0.02504 252.1)",
+          "oklch(38.0% 0.03682 252.1)",
+          "oklch(50.0% 0.03682 252.1)",
+          "oklch(61.0% 0.03682 252.1)",
+          "oklch(73.0% 0.03314 252.1)",
+          "oklch(84.0% 0.01964 252.1)",
+          "oklch(95.0% 0.00614 252.1)"
+        ]
+      },
+      "text": {
+        "displayName": "Text",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00276 247.97)",
+          "oklch(27.0% 0.00938 247.97)",
+          "oklch(38.0% 0.0138 247.97)",
+          "oklch(50.0% 0.0138 247.97)",
+          "oklch(61.0% 0.0138 247.97)",
+          "oklch(73.0% 0.01242 247.97)",
+          "oklch(84.0% 0.00736 247.97)",
+          "oklch(95.0% 0.0023 247.97)"
+        ]
+      },
+      "muted": {
+        "displayName": "Muted",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00591 251.52)",
+          "oklch(27.0% 0.02011 251.52)",
+          "oklch(38.0% 0.02957 251.52)",
+          "oklch(50.0% 0.02957 251.52)",
+          "oklch(61.0% 0.02957 251.52)",
+          "oklch(73.0% 0.02662 251.52)",
+          "oklch(84.0% 0.01577 251.52)",
+          "oklch(95.0% 0.00493 251.52)"
+        ]
+      },
+      "cyan": {
+        "displayName": "Cyan",
+        "role": "primary",
+        "tonalRamp": [
+          "oklch(15.0% 0.02844 174.29)",
+          "oklch(27.0% 0.0967 174.29)",
+          "oklch(38.0% 0.1422 174.29)",
+          "oklch(50.0% 0.1422 174.29)",
+          "oklch(61.0% 0.1422 174.29)",
+          "oklch(73.0% 0.12798 174.29)",
+          "oklch(84.0% 0.07584 174.29)",
+          "oklch(95.0% 0.0237 174.29)"
+        ]
+      },
+      "blue": {
+        "displayName": "Blue",
+        "role": "secondary",
+        "tonalRamp": [
+          "oklch(15.0% 0.02408 254.42)",
+          "oklch(27.0% 0.08187 254.42)",
+          "oklch(38.0% 0.1204 254.42)",
+          "oklch(50.0% 0.1204 254.42)",
+          "oklch(61.0% 0.1204 254.42)",
+          "oklch(73.0% 0.10836 254.42)",
+          "oklch(84.0% 0.06421 254.42)",
+          "oklch(95.0% 0.02007 254.42)"
+        ]
+      },
+      "amber": {
+        "displayName": "Amber",
+        "role": "secondary",
+        "tonalRamp": [
+          "oklch(15.0% 0.02133 74.47)",
+          "oklch(27.0% 0.07252 74.47)",
+          "oklch(38.0% 0.10665 74.47)",
+          "oklch(50.0% 0.10665 74.47)",
+          "oklch(61.0% 0.10665 74.47)",
+          "oklch(73.0% 0.09599 74.47)",
+          "oklch(84.0% 0.05688 74.47)",
+          "oklch(95.0% 0.01778 74.47)"
+        ]
+      },
+      "red": {
+        "displayName": "Red",
+        "role": "secondary",
+        "tonalRamp": [
+          "oklch(15.0% 0.02643 18.33)",
+          "oklch(27.0% 0.08986 18.33)",
+          "oklch(38.0% 0.13215 18.33)",
+          "oklch(50.0% 0.13215 18.33)",
+          "oklch(61.0% 0.13215 18.33)",
+          "oklch(73.0% 0.11893 18.33)",
+          "oklch(84.0% 0.07048 18.33)",
+          "oklch(95.0% 0.02202 18.33)"
+        ]
+      },
+      "primary-fill": {
+        "displayName": "Primary Fill",
+        "role": "primary",
+        "tonalRamp": [
+          "oklch(15.0% 0.02258 170.8)",
+          "oklch(27.0% 0.07676 170.8)",
+          "oklch(38.0% 0.11289 170.8)",
+          "oklch(50.0% 0.11289 170.8)",
+          "oklch(61.0% 0.11289 170.8)",
+          "oklch(73.0% 0.1016 170.8)",
+          "oklch(84.0% 0.06021 170.8)",
+          "oklch(95.0% 0.01881 170.8)"
+        ]
+      },
+      "primary-hover": {
+        "displayName": "Primary Hover",
+        "role": "primary",
+        "tonalRamp": [
+          "oklch(15.0% 0.01632 172.34)",
+          "oklch(27.0% 0.0555 172.34)",
+          "oklch(38.0% 0.08162 172.34)",
+          "oklch(50.0% 0.08162 172.34)",
+          "oklch(61.0% 0.08162 172.34)",
+          "oklch(73.0% 0.07346 172.34)",
+          "oklch(84.0% 0.04353 172.34)",
+          "oklch(95.0% 0.0136 172.34)"
+        ]
+      },
+      "primary-ink": {
+        "displayName": "Primary Ink",
+        "role": "primary",
+        "tonalRamp": [
+          "oklch(15.0% 0.00791 172.68)",
+          "oklch(27.0% 0.02689 172.68)",
+          "oklch(38.0% 0.03954 172.68)",
+          "oklch(50.0% 0.03954 172.68)",
+          "oklch(61.0% 0.03954 172.68)",
+          "oklch(73.0% 0.03559 172.68)",
+          "oklch(84.0% 0.02109 172.68)",
+          "oklch(95.0% 0.00659 172.68)"
+        ]
+      },
+      "control-hover": {
+        "displayName": "Control Hover",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.0085 245.71)",
+          "oklch(27.0% 0.02891 245.71)",
+          "oklch(38.0% 0.04252 245.71)",
+          "oklch(50.0% 0.04252 245.71)",
+          "oklch(61.0% 0.04252 245.71)",
+          "oklch(73.0% 0.03826 245.71)",
+          "oklch(84.0% 0.02267 245.71)",
+          "oklch(95.0% 0.00709 245.71)"
+        ]
+      },
+      "field-border": {
+        "displayName": "Field Border",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00942 250.08)",
+          "oklch(27.0% 0.03202 250.08)",
+          "oklch(38.0% 0.04709 250.08)",
+          "oklch(50.0% 0.04709 250.08)",
+          "oklch(61.0% 0.04709 250.08)",
+          "oklch(73.0% 0.04238 250.08)",
+          "oklch(84.0% 0.02511 250.08)",
+          "oklch(95.0% 0.00785 250.08)"
+        ]
+      },
+      "sos-fill": {
+        "displayName": "Sos Fill",
+        "role": "secondary",
+        "tonalRamp": [
+          "oklch(15.0% 0.02403 13.97)",
+          "oklch(27.0% 0.0817 13.97)",
+          "oklch(38.0% 0.12014 13.97)",
+          "oklch(50.0% 0.12014 13.97)",
+          "oklch(61.0% 0.12014 13.97)",
+          "oklch(73.0% 0.10813 13.97)",
+          "oklch(84.0% 0.06408 13.97)",
+          "oklch(95.0% 0.02002 13.97)"
+        ]
+      },
+      "sos-rule": {
+        "displayName": "Sos Rule",
+        "role": "secondary",
+        "tonalRamp": [
+          "oklch(15.0% 0.02336 12.65)",
+          "oklch(27.0% 0.07942 12.65)",
+          "oklch(38.0% 0.11679 12.65)",
+          "oklch(50.0% 0.11679 12.65)",
+          "oklch(61.0% 0.11679 12.65)",
+          "oklch(73.0% 0.10511 12.65)",
+          "oklch(84.0% 0.06229 12.65)",
+          "oklch(95.0% 0.01946 12.65)"
+        ]
+      },
+      "white": {
+        "displayName": "White",
+        "role": "neutral",
         "tonalRamp": [
           "oklch(15.0% 0.0 89.88)",
           "oklch(27.0% 0.0 89.88)",
@@ -32,282 +256,234 @@
           "oklch(95.0% 0.0 89.88)"
         ]
       },
-      "ink": {
+      "dock-active": {
+        "displayName": "Dock Active",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00819 177.6)",
+          "oklch(27.0% 0.02786 177.6)",
+          "oklch(38.0% 0.04097 177.6)",
+          "oklch(50.0% 0.04097 177.6)",
+          "oklch(61.0% 0.04097 177.6)",
+          "oklch(73.0% 0.03688 177.6)",
+          "oklch(84.0% 0.02185 177.6)",
+          "oklch(95.0% 0.00683 177.6)"
+        ]
+      },
+      "dock-rule": {
+        "displayName": "Dock Rule",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.01603 173.54)",
+          "oklch(27.0% 0.0545 173.54)",
+          "oklch(38.0% 0.08015 173.54)",
+          "oklch(50.0% 0.08015 173.54)",
+          "oklch(61.0% 0.08015 173.54)",
+          "oklch(73.0% 0.07214 173.54)",
+          "oklch(84.0% 0.04275 173.54)",
+          "oklch(95.0% 0.01336 173.54)"
+        ]
+      },
+      "phone-frame": {
+        "displayName": "Phone Frame",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00328 248.93)",
+          "oklch(27.0% 0.01116 248.93)",
+          "oklch(38.0% 0.01641 248.93)",
+          "oklch(50.0% 0.01641 248.93)",
+          "oklch(61.0% 0.01641 248.93)",
+          "oklch(73.0% 0.01476 248.93)",
+          "oklch(84.0% 0.00875 248.93)",
+          "oklch(95.0% 0.00273 248.93)"
+        ]
+      },
+      "phone-frame-border": {
+        "displayName": "Phone Frame Border",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00692 251.85)",
+          "oklch(27.0% 0.02353 251.85)",
+          "oklch(38.0% 0.0346 251.85)",
+          "oklch(50.0% 0.0346 251.85)",
+          "oklch(61.0% 0.0346 251.85)",
+          "oklch(73.0% 0.03114 251.85)",
+          "oklch(84.0% 0.01845 251.85)",
+          "oklch(95.0% 0.00577 251.85)"
+        ]
+      },
+      "phone-screen": {
+        "displayName": "Phone Screen",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.0% 0.00546 249.29)",
+          "oklch(27.0% 0.01855 249.29)",
+          "oklch(38.0% 0.02728 249.29)",
+          "oklch(50.0% 0.02728 249.29)",
+          "oklch(61.0% 0.02728 249.29)",
+          "oklch(73.0% 0.02455 249.29)",
+          "oklch(84.0% 0.01455 249.29)",
+          "oklch(95.0% 0.00455 249.29)"
+        ]
+      },
+      "phone-mic": {
+        "displayName": "Phone Mic",
         "role": "primary",
-        "displayName": "Blue Ink",
         "tonalRamp": [
-          "oklch(15.0% 0.01591 270.69)",
-          "oklch(27.0% 0.05409 270.69)",
-          "oklch(38.0% 0.07954 270.69)",
-          "oklch(50.0% 0.07954 270.69)",
-          "oklch(61.0% 0.07954 270.69)",
-          "oklch(73.0% 0.07158 270.69)",
-          "oklch(84.0% 0.04242 270.69)",
-          "oklch(95.0% 0.01326 270.69)"
+          "oklch(15.0% 0.01012 176.99)",
+          "oklch(27.0% 0.0344 176.99)",
+          "oklch(38.0% 0.05059 176.99)",
+          "oklch(50.0% 0.05059 176.99)",
+          "oklch(61.0% 0.05059 176.99)",
+          "oklch(73.0% 0.04553 176.99)",
+          "oklch(84.0% 0.02698 176.99)",
+          "oklch(95.0% 0.00843 176.99)"
         ]
       },
-      "muted": {
-        "role": "neutral",
-        "displayName": "Muted Ink",
-        "tonalRamp": [
-          "oklch(15.0% 0.01237 273.2)",
-          "oklch(27.0% 0.04205 273.2)",
-          "oklch(38.0% 0.06184 273.2)",
-          "oklch(50.0% 0.06184 273.2)",
-          "oklch(61.0% 0.06184 273.2)",
-          "oklch(73.0% 0.05566 273.2)",
-          "oklch(84.0% 0.03298 273.2)",
-          "oklch(95.0% 0.01031 273.2)"
-        ]
-      },
-      "blue": {
+      "phone-mic-text": {
+        "displayName": "Phone Mic Text",
         "role": "primary",
-        "displayName": "Ballpoint Blue",
         "tonalRamp": [
-          "oklch(15.0% 0.03717 266.44)",
-          "oklch(27.0% 0.12639 266.44)",
-          "oklch(38.0% 0.18586 266.44)",
-          "oklch(50.0% 0.18586 266.44)",
-          "oklch(61.0% 0.18586 266.44)",
-          "oklch(73.0% 0.16728 266.44)",
-          "oklch(84.0% 0.09913 266.44)",
-          "oklch(95.0% 0.03098 266.44)"
+          "oklch(15.0% 0.02196 174.24)",
+          "oklch(27.0% 0.07467 174.24)",
+          "oklch(38.0% 0.10981 174.24)",
+          "oklch(50.0% 0.10981 174.24)",
+          "oklch(61.0% 0.10981 174.24)",
+          "oklch(73.0% 0.09883 174.24)",
+          "oklch(84.0% 0.05856 174.24)",
+          "oklch(95.0% 0.0183 174.24)"
         ]
       },
-      "wash": {
+      "phone-mic-border": {
+        "displayName": "Phone Mic Border",
         "role": "primary",
-        "displayName": "Blue Wash",
         "tonalRamp": [
-          "oklch(15.0% 0.00392 270.21)",
-          "oklch(27.0% 0.01333 270.21)",
-          "oklch(38.0% 0.0196 270.21)",
-          "oklch(50.0% 0.0196 270.21)",
-          "oklch(61.0% 0.0196 270.21)",
-          "oklch(73.0% 0.01764 270.21)",
-          "oklch(84.0% 0.01046 270.21)",
-          "oklch(95.0% 0.00327 270.21)"
+          "oklch(15.0% 0.01809 172.77)",
+          "oklch(27.0% 0.06151 172.77)",
+          "oklch(38.0% 0.09046 172.77)",
+          "oklch(50.0% 0.09046 172.77)",
+          "oklch(61.0% 0.09046 172.77)",
+          "oklch(73.0% 0.08141 172.77)",
+          "oklch(84.0% 0.04824 172.77)",
+          "oklch(95.0% 0.01508 172.77)"
         ]
       },
-      "rule": {
+      "phone-mic-hover": {
+        "displayName": "Phone Mic Hover",
+        "role": "primary",
+        "tonalRamp": [
+          "oklch(15.0% 0.01194 175.55)",
+          "oklch(27.0% 0.04061 175.55)",
+          "oklch(38.0% 0.05972 175.55)",
+          "oklch(50.0% 0.05972 175.55)",
+          "oklch(61.0% 0.05972 175.55)",
+          "oklch(73.0% 0.05374 175.55)",
+          "oklch(84.0% 0.03185 175.55)",
+          "oklch(95.0% 0.00995 175.55)"
+        ]
+      },
+      "phone-mic-hover-border": {
+        "displayName": "Phone Mic Hover Border",
+        "role": "primary",
+        "tonalRamp": [
+          "oklch(15.0% 0.01818 174.81)",
+          "oklch(27.0% 0.0618 174.81)",
+          "oklch(38.0% 0.09088 174.81)",
+          "oklch(50.0% 0.09088 174.81)",
+          "oklch(61.0% 0.09088 174.81)",
+          "oklch(73.0% 0.08179 174.81)",
+          "oklch(84.0% 0.04847 174.81)",
+          "oklch(95.0% 0.01515 174.81)"
+        ]
+      },
+      "phone-nav": {
+        "displayName": "Phone Nav",
         "role": "neutral",
-        "displayName": "Divider Rule",
         "tonalRamp": [
-          "oklch(15.0% 0.00239 264.5)",
-          "oklch(27.0% 0.00811 264.5)",
-          "oklch(38.0% 0.01193 264.5)",
-          "oklch(50.0% 0.01193 264.5)",
-          "oklch(61.0% 0.01193 264.5)",
-          "oklch(73.0% 0.01073 264.5)",
-          "oklch(84.0% 0.00636 264.5)",
-          "oklch(95.0% 0.00199 264.5)"
-        ]
-      },
-      "control-rule": {
-        "role": "neutral",
-        "displayName": "Control Rule",
-        "tonalRamp": [
-          "oklch(15.0% 0.00453 268.36)",
-          "oklch(27.0% 0.0154 268.36)",
-          "oklch(38.0% 0.02265 268.36)",
-          "oklch(50.0% 0.02265 268.36)",
-          "oklch(61.0% 0.02265 268.36)",
-          "oklch(73.0% 0.02039 268.36)",
-          "oklch(84.0% 0.01208 268.36)",
-          "oklch(95.0% 0.00378 268.36)"
-        ]
-      },
-      "red": {
-        "role": "secondary",
-        "displayName": "Action Red",
-        "tonalRamp": [
-          "oklch(15.0% 0.04004 28.39)",
-          "oklch(27.0% 0.13613 28.39)",
-          "oklch(38.0% 0.2002 28.39)",
-          "oklch(50.0% 0.2002 28.39)",
-          "oklch(61.0% 0.2002 28.39)",
-          "oklch(73.0% 0.18018 28.39)",
-          "oklch(84.0% 0.10677 28.39)",
-          "oklch(95.0% 0.03337 28.39)"
-        ]
-      },
-      "night": {
-        "role": "neutral",
-        "displayName": "Night Ground",
-        "tonalRamp": [
-          "oklch(15.0% 0.01346 270.9)",
-          "oklch(27.0% 0.04577 270.9)",
-          "oklch(38.0% 0.06731 270.9)",
-          "oklch(50.0% 0.06731 270.9)",
-          "oklch(61.0% 0.06731 270.9)",
-          "oklch(73.0% 0.06057 270.9)",
-          "oklch(84.0% 0.0359 270.9)",
-          "oklch(95.0% 0.01122 270.9)"
-        ]
-      },
-      "night-sheet": {
-        "role": "neutral",
-        "displayName": "Night Sheet",
-        "tonalRamp": [
-          "oklch(15.0% 0.01658 271.46)",
-          "oklch(27.0% 0.05637 271.46)",
-          "oklch(38.0% 0.08289 271.46)",
-          "oklch(50.0% 0.08289 271.46)",
-          "oklch(61.0% 0.08289 271.46)",
-          "oklch(73.0% 0.0746 271.46)",
-          "oklch(84.0% 0.04421 271.46)",
-          "oklch(95.0% 0.01382 271.46)"
-        ]
-      },
-      "night-text": {
-        "role": "neutral",
-        "displayName": "Night Text",
-        "tonalRamp": [
-          "oklch(15.0% 0.00218 274.89)",
-          "oklch(27.0% 0.00742 274.89)",
-          "oklch(38.0% 0.01092 274.89)",
-          "oklch(50.0% 0.01092 274.89)",
-          "oklch(61.0% 0.01092 274.89)",
-          "oklch(73.0% 0.00982 274.89)",
-          "oklch(84.0% 0.00582 274.89)",
-          "oklch(95.0% 0.00182 274.89)"
-        ]
-      },
-      "night-muted": {
-        "role": "neutral",
-        "displayName": "Night Muted",
-        "tonalRamp": [
-          "oklch(15.0% 0.0105 274.09)",
-          "oklch(27.0% 0.03569 274.09)",
-          "oklch(38.0% 0.05249 274.09)",
-          "oklch(50.0% 0.05249 274.09)",
-          "oklch(61.0% 0.05249 274.09)",
-          "oklch(73.0% 0.04724 274.09)",
-          "oklch(84.0% 0.02799 274.09)",
-          "oklch(95.0% 0.00875 274.09)"
-        ]
-      },
-      "night-rule": {
-        "role": "neutral",
-        "displayName": "Night Rule",
-        "tonalRamp": [
-          "oklch(15.0% 0.01537 270.48)",
-          "oklch(27.0% 0.05225 270.48)",
-          "oklch(38.0% 0.07684 270.48)",
-          "oklch(50.0% 0.07684 270.48)",
-          "oklch(61.0% 0.07684 270.48)",
-          "oklch(73.0% 0.06916 270.48)",
-          "oklch(84.0% 0.04098 270.48)",
-          "oklch(95.0% 0.01281 270.48)"
-        ]
-      },
-      "night-confirmation": {
-        "role": "neutral",
-        "displayName": "Night Confirmation",
-        "tonalRamp": [
-          "oklch(15.0% 0.01859 268.79)",
-          "oklch(27.0% 0.06321 268.79)",
-          "oklch(38.0% 0.09295 268.79)",
-          "oklch(50.0% 0.09295 268.79)",
-          "oklch(61.0% 0.09295 268.79)",
-          "oklch(73.0% 0.08366 268.79)",
-          "oklch(84.0% 0.04958 268.79)",
-          "oklch(95.0% 0.01549 268.79)"
-        ]
-      },
-      "warning-wash": {
-        "role": "secondary",
-        "displayName": "Warning Paper",
-        "tonalRamp": [
-          "oklch(15.0% 0.00593 85.56)",
-          "oklch(27.0% 0.02017 85.56)",
-          "oklch(38.0% 0.02966 85.56)",
-          "oklch(50.0% 0.02966 85.56)",
-          "oklch(61.0% 0.02966 85.56)",
-          "oklch(73.0% 0.02669 85.56)",
-          "oklch(84.0% 0.01582 85.56)",
-          "oklch(95.0% 0.00494 85.56)"
-        ]
-      },
-      "warning-ink": {
-        "role": "secondary",
-        "displayName": "Warning Ink",
-        "tonalRamp": [
-          "oklch(15.0% 0.01857 66.76)",
-          "oklch(27.0% 0.06315 66.76)",
-          "oklch(38.0% 0.09287 66.76)",
-          "oklch(50.0% 0.09287 66.76)",
-          "oklch(61.0% 0.09287 66.76)",
-          "oklch(73.0% 0.08359 66.76)",
-          "oklch(84.0% 0.04953 66.76)",
-          "oklch(95.0% 0.01548 66.76)"
-        ]
-      },
-      "warning-rule": {
-        "role": "secondary",
-        "displayName": "Warning Rule",
-        "tonalRamp": [
-          "oklch(15.0% 0.0255 63.83)",
-          "oklch(27.0% 0.08671 63.83)",
-          "oklch(38.0% 0.12751 63.83)",
-          "oklch(50.0% 0.12751 63.83)",
-          "oklch(61.0% 0.12751 63.83)",
-          "oklch(73.0% 0.11476 63.83)",
-          "oklch(84.0% 0.06801 63.83)",
-          "oklch(95.0% 0.02125 63.83)"
-        ]
-      },
-      "error-ink": {
-        "role": "secondary",
-        "displayName": "Error Ink",
-        "tonalRamp": [
-          "oklch(15.0% 0.0301 28.5)",
-          "oklch(27.0% 0.10233 28.5)",
-          "oklch(38.0% 0.15048 28.5)",
-          "oklch(50.0% 0.15048 28.5)",
-          "oklch(61.0% 0.15048 28.5)",
-          "oklch(73.0% 0.13544 28.5)",
-          "oklch(84.0% 0.08026 28.5)",
-          "oklch(95.0% 0.02508 28.5)"
+          "oklch(15.0% 0.0051 249.31)",
+          "oklch(27.0% 0.01733 249.31)",
+          "oklch(38.0% 0.02548 249.31)",
+          "oklch(50.0% 0.02548 249.31)",
+          "oklch(61.0% 0.02548 249.31)",
+          "oklch(73.0% 0.02293 249.31)",
+          "oklch(84.0% 0.01359 249.31)",
+          "oklch(95.0% 0.00425 249.31)"
         ]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Display",
-        "purpose": "Landing hero headline; responsive overrides are recorded in DESIGN.md."
-      },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Base h2, with surface-specific sizes."
+        "purpose": "Base operational h1; more specific surface headings vary."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Base workspace h2."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Base h3."
+        "purpose": "Base workspace h3."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Default interface text; paragraphs use a more open line height."
+        "purpose": "Operational text in Arial with Segoe UI fallback."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Visible field labels."
+        "purpose": "Field labels and disclosures."
       },
-      "button": {
-        "displayName": "Button",
-        "purpose": "Default light-surface actions."
+      "metadata": {
+        "displayName": "Metadata",
+        "purpose": "Statuses, original quotes and compact supporting text."
       }
     },
-    "shadows": [],
-    "motion": [
+    "shadows": [
       {
-        "name": "control-state",
-        "value": "background 0.15s, border-color 0.15s",
-        "purpose": "Default button state transitions."
+        "name": "phone-frame",
+        "value": "0 18px 45px #0005",
+        "purpose": "Physical device frame."
       },
       {
-        "name": "reduced-motion",
-        "value": "animation: none !important; transition: none !important; scroll-behavior: auto",
-        "purpose": "Applied under prefers-reduced-motion: reduce; scroll behavior applies to html."
+        "name": "phone-microphone",
+        "value": "0 9px 24px #0003",
+        "purpose": "Resting phone microphone action."
+      },
+      {
+        "name": "connected-voice-glow",
+        "value": "0 0 25px #3be1bd35",
+        "purpose": "Midpoint of the connected microphone animation; not amplitude."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button-state",
+        "value": "background 0.15s, border-color 0.15s",
+        "purpose": "Inherited button transitions; disabled under reduced motion."
+      },
+      {
+        "name": "panel-columns",
+        "value": "grid-template-columns 0.35s ease",
+        "purpose": "Workspace panel toggles; disabled under reduced motion."
+      },
+      {
+        "name": "route-framing",
+        "value": "900ms",
+        "purpose": "Map fitBounds; zero duration under reduced motion."
+      },
+      {
+        "name": "location-framing",
+        "value": "600ms",
+        "purpose": "Map easeTo; zero duration under reduced motion."
+      },
+      {
+        "name": "connected-voice-breathe",
+        "value": "voice-breathe 1.8s ease-in-out infinite",
+        "purpose": "Connected voice state, not microphone amplitude; disabled under reduced motion."
+      },
+      {
+        "name": "map-pitch-toggle",
+        "value": "500ms",
+        "purpose": "2D/3D pitch transition; zero duration under reduced motion."
       }
     ],
     "breakpoints": [
@@ -316,130 +492,126 @@
         "value": "760px"
       },
       {
-        "name": "two-column-workspace",
-        "value": "1200px"
-      },
-      {
-        "name": "wide",
-        "value": "1550px"
+        "name": "two-column-upper-bound",
+        "value": "1099px"
       }
     ]
   },
   "components": [
     {
-      "name": "Primary action",
-      "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Primary action from the current authored styles.",
-      "html": "<button class=\"ds-button-primary\">Run the simulation</button>",
-      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--ink, #1b2550);color:var(--sheet, #fff);border-color:var(--ink, #1b2550);}.ds-button-primary:hover{background:var(--blue, #2a4cc0);border-color:var(--blue, #2a4cc0);}.ds-button-primary:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}.ds-button-primary:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none;}}"
-    },
-    {
       "name": "Default action",
       "kind": "button",
       "refersTo": "button-default",
-      "description": "Default action from the current authored styles.",
-      "html": "<button class=\"ds-button-default\">Open companion</button>",
-      "css": ".ds-button-default{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--sheet, #fff);color:var(--ink, #1b2550);border-color:#a3a9b8;}.ds-button-default:hover{background:var(--wash, #e8edfb);border-color:var(--blue, #2a4cc0);}.ds-button-default:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}.ds-button-default:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-default{transition:none;}}"
+      "description": "Observed operational action styling.",
+      "html": "<button class=\"ds-command-scope ds-button-default\">Show reference route</button>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-button-default{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;background:var(--panel2, #142232);color:var(--text, #e5edf5);border-color:var(--border, #223142);}.ds-button-default:hover{background:#1b3042;border-color:var(--cyan, #3be1bd);}.ds-button-default:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}.ds-button-default:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-default{transition:none;}}"
     },
     {
-      "name": "Danger action",
+      "name": "Primary action",
       "kind": "button",
-      "refersTo": "button-danger",
-      "description": "Danger action from the current authored styles.",
-      "html": "<button class=\"ds-button-danger\">End session</button>",
-      "css": ".ds-button-danger{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--red, #d22f27);color:var(--sheet, #fff);border-color:var(--red, #d22f27);}.ds-button-danger:hover{background:var(--red, #d22f27);border-color:var(--red, #d22f27);}.ds-button-danger:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}.ds-button-danger:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-danger{transition:none;}}"
-    },
-    {
-      "name": "Night primary action",
-      "kind": "button",
-      "refersTo": "button-night-primary",
-      "description": "Night primary action from the current authored styles.",
-      "html": "<button class=\"ds-button-night-primary\">Accept this plan</button>",
-      "css": ".ds-button-night-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--night-text, #eef0f8);color:var(--ink, #1b2550);border-color:var(--night-text, #eef0f8);font-size:12px;}.ds-button-night-primary:hover{background:var(--wash, #e8edfb);border-color:var(--wash, #e8edfb);}.ds-button-night-primary:focus-visible{outline:3px solid #a9c0ff;outline-offset:3px;}.ds-button-night-primary:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-night-primary{transition:none;}}"
+      "refersTo": "button-primary",
+      "description": "Observed operational action styling.",
+      "html": "<button class=\"ds-command-scope ds-button-primary\">Accept this plan</button>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-button-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;background:#72dfbd;color:#07261e;border-color:#72dfbd;}.ds-button-primary:hover{background:#a1ecd4;border-color:#a1ecd4;}.ds-button-primary:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}.ds-button-primary:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none;}}"
     },
     {
       "name": "SOS action",
       "kind": "button",
       "refersTo": "button-sos",
-      "description": "SOS action from the current authored styles.",
-      "html": "<button class=\"ds-button-sos\">I need help</button>",
-      "css": ".ds-button-sos{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;background:var(--red, #d22f27);color:var(--sheet, #fff);border-color:var(--red, #d22f27);width:100%;min-height:58px;font-size:16px;font-weight:700;}.ds-button-sos:hover{background:#b42720;border-color:var(--red, #d22f27);}.ds-button-sos:focus-visible{outline:3px solid #a9c0ff;outline-offset:3px;}.ds-button-sos:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-sos{transition:none;}}"
+      "description": "Full-width SOS action inside the phone.",
+      "html": "<button class=\"ds-command-scope ds-button-sos\">I need help</button>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-button-sos{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;background:#943b48;color:#fff;border-color:#c86c78;width:100%;min-height:52px;border-radius:14px;font-size:14px;font-weight:700;}.ds-button-sos:hover{background:#943b48;border-color:#c86c78;}.ds-button-sos:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}.ds-button-sos:disabled{opacity:.45;cursor:not-allowed;}@media(prefers-reduced-motion:reduce){.ds-button-sos{transition:none;}}"
     },
     {
-      "name": "Labeled field",
+      "name": "Workspace field",
       "kind": "input",
       "refersTo": "input-field",
-      "description": "Visible label, light field and keyboard focus.",
-      "html": "<label class=\"ds-field-label\">How can you help?<input class=\"ds-field\" placeholder=\"I am on my way, about 10 minutes.\"></label>",
-      "css": ".ds-field-label{display:block;margin:15px 0 9px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--ink, #1b2550);}.ds-field{display:block;width:100%;margin-top:7px;min-height:44px;border:1px solid #a3a9b8;border-radius:2px;padding:11px 12px;background:var(--sheet, #fff);color:var(--ink, #1b2550);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;caret-color:var(--blue, #2a4cc0);}.ds-field::placeholder{color:var(--muted, #4a5378);}.ds-field:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}"
+      "description": "A general workspace field, also applied explicitly to companion fields.",
+      "html": "<label class=\"ds-command-scope ds-field-label\">Scenario time<input class=\"ds-field\" type=\"time\" value=\"22:15\"></label>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-field-label{display:block;font-family:Arial,\"Segoe UI\",sans-serif;font-size:13px;color:var(--text, #e5edf5);}.ds-field{display:block;margin-top:7px;width:100%;min-height:44px;padding:11px 12px;border:1px solid #3b5168;border-radius:8px;background:var(--bg, #080f18);color:var(--text, #e5edf5);font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;}.ds-field:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}"
     },
     {
-      "name": "Workspace navigation",
+      "name": "Bottom navigation",
       "kind": "nav",
-      "refersTo": "workspace-tab-active",
-      "description": "Explicit selected state for operational views.",
-      "html": "<nav class=\"ds-tabs\" aria-label=\"Workspace\"><button aria-pressed=\"true\">Journey</button><button aria-pressed=\"false\">People</button><button aria-pressed=\"false\">Record</button></nav>",
-      "css": ".ds-tabs{display:flex;gap:8px;padding:8px 24px;border-block:1px solid var(--rule, #c8ccd4);}.ds-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;border-color:transparent;background:transparent;color:var(--ink, #1b2550);}.ds-tabs button:hover{background:var(--wash, #e8edfb);border-color:var(--blue, #2a4cc0);}.ds-tabs button[aria-pressed=\"true\"]{background:var(--wash, #e8edfb);color:var(--blue, #2a4cc0);border-color:var(--blue, #2a4cc0);}.ds-tabs button:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}@media(max-width:760px){.ds-tabs{padding:8px;gap:0;}.ds-tabs button{flex:1;font-size:12px;padding:10px;}}@media(prefers-reduced-motion:reduce){.ds-tabs button{transition:none;}}"
-    },
-    {
-      "name": "Language switch",
-      "kind": "nav",
-      "refersTo": "language-active",
-      "description": "Same interface in Vietnamese and English.",
-      "html": "<div class=\"ds-languages\" role=\"group\" aria-label=\"Language\"><button aria-pressed=\"true\">VI</button><button aria-pressed=\"false\">EN</button></div>",
-      "css": ".ds-languages{display:flex;}.ds-languages button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #a3a9b8;border-radius:2px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.6;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s;min-width:44px;padding:8px;background:transparent;border-color:var(--rule, #c8ccd4);color:var(--ink, #1b2550);}.ds-languages button[aria-pressed=\"true\"]{background:var(--ink, #1b2550);color:var(--sheet, #fff);border-color:var(--ink, #1b2550);}.ds-languages button:focus-visible{outline:3px solid var(--blue, #2a4cc0);outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-languages button{transition:none;}}"
+      "refersTo": "dock-active",
+      "description": "Dock navigation shown in flow for preview; production pins it to the viewport.",
+      "html": "<nav class=\"ds-command-scope ds-dock\" aria-label=\"Workspace\"><button aria-pressed=\"true\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>Companion</button><button aria-pressed=\"false\">People</button><button aria-pressed=\"false\">Record</button></nav>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-dock{display:flex;gap:5px;padding:9px 12px;background:var(--panel, #101b28);border-top:1px solid var(--border, #223142);overflow-x:auto;}.ds-dock button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;padding:8px 10px;font-size:12px;white-space:nowrap;background:var(--panel2, #142232);color:var(--text, #e5edf5);}.ds-dock button:hover{border-color:var(--cyan, #3be1bd);background:#1b3042;}.ds-dock button[aria-pressed=\"true\"]{color:var(--cyan, #3be1bd);background:#15362f;border-color:#2e7966;}.ds-dock button:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-dock button{transition:none;}}"
     },
     {
       "name": "Source label",
       "kind": "chip",
       "refersTo": "source-label",
-      "description": "Functional noninteractive provenance label.",
-      "html": "<span class=\"ds-source\">SIMULATION</span>",
-      "css": ".ds-source{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #a3a9b8;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;letter-spacing:.055em;line-height:1.4;padding:5px 8px;width:fit-content;color:var(--muted, #4a5378);}"
+      "description": "Explicit noninteractive simulation provenance.",
+      "html": "<span class=\"ds-command-scope ds-source\">SIMULATION</span>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-source{display:inline-flex;padding:5px 8px;border:1px solid #70532e;background:#251f17;color:var(--amber, #e9b66f);font-family:Arial,\"Segoe UI\",sans-serif;font-size:12px;line-height:1.4;font-weight:700;letter-spacing:.055em;white-space:nowrap;}"
+    },
+    {
+      "name": "Physical phone simulator",
+      "kind": "custom",
+      "refersTo": "phone-shell",
+      "description": "Source-derived device frame with independent screen scrolling, sticky language strip and in-frame navigation; preview is static.",
+      "html": "<section class=\"ds-command-scope ds-phone\" aria-label=\"Guardian AI phone simulator\"><div class=\"ds-phone-hardware\" aria-hidden=\"true\"></div><div class=\"ds-phone-status\"><time>22:15</time><span class=\"ds-island\" aria-hidden=\"true\"></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"2\" y=\"6\" width=\"16\" height=\"12\" rx=\"2\"/><path d=\"M22 10v4M6 10v4M10 10v4M14 10v4\"/></svg></div><div class=\"ds-phone-screen\"><div class=\"ds-phone-language\"><h2>Guardian AI</h2><div><button aria-pressed=\"true\">VI</button><button aria-pressed=\"false\">EN</button></div></div><div class=\"ds-phone-content\"><h2>Your people</h2><p>Messages and commitments from people in this session.</p><details><summary>Manage invitations</summary><label>Recipient name<input placeholder=\"Name\"></label><button>Create invitation</button></details></div></div><nav class=\"ds-phone-nav\" aria-label=\"Phone views\"><button aria-label=\"Companion\" aria-pressed=\"false\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z\"/><path d=\"m9 12 2 2 4-4\"/></svg></button><button aria-label=\"Your people\" aria-pressed=\"true\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/></svg></button><button aria-label=\"Record\" aria-pressed=\"false\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z\"/><path d=\"M14 2v6h6M8 13h8M8 17h8\"/></svg></button></nav><div class=\"ds-home-indicator\" aria-hidden=\"true\"></div></section>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-phone{position:relative;width:100%;max-width:380px;height:780px;padding:8px;border:1px solid #3b4a5b;border-radius:44px;background:#050a10;color:#e5edf5;box-shadow:0 18px 45px #0005;isolation:isolate;min-width:0;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;line-height:1.6;}.ds-phone-status{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;font-size:12px;font-weight:600;}.ds-phone-status time{font-variant-numeric:tabular-nums;}.ds-island{position:absolute;top:17px;left:50%;transform:translateX(-50%);width:86px;height:22px;border-radius:20px;background:#000;}.ds-phone-screen{height:calc(100% - 122px);overflow-y:auto;overflow-x:hidden;background:#0d1823;border-radius:28px 28px 12px 12px;scrollbar-width:thin;scrollbar-color:#334b5c transparent;overscroll-behavior:contain;}.ds-phone-language{position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0d1823;padding:15px 20px 0;}.ds-phone-language h2{font-size:18px;letter-spacing:-.03em;margin:0;}.ds-phone button{min-height:44px;padding:7px 8px;border:1px solid #223142;border-radius:8px;background:#142232;color:#e5edf5;font-family:inherit;font-size:11px;cursor:pointer;}.ds-phone button:hover{border-color:#3be1bd;background:#1b3042;}.ds-phone button:focus-visible,.ds-phone input:focus-visible,.ds-phone summary:focus-visible{outline:3px solid #7db7ff;outline-offset:3px;}.ds-phone-language button[aria-pressed=\"true\"]{background:#3be1bd;color:#07261e;border-color:#3be1bd;}.ds-phone-content{padding:24px 20px;}.ds-phone-content h2{font-size:23px;line-height:1.3;margin:10px 0;}.ds-phone-content p{font-size:13px;color:#a5b4c5;}.ds-phone-content details{padding-top:14px;}.ds-phone-content summary{min-height:44px;cursor:pointer;}.ds-phone-content label{display:block;font-size:13px;}.ds-phone-content input{display:block;min-height:44px;margin:7px 0 12px;padding:11px 12px;border:1px solid #3b5168;border-radius:8px;background:#080f18;color:#e5edf5;font-family:inherit;}.ds-phone-nav{height:52px;display:flex;align-items:center;justify-content:space-around;padding:4px 28px;background:#09131d;border-radius:0 0 22px 22px;}.ds-phone-nav button{background:transparent;border:0;min-width:48px;color:#8da2b5;}.ds-phone-nav button[aria-pressed=\"true\"]{color:#6fdfbd;background:#132f2b;border-radius:13px;}.ds-home-indicator{width:105px;height:4px;border-radius:4px;background:#bdcbd4;margin:12px auto 0;}@media(max-width:760px){.ds-phone{max-width:370px;height:760px;}}.ds-phone-hardware{position:absolute;right:-3px;top:145px;width:3px;height:57px;background:#506070;border-radius:0 3px 3px 0;}.ds-phone-hardware:before{content:\"\";position:absolute;top:-45px;width:3px;height:28px;background:#506070;border-radius:0 3px 3px 0;}.ds-phone-nav button{display:inline-flex;align-items:center;justify-content:center;}"
+    },
+    {
+      "name": "Tool disclosure",
+      "kind": "custom",
+      "refersTo": "tool-disclosure",
+      "description": "Native disclosure for exploration and recorded activity.",
+      "html": "<details class=\"ds-command-scope ds-tools\"><summary>Agent activity</summary><p>Sourced consent, admission checks and user acceptance.</p></details>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-tools{margin:8px 0;padding:0 14px;border:1px solid var(--border, #223142);border-radius:8px;background:var(--panel, #101b28);color:var(--text, #e5edf5);font-family:Arial,\"Segoe UI\",sans-serif;}.ds-tools summary{min-height:44px;padding:12px 0;cursor:pointer;font-size:13px;line-height:1.7;}.ds-tools summary:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}.ds-tools p{font-size:12px;line-height:1.6;}"
     },
     {
       "name": "Commitment row",
       "kind": "card",
       "refersTo": "commitment-row",
-      "description": "A named person, explicit status and original quote in a ruled container.",
-      "html": "<article class=\"ds-commitment\"><b>Linh</b><span class=\"ds-commitment-state\">On the way</span><q>I am on my way, about 10 minutes.</q></article>",
-      "css": ".ds-commitment{display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--rule, #c8ccd4);padding:16px 0;font-family:'Be Vietnam Pro',sans-serif;color:var(--ink, #1b2550);}.ds-commitment b{font-size:14px;}.ds-commitment-state{font-size:12px;color:var(--blue, #2a4cc0);}.ds-commitment q{font-size:12px;line-height:1.8;font-style:italic;overflow-wrap:anywhere;color:var(--muted, #4a5378);}.ds-commitment.ds-revoked b{text-decoration:line-through;text-decoration-color:var(--red, #d22f27);}.ds-commitment.ds-revoked .ds-commitment-state{color:#8f1d17;}"
+      "description": "Original human response beside an explicit semantic state.",
+      "html": "<article class=\"ds-command-scope ds-commitment\"><b>Linh</b><span class=\"ds-on-the-way\">On the way</span><q>I am on my way, about 10 minutes.</q></article>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-commitment{display:flex;flex-direction:column;gap:7px;padding:12px 0;border-top:1px solid var(--border, #223142);color:var(--text, #e5edf5);font-family:Arial,\"Segoe UI\",sans-serif;}.ds-commitment b{font-size:14px;}.ds-commitment span{font-size:12px;color:var(--amber, #e9b66f);}.ds-commitment q{font-size:12px;line-height:1.5;font-style:italic;color:var(--muted, #a5b4c5);overflow-wrap:anywhere;}.ds-commitment .ds-on-the-way{color:var(--blue);}.ds-commitment .ds-accepted{color:var(--cyan);}.ds-commitment .ds-revoked,.ds-commitment .ds-declined{color:var(--red);}"
+    },
+    {
+      "name": "Phone microphone",
+      "kind": "button",
+      "refersTo": "phone-microphone",
+      "description": "108px voice action, reduced to 72px with a plan; glow means connected, not amplitude.",
+      "html": "<button class=\"ds-command-scope ds-phone-mic ds-connected\" aria-label=\"End voice\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><rect x=\"9\" y=\"2\" width=\"6\" height=\"12\" rx=\"3\"/><path d=\"M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8\"/></svg></button>",
+      "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-phone-mic{display:flex;align-items:center;justify-content:center;width:108px;height:108px;min-height:44px;margin:0 auto 12px;border-radius:50%;background:#123e35;color:#7eebce;border:1px solid #3c927b;box-shadow:0 9px 24px #0003;cursor:pointer;transition:background .15s,border-color .15s;}.ds-phone-mic:hover{background:#1c5145;border-color:#9df4dc;}.ds-phone-mic:focus-visible{outline:3px solid #a9c0ff;outline-offset:3px;}.ds-phone-mic:disabled{opacity:.45;cursor:not-allowed;}.ds-phone-mic.ds-connected{animation:ds-phone-breathe 1.8s ease-in-out infinite;}.ds-phone-mic.ds-has-plan{width:72px;height:72px;margin-bottom:8px;}@keyframes ds-phone-breathe{50%{box-shadow:0 0 25px #3be1bd35;}}@media(prefers-reduced-motion:reduce){.ds-phone-mic{transition:none;}.ds-phone-mic.ds-connected{animation:none;}}"
     }
   ],
   "narrative": {
-    "northStar": "Paper and Blue Ink",
-    "overview": "Guardian AI presents human support as a record that can be read and checked. Cool paper, blue-black text, explicit rules and quoted commitments connect the public introduction, operational workspace and recipient page. The companion surface inverts the same family into a restrained night palette.\n\nThe public introduction is spacious and editorial; operational surfaces are denser, with clear separation between a person's next action, the map and the people offering help. Original statements stay visibly distinct from status and proposed actions. Vietnamese and English share one type family and the same component structure.",
+    "northStar": "The Command Center",
+    "overview": "The operational workspace is a dark command center: an interactive physical phone simulator, a central map and a coordination panel share a continuous night background. Cyan identifies confirmed or primary coordination, blue supports reference information, amber marks unresolved or simulated information, and muted borders separate dense content.\n\nThe interface keeps the need, original human replies, proposed action and user acceptance legible together. The phone has its own scrolling screen, shared VI/EN strip, contact and record sheets, and internal navigation. Rounded command panels organize tools and evidence; the desktop bottom dock replaces the workspace header. Vietnamese and English retain the same compact system-font structure.",
     "keyCharacteristics": [
-      "Cool paper and blue ink, with a dark companion surface.",
-      "Flat, ruled containers and nearly square controls.",
-      "Quoted human commitments beside explicit status text.",
-      "One Vietnamese-capable family across both interface languages."
+      "Dark continuous workspace with two levels of panel fill.",
+      "Map-centered operational grid and a fixed bottom dock.",
+      "Eight-pixel command controls, ten-pixel panels and a physical phone frame.",
+      "Explicit provenance, original quotes and acceptance states."
     ],
     "rules": [
       {
         "name": "The Source Before Status Rule",
-        "body": "Keep the simulation or device-trial label and original response visible alongside derived status; color does not replace that text.",
+        "body": "Keep simulation, device-trial and reference-route labels next to the information they qualify; color does not replace explicit status.",
         "section": "colors"
       },
       {
-        "name": "The Flat Paper Rule",
-        "body": "Use borders and tonal surfaces for record structure; the authored containers do not rely on floating shadows.",
+        "name": "The Bordered Depth Rule",
+        "body": "Separate command panels with fills and fine borders; reserve ambient shadows for the physical phone frame and its microphone action.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do keep source labels, human quotes and derived status visually distinct.",
-      "Do use blue ink on paper for records and the night palette for the companion.",
-      "Do retain visible keyboard focus and reduced-motion behavior.",
-      "Do preserve Vietnamese diacritics and allow both interface languages to wrap.",
-      "Do retain the base 44px action and field target when extending the interface."
+      "Do use the scoped dark palette for operational workspace additions.",
+      "Do preserve the map, companion and coordination hierarchy with the bottom dock.",
+      "Do keep original replies and explicit acceptance status beside derived plans.",
+      "Do retain visible keyboard focus and support Vietnamese and English text.",
+      "Do keep reference routes visibly labeled as reception unconfirmed."
     ],
     "donts": [
-      "Don't use action red as a verified-commitment seal.",
-      "Don't infer a rounded phone frame, numbered clause system or stamp motif from the superseded direction document.",
-      "Don't replace explicit state text and original quotes with color alone.",
-      "Don't treat this source extraction as completed visual or responsive QA."
+      "Don't reintroduce the landing header into the operational workspace.",
+      "Don't use a displayed route or open venue as proof of an accepted commitment.",
+      "Don't apply the workspace palette globally to surfaces that still use their existing stylesheet.",
+      "Don't treat this source documentation as browser or visual approval."
     ]
   }
 }

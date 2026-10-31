@@ -1,3 +1,4 @@
+import { cityStart, walkingRoute } from "./city";
 import { z } from "zod";
 import type { Incident, Reply, Point, Route } from "./types";
 export const fold = (s: string) =>
@@ -6,6 +7,47 @@ export const fold = (s: string) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/g, "d");
+export function spokenMinutes(text: string): number | null {
+  const s = fold(text),
+    numeric = s.match(/\b(\d{1,3})\s*(phut|minutes?|mins?)\b/);
+  if (numeric) return Math.min(240, Number(numeric[1]));
+  const words: Record<string, number> = {
+    nam: 5,
+    muoi: 10,
+    "muoi lam": 15,
+    "hai muoi": 20,
+    "ba muoi": 30,
+    hai: 2,
+    ba: 3,
+    mot: 1,
+  };
+  for (const [word, value] of Object.entries(words).sort(
+    (a, b) => b[0].length - a[0].length,
+  ))
+    if (new RegExp("\\b" + word + " phut\\b").test(s)) return value;
+  return null;
+}
+export function parseNeeds(
+  text: string,
+  previous: Incident["needs"],
+): Incident["needs"] {
+  const s = fold(text),
+    next = { ...previous };
+  const limit = s.match(
+    /(?:chi|toi da|khong qua|only|at most|max(?:imum)?)\D{0,25}(\d{1,4})\s*(?:met|meters?|m\b)/,
+  );
+  if (limit) next.maxWalk = Math.max(20, Math.min(5000, Number(limit[1])));
+  if (
+    /khong (?:muon )?(?:di |qua |vao )*hem|tranh hem|avoid alleys|no alleys/.test(
+      s,
+    )
+  )
+    next.avoidAlleys = true;
+  if (/kin dao|discreet/.test(s)) next.discreet = true;
+  if (/khong (?:the )?(?:di duoc|di bo duoc)|cannot walk|can't walk/.test(s))
+    next.canMove = false;
+  return next;
+}
 export function emergency(
   text: string,
 ): { risk: 3 | 4; medical: boolean } | null {
@@ -90,7 +132,7 @@ export function ruleExtract(text: string): Extraction {
     decision,
     quote: text,
     offer: text,
-    minutes: eta ? Math.min(240, Number(eta[1])) : null,
+    minutes: spokenMinutes(text),
     entrance: /cua chinh|main entrance/.test(s) ? "Main entrance" : "",
     discreet: /kin dao|discreet/.test(s),
     viaAlley: /cua sau|qua hem|back alley|back entrance/.test(s),
@@ -112,7 +154,7 @@ export function validateExtraction(
     return { ...parsed, decision: "CLARIFY" };
   // Never accept an invented ETA even when it fits the model schema.
   const eta = fold(text).match(/\b(\d{1,3})\s*(phut|minutes?|mins?)\b/);
-  if (parsed.minutes !== null && (!eta || Number(eta[1]) !== parsed.minutes))
+  if (parsed.minutes !== null && spokenMinutes(text) !== parsed.minutes)
     parsed.minutes = null;
   return parsed;
 }
@@ -169,39 +211,23 @@ export function routeDistance(point: Point, route: Point[]): number {
   }
   return minimum;
 }
-export const demoStart: Point = { lat: 10.7714, lng: 106.7049 };
+export const demoStart: Point = cityStart;
 export function simulatedRoute(
   from: Point,
   to: Point,
   blocked: boolean,
 ): Route {
-  // Illustrative paths only. This geometry is never used for LIVE sessions.
-  const points = blocked
-    ? [
-        from,
-        { lat: from.lat - 0.0007, lng: from.lng },
-        { lat: from.lat - 0.0007, lng: to.lng },
-        to,
-      ]
-    : [from, { lat: from.lat, lng: to.lng }, to];
-  return {
-    points,
-    meters: points.slice(1).reduce((n, p, k) => n + distance(points[k], p), 0),
-    source: "SIMULATED",
-    note: blocked
-      ? [
-          "Đường vòng minh họa tránh đoạn tối",
-          "Illustrative detour around a dark segment",
-        ]
-      : [
-          "Tuyến minh họa, không dùng để đi ngoài thực tế",
-          "Illustrative route, not for real-world navigation",
-        ],
-  };
+  const direct = walkingRoute(from, to, [], true);
+  if (!blocked) return direct;
+  for (const edge of [...(direct.edgeIds || [])].reverse())
+    try {
+      return walkingRoute(from, to, [edge], true);
+    } catch {}
+  throw Error("NO_ALTERNATIVE_WALKING_ROUTE");
 }
 export async function liveRoute(from: Point, to: Point): Promise<Route> {
   if (!process.env.GOOGLE_MAPS_API_KEY)
-    throw new Error("LIVE_MAPS_NOT_CONFIGURED");
+    return walkingRoute(from, to, [], false);
   const res = await fetch(
     "https://routes.googleapis.com/directions/v2:computeRoutes",
     {

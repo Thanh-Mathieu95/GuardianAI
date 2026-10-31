@@ -1,236 +1,283 @@
 ---
 name: "Guardian AI"
-description: "Practical human support, recorded in paper and blue ink."
+description: "A dark operational workspace for sourced human commitments and the next action."
 colors:
-  paper: "#f6f7f5"
-  sheet: "#fff"
-  ink: "#1b2550"
-  muted: "#4a5378"
-  blue: "#2a4cc0"
-  wash: "#e8edfb"
-  rule: "#c8ccd4"
-  control-rule: "#a3a9b8"
-  red: "#d22f27"
-  night: "#141c3f"
-  night-sheet: "#1a2350"
-  night-text: "#eef0f8"
-  night-muted: "#a9b2d6"
-  night-rule: "#6473a3"
-  night-confirmation: "#a9c0ff"
-  warning-wash: "#fbf1dc"
-  warning-ink: "#6e4100"
-  warning-rule: "#a86200"
-  error-ink: "#8f1d17"
+  bg: "#080f18"
+  panel: "#101b28"
+  panel2: "#142232"
+  border: "#223142"
+  text: "#e5edf5"
+  muted: "#a5b4c5"
+  cyan: "#3be1bd"
+  blue: "#7db7ff"
+  amber: "#e9b66f"
+  red: "#fa8d91"
+  primary-fill: "#72dfbd"
+  primary-hover: "#a1ecd4"
+  primary-ink: "#07261e"
+  control-hover: "#1b3042"
+  field-border: "#3b5168"
+  sos-fill: "#943b48"
+  sos-rule: "#c86c78"
+  white: "#fff"
+  dock-active: "#15362f"
+  dock-rule: "#2e7966"
+  phone-frame: "#050a10"
+  phone-frame-border: "#3b4a5b"
+  phone-screen: "#0d1823"
+  phone-mic: "#123e35"
+  phone-mic-text: "#7eebce"
+  phone-mic-border: "#3c927b"
+  phone-mic-hover: "#1c5145"
+  phone-mic-hover-border: "#9df4dc"
+  phone-nav: "#09131d"
 typography:
-  display:
-    fontFamily: "Be Vietnam Pro"
-    fontSize: "clamp(42px, 4.5vw, 70px)"
-    fontWeight: 600
-    lineHeight: 1.18
-    letterSpacing: "-0.035em"
   headline:
-    fontFamily: "Be Vietnam Pro"
-    fontSize: "26px"
+    fontFamily: "Arial, Segoe UI, sans-serif"
+    fontSize: "22px"
+    fontWeight: 700
+    lineHeight: 1.18
+    letterSpacing: "-0.02em"
+  section:
+    fontFamily: "Arial, Segoe UI, sans-serif"
+    fontSize: "19px"
     fontWeight: 700
     lineHeight: 1.35
     letterSpacing: "-0.02em"
   title:
-    fontFamily: "Be Vietnam Pro"
-    fontSize: "18px"
+    fontFamily: "Arial, Segoe UI, sans-serif"
+    fontSize: "15px"
     fontWeight: 700
     lineHeight: 1.4
   body:
-    fontFamily: "Be Vietnam Pro"
+    fontFamily: "Arial, Segoe UI, sans-serif"
     fontSize: "14px"
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: "Be Vietnam Pro"
+    fontFamily: "Arial, Segoe UI, sans-serif"
     fontSize: "13px"
     fontWeight: 400
     lineHeight: 1.6
-  button:
-    fontFamily: "Be Vietnam Pro"
-    fontSize: "14px"
-    fontWeight: 500
+  metadata:
+    fontFamily: "Arial, Segoe UI, sans-serif"
+    fontSize: "12px"
+    fontWeight: 400
     lineHeight: 1.6
 rounded:
-  control: "2px"
-  circle: "50%"
+  control: "8px"
+  panel: "10px"
+  sos: "14px"
+  map-label: "6px"
+  voice: "50%"
+  phone-shell: "44px"
+  phone-screen: "28px 28px 12px 12px"
+  phone-plan: "16px"
+  phone-control: "13px"
 spacing:
-  compact: "8px"
-  action-gap: "10px"
-  field: "12px"
-  inset: "16px"
-  grid-gap: "18px"
-  mobile-page: "20px"
-  panel: "22px"
-  page: "24px"
+  compact: "7px"
+  control: "10px"
+  grid: "12px"
+  inset: "14px"
+  mobile-panel: "16px"
+  workspace: "18px"
+  panel: "20px"
 components:
   button-default:
-    backgroundColor: "{colors.sheet}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.panel2}"
+    textColor: "{colors.text}"
     rounded: "{rounded.control}"
     padding: "10px 16px"
-    typography: "{typography.button}"
   button-default-hover:
-    backgroundColor: "{colors.wash}"
+    backgroundColor: "{colors.control-hover}"
   button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.sheet}"
+    backgroundColor: "{colors.primary-fill}"
+    textColor: "{colors.primary-ink}"
     rounded: "{rounded.control}"
     padding: "10px 16px"
-    typography: "{typography.button}"
   button-primary-hover:
-    backgroundColor: "{colors.blue}"
-  button-danger:
-    backgroundColor: "{colors.red}"
-    textColor: "{colors.sheet}"
-    rounded: "{rounded.control}"
-    padding: "10px 16px"
-  button-night-primary:
-    backgroundColor: "{colors.night-text}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "10px 16px"
+    backgroundColor: "{colors.primary-hover}"
   button-sos:
-    backgroundColor: "{colors.red}"
-    textColor: "{colors.sheet}"
-    rounded: "{rounded.control}"
+    backgroundColor: "{colors.sos-fill}"
+    textColor: "{colors.white}"
+    rounded: "{rounded.sos}"
     padding: "10px 16px"
     width: "100%"
   input-field:
-    backgroundColor: "{colors.sheet}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.bg}"
+    textColor: "{colors.text}"
     rounded: "{rounded.control}"
     padding: "11px 12px"
-  workspace-tab-active:
-    backgroundColor: "{colors.wash}"
-    textColor: "{colors.blue}"
+  panel:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.panel}"
+    padding: "20px"
+  dock-active:
+    backgroundColor: "{colors.dock-active}"
+    textColor: "{colors.cyan}"
     rounded: "{rounded.control}"
-    padding: "10px 16px"
-  language-active:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.sheet}"
-    rounded: "{rounded.control}"
-    padding: "8px"
+    padding: "8px 10px"
   source-label:
-    textColor: "{colors.muted}"
+    textColor: "{colors.amber}"
     padding: "5px 8px"
+  tool-disclosure:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.control}"
+    padding: "0 14px"
   commitment-row:
-    textColor: "{colors.ink}"
-    padding: "16px 0"
+    textColor: "{colors.text}"
+    padding: "12px 0"
+  phone-microphone:
+    backgroundColor: "{colors.phone-mic}"
+    textColor: "{colors.phone-mic-text}"
+    rounded: "{rounded.voice}"
+    width: "108px"
+    height: "108px"
+  phone-shell:
+    backgroundColor: "{colors.phone-frame}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.phone-shell}"
+    width: "100%"
+    height: "780px"
+    padding: "8px"
+  phone-screen:
+    backgroundColor: "{colors.phone-screen}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.phone-screen}"
+    height: "calc(100% - 122px)"
+  assignment-row:
+    textColor: "{colors.text}"
+    padding: "10px 0"
 ---
 
 # Design System: Guardian AI
 
 ## Overview
 
-**Creative North Star: "Paper and Blue Ink"**
+**Creative North Star: "The Command Center"**
 
-Guardian AI presents human support as a record that can be read and checked. Cool paper, blue-black text, explicit rules and quoted commitments connect the public introduction, operational workspace and recipient page. The companion surface inverts the same family into a restrained night palette.
+The operational workspace is a dark command center: an interactive physical phone simulator, a central map and a coordination panel share a continuous night background. Cyan identifies confirmed or primary coordination, blue supports reference information, amber marks unresolved or simulated information, and muted borders separate dense content.
 
-The public introduction is spacious and editorial; operational surfaces are denser, with clear separation between a person's next action, the map and the people offering help. Original statements stay visibly distinct from status and proposed actions. Vietnamese and English share one type family and the same component structure.
+The interface keeps the need, original human replies, proposed action and user acceptance legible together. The phone has its own scrolling screen, shared VI/EN strip, contact and record sheets, and internal navigation. Rounded command panels organize tools and evidence; the desktop bottom dock replaces the workspace header. Vietnamese and English retain the same compact system-font structure.
 
-This is a source-derived snapshot of the new local demo implementation, based on `app/globals.css`, `app/layout.tsx`, and the home, workspace and receiver components. It reconciles the earlier direction document with current code. No approved raster composition or rendered captures were available; this document does not certify visual QA. Sidecar tonal ramps are generated swatch previews, not extra runtime color tokens.
+This update records the current local demo source in `app/command.css`, `components/command-tools.tsx`, `components/workspace.tsx` and `components/guardian-map.tsx`, including inherited rules from `app/globals.css`. The command stylesheet loads after the global stylesheet. Its tokens are scoped to the workspace, not the root. The landing page retains its header and existing paper presentation; recipient, loading and covert screens also remain governed by their existing styles. Frontmatter describes the command system, not an asserted global conversion.
+
+Browser captures and functional checks are separate evidence; this source extraction asserts no visual-review verdict. Sidecar ramps are generated swatch previews, not additional runtime tokens. This document describes presentation and does not certify deployment or transport capabilities.
 
 **Key Characteristics:**
-- Cool paper and blue ink, with a dark companion surface.
-- Flat, ruled containers and nearly square controls.
-- Quoted human commitments beside explicit status text.
-- One Vietnamese-capable family across both interface languages.
+- Dark continuous workspace with two levels of panel fill.
+- Map-centered operational grid and a fixed bottom dock.
+- Eight-pixel command controls, ten-pixel panels and a physical phone frame.
+- Explicit provenance, original quotes and acceptance states.
 
 ## Colors
 
-The palette pairs cool paper with blue ink; warning and error colors carry operational meaning. Normative values are in frontmatter.
+The workspace uses a near-black blue ground, two blue-gray panel layers, pale text and restrained semantic accents. Exact reusable values are in frontmatter.
 
 ### Primary
-- **Blue ink** (`ink`): primary text, strong boundaries and primary buttons on light surfaces.
-- **Ballpoint blue** (`blue`): active tabs, confirmations, links, focus and primary-button hover.
-- **Blue wash** (`wash`): selected navigation, proposed-plan blocks and supporting information.
+- **Cyan**: verified labels, accepted status, primary assignment names and selected dock text.
+- **Primary fill, hover and ink**: a softer green button fill, lighter hover and dark label; the primary button is not filled directly with the cyan token.
 
 ### Secondary
-- **Action red** (`red`): SOS, emergency and destructive actions; it is not a confirmation seal.
-- **Warning paper, ink and rule** (`warning-wash`, `warning-ink`, `warning-rule`): warning and check-in surfaces.
-- **Error ink** (`error-ink`): error text and withdrawn-commitment status.
+- **Blue**: support assignments, reference routes and general focus.
+- **Amber**: source tags, commitment-state text and backup assignments.
+- **Red**: emergency boundaries and withdrawn-state decoration; the SOS action has its own deeper fill and pale border.
 
 ### Neutral
-- **Cool paper** (`paper`) and **white sheet** (`sheet`): page ground and bordered content surfaces.
-- **Muted ink** (`muted`), **divider rule** (`rule`) and **control rule** (`control-rule`): secondary text, section divisions and field boundaries.
-- **Night ground** (`night`) and **night sheet** (`night-sheet`): companion background and its text fields.
-- **Night text**, **night muted**, **night rule** and **night confirmation**: corresponding text, field-border and focus/confirmation roles on the dark companion.
+- **Background**, **panel**, **panel 2** and **border**: continuous ground, primary regions, nested controls and fine separation.
+- **Text** and **muted**: foreground hierarchy across operational surfaces.
+- **Control hover** and **field border**: interactive boundaries and hover fill.
+- **Dock active** and **dock rule**: the selected navigation surface and its border.
 
-**The Source Before Status Rule.** Keep the simulation or device-trial label and original response visible alongside derived status; color does not replace that text.
+**The Source Before Status Rule.** Keep simulation, device-trial and reference-route labels next to the information they qualify; color does not replace explicit status.
+
+Confirmed map markers now use cyan, available markers amber and the user marker blue through explicit state-specific selectors.
+
+The map uses a solid cyan active route at 5px over a 10px white casing, a dashed blue reference route at 4px, and a muted history route at 3px and 0.45 opacity. These are distinct route meanings, not interchangeable decorative lines. A reference-route label explicitly says reception is unconfirmed.
 
 ## Typography
 
-Be Vietnam Pro is loaded through `next/font/google` with Latin and Vietnamese subsets and weights 400, 500, 600 and 700. The framework supplies its generated fallback; no separate display or monospace face is declared.
+The workspace explicitly uses Arial, followed by Segoe UI and sans-serif, with 14px body text. This is the selected operational face; the separately styled landing page continues to load Be Vietnam Pro through the app layout. There is no oversized display role in the command workspace.
 
-The display role is the landing headline. Its fluid size is overridden to 48px at widths up to 1200px and 43px at widths up to 760px. The base headline and title roles correspond to h2 and h3; individual surfaces adjust these: the demo director uses a 29px h1, setup and record headings use 36px, and the receiver uses 31px. The companion heading is 26px at weight 500.
+The frontmatter headline, section and title roles reflect the workspace's base h1, h2 and h3. The scenario director uses 20px. Inside the phone, the sticky app name uses 18px, the voice heading uses 21px at weight 500, and contact/record sheet headings use 23px. An active plan compacts the voice heading to 17px. Structural headings remain bold. Metadata and operational states generally use 12px; field labels and disclosure summaries use 13px. Paragraphs use line height 1.6, commitment quotes use 1.5, and time values inherit tabular numerals.
 
-Body text uses the frontmatter role; paragraphs have a more open line height of 1.8. Introductory copy is 16px with a 61ch limit, while setup lead text is 15px with a 75ch limit. Labels sit above controls. Time elements and record totals use tabular numerals. Functional source tags and secondary metadata use 12px text; they are not a display-heading pattern.
+Do not infer that every inherited heading has been normalized: more specific setup and record selectors still carry their existing sizes. Small badges in command disclosures and some mobile labels currently fall to 11px; these exceptions are not a new typography role.
 
 ## Layout
 
-The landing page uses 4vw side gutters and a two-column hero with a 1.15:1 ratio. Its content becomes a single column at 760px. At widths of 1550px and above, the landing container is capped at 1700px. Hero actions provide direct access to simulation and companion routes; the adjacent sample record is explicitly labeled as simulated.
+The workspace has no rendered top header. It starts with source status, a scenario director in demo mode, and collapsible exploration/activity tools. The desktop journey grid is **380px / flexible map / 320px**, with 12px gaps. Outer padding is 14px by 18px, with 88px reserved below for the dock. Panels use 20px padding. The map's normal height is `clamp(450px, 68vh, 820px)` and its region remains sticky at a 12px top offset on wide layouts.
 
-The default operational grid is 330px / flexible map / 270px, with an 18px gap and 22px by 24px outer padding. The walk variant uses 380px / flexible map / 280px. Above 1550px, the demo grid becomes 380px / flexible map / 320px. At 1200px and below, both use a 320px companion and flexible map, followed by a full-width coordination region.
+At 1100px and above the three-column layout remains. From 761px through 1099px, the grid becomes a 320px companion plus flexible map, followed by a full-width coordination region using three columns. At 760px and below, it stacks with 10px outer gutters and places the map first. The map becomes 380px tall. The dedicated phone mode caps its workspace at 520px, hides the map, coordination, director and command tools at every breakpoint, and keeps the companion visible.
 
-At 760px and below, the workspace stacks with 16px gutters. The demo places the map before the companion; the walk route keeps the companion first. The map is no longer sticky. Map height is 630px by default, 700px on large screens, 650px in the intermediate layout, and 330px on small screens; the small walk map is 300px. These are current source rules, not measurements from rendered captures.
+The bottom dock is 64px high. Navigation occupies 355px on desktop and the footer occupies the remaining width; both are fixed at the bottom with z-index 50. On small screens, navigation gets the width minus 100px, with an icon presentation, and the language footer occupies the last 100px. The source JSX retains text inside the navigation buttons. The dedicated phone route hides this external dock and footer; its own bottom navigation remains inside the device frame.
 
-Setup and record views cap at 1060px; the receiver caps at 520px. Setup's two columns collapse at 760px. Repeated gaps and insets appear in frontmatter; they describe observed values rather than an invented mathematical spacing scale. Printing removes workspace navigation and action chrome around the record.
+The phone shell is 380px wide at most and 780px high on desktop, with 8px frame padding and an isolated stacking context. Its 46px status bar, 86px by 22px camera island, hardware details, 52px app navigation and home indicator frame an independently scrolling screen. The screen height is `calc(100% - 122px)`, with horizontal overflow hidden and contained overscroll. At tablet widths the shell caps at 320px; on small command layouts it caps at 370px and uses a 760px height. The dedicated small-screen phone route uses `calc(100dvh - 24px)` with a 620px minimum height. Its app navigation stays outside the scrolling screen.
+
+Panel toggles collapse the left or right grid column. Map-only mode removes surrounding director and tool regions and uses a map height based on the viewport. A 0.35s grid-column transition supports these changes and is disabled for reduced motion. Catalog content uses an auto-fitting grid with a 270px minimum card width, a 400px maximum scroll region and 10px gaps.
 
 ## Elevation & Depth
 
-The authored stylesheet has no box-shadow vocabulary. Rules, background changes and content hierarchy establish depth. The landing sample record alone rotates by minus one degree at wide widths and returns upright at 1200px; that is a surface-specific composition, not a universal card treatment. The map is sticky on wider layouts. External map-library styling is outside this extracted system.
+Command panels use tonal layering and one-pixel borders. The physical phone shell adds an ambient shadow (`0 18px 45px #0005`), and its microphone action has a smaller shadow (`0 9px 24px #0003`). The connected microphone adds a breathing glow (`0 0 25px #3be1bd35` at its midpoint). These shadows belong to the device and its main action, not every command panel. The fixed dock, sticky map, absolute map annotations and library popups establish spatial order. Their positioning is functional rather than a general floating-card motif.
 
-**The Flat Paper Rule.** Use borders and tonal surfaces for record structure; the authored containers do not rely on floating shadows.
+**The Bordered Depth Rule.** Separate command panels with fills and fine borders; reserve ambient shadows for the physical phone frame and its microphone action.
+
+The map initializes with a pitched dark basemap and optional building extrusions when the expected source exists. Camera framing animates over 900ms for a route and 600ms for a location, each reduced to zero when reduced motion is requested. The 2D/3D toggle uses 500ms and now also reduces its duration to zero under that preference. Rendering and availability depend on map resources; these are source behaviors, not verified visual results.
 
 ## Shapes
 
-Buttons and inputs have the slight control radius in frontmatter. Major panels, records, dividers and source labels remain rectangular. Circular shapes belong to map markers, the covert-call avatar and the call-ending control. The companion is a rectangular dark panel; the old document's rounded phone shell is not implemented here.
+Command controls and tools use 8px corners; main command panels and the map use 10px. The phone shell uses 44px, while its screen uses 28px upper and 12px lower corners. Its next-action panel uses 16px, SOS uses 14px, and contact and selected-navigation controls use 13px. The microphone is circular. Small map labels use 6px, with reference annotations using a local 7px radius; source tags remain rectangular.
 
 ## Components
 
 ### Buttons
 
-Buttons are compact actions with a base minimum height of 44px, an 8px icon gap and the padding defined in frontmatter. Default buttons use a white surface and control rule; hover changes the fill to blue wash and the border to blue. Primary buttons use blue ink and turn blue on hover. Danger buttons use action red. Disabled buttons use 0.45 opacity and a not-allowed cursor.
+Default buttons use panel 2, pale text and a border; hover changes the fill to control hover and the border to cyan. Primary buttons use the dedicated green fill, dark text and matching border, with the lighter green hover. They inherit 10px by 16px padding, an 8px icon gap and the global 44px minimum height. The scenario director, map toolbar, simulation controls and 3D toggle now explicitly enforce a 44px minimum height.
 
-The companion's primary action uses night text as a light fill with ink text and a 12px label; hover changes its fill and border to blue wash. SOS is full width, at least 58px high, with a 16px bold label and a darker red hover. Preserve its prominence within the companion rather than applying it to ordinary actions.
+The in-phone SOS action is full width, at least 52px high, with a 14px bold label, muted red fill and a lighter red border. Disabled buttons retain the global 0.45 opacity. Keyboard focus uses the global 3px outline with 3px offset; the workspace blue token supplies its general color, while the companion currently inherits a separate lighter blue focus value.
 
-Global keyboard focus uses a 3px blue outline offset by 3px; companion focus uses night confirmation. Background and border changes transition over 0.15s. Reduced-motion preferences disable transitions and animations and remove smooth scrolling. Disclosure summaries and error-dismiss controls also carry a 44px minimum target in the current source.
+### Voice Control
+
+The phone microphone is a centered 108px circle with a dark green fill, pale green icon and green border. It contracts to 72px when a plan is present, leaving room for the next action. A separate 12px label explains start, setup, unavailable, ended or connected behavior; accessible button names also follow those states. Before consent, activation opens the voice settings and scrolls them into view, using immediate scrolling for reduced motion. The connected state adds a 1.8s ease-in-out breathing glow; reduced motion disables it. The state follows the established voice connection, not measured microphone amplitude. The older settings orb is hidden inside the phone and is no longer the main control.
 
 ### Chips
 
-The source label is a noninteractive rectangular tag with a control-rule border, muted text, 12px bold lettering and 0.055em tracking. It identifies simulation or device trial; it is neither a decorative eyebrow nor a selectable filter. Do not give it fabricated interactive states.
+The noninteractive source label uses amber text on a dark brown fill with a warm border, 12px bold text, 0.055em tracking and 5px by 8px padding. It describes simulation or device-trial provenance. Do not turn it into a decorative heading or invent hover states for it.
 
 ### Cards / Containers
 
-The coordination panel is a white, ink-bordered rectangle padded 22px vertically and 18px horizontally. The companion uses night ground and 26px by 22px padding. Receiver plan summaries use blue wash with 20px padding. Rows and sections use fine rules, without shadows or an assumed all-purpose card radius.
+The coordination panel retains panel fill, the border token, 10px corners and 20px padding. Inside the phone, companion content uses the screen fill without an extra border or corner radius, 20px side padding and a final 6px top inset beneath the sticky language strip. Nested place disclosures use panel 2, 8px corners and 10px padding. Coordination assignments are separated by border rules; primary names are cyan, support names blue and backup names amber. Unused assignments are reduced to 0.65 opacity but retain their textual role.
 
 ### Inputs / Fields
 
-Fields use white, ink text, a control-rule border and the frontmatter padding, with a minimum height of 44px. Textareas start at 100px high, resize vertically and use line height 1.7. The companion substitutes night sheet, night text, night rule and night-muted placeholders. Visible labels remain outside fields; a placeholder is supporting copy. Errors appear in separate alert boxes.
+Workspace fields use background fill, pale text, the field border and 8px corners, retaining 11px by 12px padding and a 44px minimum height. General textareas retain a 100px minimum height and vertical resize; the phone request field overrides its minimum to 85px with 13px text. Field labels stay visible outside the control. Explicit companion field overrides now apply the same dark fill, field border and pale text.
 
 ### Navigation
 
-The header carries a bold wordmark, route links and the VI/EN switch. Header route links change to blue on hover and are hidden at the small breakpoint; direct landing actions remain. Workspace tabs use transparent rest states and blue text, a blue border and blue wash when `aria-pressed` is true. On small screens they share the available width. The language switch gives each language a minimum 44px width; the active language has ink fill and white text.
+The bottom dock contains companion, people and record controls with SVG icons and explicit pressed state. The selected item uses cyan text, dock-active fill and dock-rule border. The footer contains VI/EN switching, route links and an explicit AI-result state. The selected language now uses cyan fill, dark primary ink and a cyan border.
 
-### Commitment Rows
+### Phone Simulator
 
-Each ruled row places a person's name above explicit status and an original quote. The row uses 16px vertical padding and a 7px internal gap. Names use 14px bold text; status uses 12px blue text; quotes use 12px italic muted text with line height 1.8 and wrap long content. Withdrawn names are struck through in red, and their status uses error ink. This text-based state treatment replaces the legacy document's numbered clauses and confirmation stamps.
+The device is an interactive surface, not a static mockup. A shared sticky strip at the top of its screen keeps Guardian AI and VI/EN controls available across companion, contact and record views. The internal navigation uses SVG icons, localized accessible names and explicit pressed states. Contact and record sheets stay inside the frame; switching tabs preserves the companion state. The contacts sheet contains a native invitation disclosure with recipient name, role, create-link action and selectable invitation output. Record content exposes plan/seal counts, recent events and the record link without leaving the phone composition. The status-bar clock derives from session data, while the island and hardware details are decorative.
+
+### Tool Disclosures and Commitment Rows
+
+Exploration and agent activity use native disclosures with panel fill, border, 8px corners and 14px horizontal padding. Their summaries have a 44px minimum height and 13px text. Exploration exposes simulated venues, operating-time filtering and explicitly unconfirmed reference routes. Activity views show source quotes and recorded events without implying that a visual tab establishes a particular transport architecture.
+
+Commitment rows use 12px vertical padding, a fine top rule and a 7px internal gap. A bold name precedes a textual state and a 12px muted italic quote. Unresolved states remain amber; accepted uses cyan, revoked or declined uses red, and on-the-way or keep-contact uses blue. Assignment rows use 10px vertical padding and keep the role next to its person. Original quotes remain distinct from translated interface labels and proposed actions.
 
 ## Do's and Don'ts
 
 ### Do:
-- Do keep source labels, human quotes and derived status visually distinct.
-- Do use blue ink on paper for records and the night palette for the companion.
-- Do retain visible keyboard focus and reduced-motion behavior.
-- Do preserve Vietnamese diacritics and allow both interface languages to wrap.
-- Do retain the base 44px action and field target when extending the interface.
+- Do use the scoped dark palette for operational workspace additions.
+- Do preserve the map, companion and coordination hierarchy with the bottom dock.
+- Do keep original replies and explicit acceptance status beside derived plans.
+- Do retain visible keyboard focus and support Vietnamese and English text.
+- Do keep reference routes visibly labeled as reception unconfirmed.
 
 ### Don't:
-- Don't use action red as a verified-commitment seal.
-- Don't infer a rounded phone frame, numbered clause system or stamp motif from the superseded direction document.
-- Don't replace explicit state text and original quotes with color alone.
-- Don't treat this source extraction as completed visual or responsive QA.
+- Don't reintroduce the landing header into the operational workspace.
+- Don't use a displayed route or open venue as proof of an accepted commitment.
+- Don't apply the workspace palette globally to surfaces that still use their existing stylesheet.
+- Don't treat this source documentation as browser or visual approval.

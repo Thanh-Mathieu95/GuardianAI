@@ -41,7 +41,9 @@ export type Reply = {
 export type Route = {
   points: Point[];
   meters: number;
-  source: "SIMULATED" | "GOOGLE";
+  source: "SIMULATED" | "GOOGLE" | "OSM";
+  edgeIds?: string[];
+  steps?: { street: string; meters: number }[];
   note: Pair;
 };
 export type Plan = {
@@ -54,6 +56,13 @@ export type Plan = {
   invalidatedAt: string | null;
   reason: Pair;
   userArrived: boolean;
+  progressMeters?: number;
+  coordination?: {
+    ref: string;
+    who: string;
+    role: "PRIMARY" | "SUPPORT" | "BACKUP" | "UNUSED";
+    instruction: Pair;
+  }[];
 };
 export type Event = {
   id: string;
@@ -117,6 +126,7 @@ export type Incident = {
     error: string | null;
   } | null;
   blocked: boolean;
+  reference?: { name: string; route: Route };
   sharedAt: string | null;
   seals: { at: string; reason: Pair; hash: string }[];
   covert: boolean;
