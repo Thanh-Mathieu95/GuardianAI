@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T05:46:12.889452+00:00",
+  "generatedAt": "2026-10-31T06:10:37.671898+00:00",
   "title": "Design System: Guardian AI",
   "extensions": {
     "colorMeta": {
@@ -563,8 +563,8 @@
       "name": "Bottom navigation",
       "kind": "nav",
       "refersTo": "dock-active",
-      "description": "Dock navigation shown in flow for preview; production pins it to the viewport.",
-      "html": "<nav class=\"ds-command-scope ds-dock\" aria-label=\"Workspace\"><button aria-pressed=\"true\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>Companion</button><button aria-pressed=\"false\">People</button><button aria-pressed=\"false\">Record</button></nav>",
+      "description": "Dock navigation for Companion, Support profiles and Record, shown in flow for preview; production pins it to the viewport.",
+      "html": "<nav class=\"ds-command-scope ds-dock\" aria-label=\"Workspace\"><button aria-pressed=\"true\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>Companion</button><button aria-pressed=\"false\">Support profiles</button><button aria-pressed=\"false\">Record</button></nav>",
       "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-dock{display:flex;gap:5px;padding:9px 12px;background:var(--panel, #101b28);border-top:1px solid var(--border, #223142);overflow-x:auto;}.ds-dock button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid var(--border, #223142);border-radius:8px;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;font-weight:500;line-height:1.6;cursor:pointer;transition:background .15s,border-color .15s;padding:8px 10px;font-size:12px;white-space:nowrap;background:var(--panel2, #142232);color:var(--text, #e5edf5);}.ds-dock button:hover{border-color:var(--cyan, #3be1bd);background:#1b3042;}.ds-dock button[aria-pressed=\"true\"]{color:var(--cyan, #3be1bd);background:#15362f;border-color:#2e7966;}.ds-dock button:focus-visible{outline:3px solid var(--blue, #7db7ff);outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-dock button{transition:none;}}"
     },
     {
@@ -579,7 +579,7 @@
       "name": "Physical phone simulator",
       "kind": "custom",
       "refersTo": "phone-shell",
-      "description": "Source-derived device frame with independent scrolling, sticky New session and language controls, and internal navigation; preview is static.",
+      "description": "Invitation-bearing TEAM/LIVE example of the source-derived device frame; scripted DEMO directs invitations to TEAM. The preview is static.",
       "html": "<section class=\"ds-command-scope ds-phone\" aria-label=\"Guardian AI phone simulator\"><div class=\"ds-phone-hardware\" aria-hidden=\"true\"></div><div class=\"ds-phone-status\"><time>22:15</time><span class=\"ds-island\" aria-hidden=\"true\"></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"2\" y=\"6\" width=\"16\" height=\"12\" rx=\"2\"/><path d=\"M22 10v4M6 10v4M10 10v4M14 10v4\"/></svg></div><div class=\"ds-phone-screen\"><div class=\"ds-phone-language\"><h2>Guardian AI</h2><button class=\"ds-new-session\" aria-label=\"New session\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M3 11a9 9 0 1 1 2.64 6.36M3 4v7h7\"/></svg></button><div><button aria-pressed=\"true\">VI</button><button aria-pressed=\"false\">EN</button></div></div><div class=\"ds-phone-content\"><h2>Your people</h2><p>Messages and commitments from people in this session.</p><details><summary>Manage invitations</summary><label>Recipient name<input placeholder=\"Name\"></label><button>Create invitation</button></details></div></div><nav class=\"ds-phone-nav\" aria-label=\"Phone views\"><button aria-label=\"Companion\" aria-pressed=\"false\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z\"/><path d=\"m9 12 2 2 4-4\"/></svg></button><button aria-label=\"Your people\" aria-pressed=\"true\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/></svg></button><button aria-label=\"Record\" aria-pressed=\"false\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z\"/><path d=\"M14 2v6h6M8 13h8M8 17h8\"/></svg></button></nav><div class=\"ds-home-indicator\" aria-hidden=\"true\"></div></section>",
       "css": ".ds-command-scope{--bg:#080f18;--panel:#101b28;--panel2:#142232;--border:#223142;--text:#e5edf5;--muted:#a5b4c5;--cyan:#3be1bd;--blue:#7db7ff;--amber:#e9b66f;--red:#fa8d91;}.ds-phone{position:relative;width:100%;max-width:380px;height:780px;padding:8px;border:1px solid #3b4a5b;border-radius:44px;background:#050a10;color:#e5edf5;box-shadow:0 18px 45px #0005;isolation:isolate;min-width:0;font-family:Arial,\"Segoe UI\",sans-serif;font-size:14px;line-height:1.6;}.ds-phone-status{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;font-size:12px;font-weight:600;}.ds-phone-status time{font-variant-numeric:tabular-nums;}.ds-island{position:absolute;top:17px;left:50%;transform:translateX(-50%);width:86px;height:22px;border-radius:20px;background:#000;}.ds-phone-screen{height:calc(100% - 122px);overflow-y:auto;overflow-x:hidden;background:#0d1823;border-radius:28px 28px 12px 12px;scrollbar-width:thin;scrollbar-color:#334b5c transparent;overscroll-behavior:contain;}.ds-phone-language{position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:3px;background:#0d1823;padding:15px 20px 0;}.ds-phone-language h2{font-size:17px;letter-spacing:-.03em;margin:0 auto 0 0;}.ds-phone button{min-height:44px;padding:7px 8px;border:1px solid #223142;border-radius:8px;background:#142232;color:#e5edf5;font-family:inherit;font-size:11px;cursor:pointer;}.ds-phone button:hover{border-color:#3be1bd;background:#1b3042;}.ds-phone button:focus-visible,.ds-phone input:focus-visible,.ds-phone summary:focus-visible{outline:3px solid #7db7ff;outline-offset:3px;}.ds-phone-language button[aria-pressed=\"true\"]{background:#3be1bd;color:#07261e;border-color:#3be1bd;}.ds-phone-content{padding:24px 20px;}.ds-phone-content h2{font-size:23px;line-height:1.3;margin:10px 0;}.ds-phone-content p{font-size:13px;color:#a5b4c5;}.ds-phone-content details{padding-top:14px;}.ds-phone-content summary{min-height:44px;cursor:pointer;}.ds-phone-content label{display:block;font-size:13px;}.ds-phone-content input{display:block;min-height:44px;margin:7px 0 12px;padding:11px 12px;border:1px solid #3b5168;border-radius:8px;background:#080f18;color:#e5edf5;font-family:inherit;}.ds-phone-nav{height:52px;display:flex;align-items:center;justify-content:space-around;padding:4px 28px;background:#09131d;border-radius:0 0 22px 22px;}.ds-phone-nav button{background:transparent;border:0;min-width:48px;color:#8da2b5;}.ds-phone-nav button[aria-pressed=\"true\"]{color:#6fdfbd;background:#132f2b;border-radius:13px;}.ds-home-indicator{width:105px;height:4px;border-radius:4px;background:#bdcbd4;margin:12px auto 0;}@media(max-width:760px){.ds-phone{max-width:370px;height:760px;}}.ds-phone-hardware{position:absolute;right:-3px;top:145px;width:3px;height:57px;background:#506070;border-radius:0 3px 3px 0;}.ds-phone-hardware:before{content:\"\";position:absolute;top:-45px;width:3px;height:28px;background:#506070;border-radius:0 3px 3px 0;}.ds-phone-nav button{display:inline-flex;align-items:center;justify-content:center;}.ds-phone-language .ds-new-session{min-width:44px;min-height:44px;padding:7px;display:inline-flex;align-items:center;justify-content:center;}@media(max-width:760px){.ds-phone-language{padding-left:16px;padding-right:16px;}.ds-phone-language h2{font-size:16px;}}"
     },
@@ -615,7 +615,8 @@
       "Dark continuous workspace with two levels of panel fill.",
       "Map-centered operational grid and a fixed bottom dock.",
       "Eight-pixel command controls, ten-pixel panels and a physical phone frame.",
-      "Explicit provenance, original quotes and acceptance states."
+      "Explicit provenance, original quotes and acceptance states.",
+      "Support profiles distinguish real teammate replies from simulated roleplay locations."
     ],
     "rules": [
       {
@@ -632,6 +633,11 @@
         "name": "The Call Is Not Consent Rule",
         "body": "Show conversing and completed calls in blue with a phone icon. Reserve acceptance treatments for sourced commitments; answering or ending a call does not confirm help.",
         "section": "colors"
+      },
+      {
+        "name": "The Roleplay Provenance Rule",
+        "body": "Label TEAM as simulated locations with participant-authored replies. A ready support profile means available for an in-app call, not acceptance of an incident.",
+        "section": "colors"
       }
     ],
     "dos": [
@@ -640,14 +646,16 @@
       "Do keep original replies and explicit acceptance status beside derived plans.",
       "Do retain visible keyboard focus and support Vietnamese and English text.",
       "Do keep reference routes visibly labeled as reception unconfirmed.",
-      "Do label synthetic road conditions and venue profiles beside their visual overlays."
+      "Do label synthetic road conditions and venue profiles beside their visual overlays.",
+      "Do keep each support profile?s name, role, invitation and explicit readiness state associated."
     ],
     "donts": [
       "Don't reintroduce the landing header into the operational workspace.",
       "Don't use a displayed route or open venue as proof of an accepted commitment.",
       "Don't apply the workspace palette globally to surfaces that still use their existing stylesheet.",
       "Don't treat this source documentation as browser or visual approval.",
-      "Don't turn call completion, open hours or a self-reported profile into a confirmed commitment."
+      "Don't turn call completion, open hours or a self-reported profile into a confirmed commitment.",
+      "Don't present TEAM readiness or simulated venue selection as an accepted support commitment."
     ]
   }
 }

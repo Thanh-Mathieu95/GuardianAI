@@ -58,7 +58,7 @@ export function fresh(
     createdAt: at,
     updatedAt: at,
     location:
-      mode === "DEMO" ? { ...demoStart, at, source: "SIMULATED" } : null,
+      mode !== "LIVE" ? { ...demoStart, at, source: "SIMULATED" } : null,
     track: [],
     needs: { maxWalk: 1200, avoidAlleys: true, discreet: false, canMove: true },
     risk: 1,
@@ -96,7 +96,12 @@ export function event(
     at: i.updatedAt,
     type,
     message,
-    source: i.mode === "DEMO" ? "SIMULATED" : "LIVE",
+    source:
+      i.mode === "DEMO"
+        ? "SIMULATED"
+        : i.mode === "TEAM"
+          ? "REHEARSAL"
+          : "LIVE",
     refs,
   });
 }
@@ -160,7 +165,10 @@ export class Engine {
         const result = await fn(a);
         if (terminal(a.incident) || a.incident.status === "SIGNAL_LOST")
           cancelCalls(a.incident);
-        else if (a.incident.sosAt) assignCalls(a.incident, this.callMembers(a));
+        else if (a.incident.sosAt) {
+          this.syncRecipients(a);
+          assignCalls(a.incident, this.callMembers(a));
+        }
         await this.repo.save(a);
         return result;
       });
@@ -210,6 +218,7 @@ export class Engine {
     return { a, m };
   }
   alert(i: Incident, members: Member[]) {
+    const before = i.replies.length;
     for (const m of members.filter(
       (m) => m.joined && (m.role === "CONTACT" || m.onDuty),
     )) {
@@ -219,10 +228,32 @@ export class Engine {
         i.replies.push(r);
       }
     }
-    event(i, "CONTACTS_ALERTED", [
-      `${i.replies.length} người nhận trong app; chưa có xác nhận`,
-      `${i.replies.length} in-app recipients; no confirmation yet`,
-    ]);
+    if (i.replies.length !== before)
+      event(i, "CONTACTS_ALERTED", [
+        `${i.replies.length} người nhận trong app; chưa có xác nhận`,
+        `${i.replies.length} in-app recipients; no confirmation yet`,
+      ]);
+  }
+  syncRecipients(a: Account) {
+    const i = a.incident;
+    if (
+      i.mode === "DEMO" ||
+      !i.sosAt ||
+      terminal(i) ||
+      i.status === "SIGNAL_LOST"
+    )
+      return;
+    i.supportProfiles = a.members.map((m) => ({
+      memberId: m.id,
+      name: m.name,
+      role: m.role,
+      joined: m.joined,
+      callConsent: !!m.callConsentAt,
+      onDuty: m.onDuty,
+      source: i.mode === "TEAM" ? "TEAM" : "LIVE",
+    }));
+    this.alert(i, a.members);
+    enqueueIncident(i, a.members);
   }
   async sos(a: Account, text: string) {
     const i = a.incident;
@@ -256,13 +287,14 @@ export class Engine {
     const i = a.incident;
     if (!i.ai.enabled || !i.ai.consentedAt)
       throw new Error("AI_CONSENT_REQUIRED");
-    if (i.mode !== "LIVE") throw new Error("LIVE_ONLY");
+    if (i.mode === "DEMO") throw new Error("LIVE_ONLY");
     if (terminal(i)) throw new Error("SESSION_ENDED");
     if (i.sosAt) return { autoSos: true, alreadyActive: true };
     if (
-      !i.location ||
-      i.location.source !== "LIVE" ||
-      Date.now() - Date.parse(i.location.at) > 90000
+      i.mode === "LIVE" &&
+      (!i.location ||
+        i.location.source !== "LIVE" ||
+        Date.now() - Date.parse(i.location.at) > 90000)
     ) {
       event(i, "AI_SOS_BLOCKED", [
         "AI nhận thấy cần SOS. Hãy bật GPS hiện tại rồi gửi lại yêu cầu; chưa báo người nhận.",
@@ -613,7 +645,7 @@ export class Engine {
     for (const r of eligible) {
       try {
         const route =
-          i.mode === "DEMO"
+          i.mode !== "LIVE"
             ? simulatedRoute(i.location, r.location!, i.blocked)
             : await liveRoute(i.location, r.location!);
         if (route.meters > i.needs.maxWalk) continue;

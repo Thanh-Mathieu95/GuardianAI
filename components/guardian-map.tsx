@@ -31,7 +31,7 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
     [scanEpoch, setScanEpoch] = useState(0);
   const radar = useRef<HTMLDivElement>(null);
   const minute = i.scenarioMinute ?? 1335,
-    showArea = i.mode === "DEMO" && !!i.sosAt,
+    showArea = i.mode !== "LIVE" && !!i.sosAt,
     openPlaces = places.filter((p) => isOpen(p, minute));
   const selectedPlace = showArea
     ? openPlaces.find((p) => p.id === selectedVenue)
@@ -75,8 +75,8 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
           if (disposed) return;
           for (const layer of m.getStyle().layers) {
             if (layer.type === "symbol" && layer.layout?.["text-field"]) {
-              m.setPaintProperty(layer.id, "text-color", "#b3c4d4");
-              m.setPaintProperty(layer.id, "text-halo-color", "#080f18");
+              m.setPaintProperty(layer.id, "text-color", "#c3cec8");
+              m.setPaintProperty(layer.id, "text-halo-color", "#0c1210");
               m.setPaintProperty(layer.id, "text-halo-width", 1.4);
             }
             if (
@@ -84,7 +84,11 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
               /road|street|highway|transportation/.test(layer.id) &&
               !/rail|bridge|tunnel|case/.test(layer.id)
             )
-              m.setPaintProperty(layer.id, "line-color", "#435b70");
+              m.setPaintProperty(layer.id, "line-color", "#56665f");
+            if (layer.type === "background")
+              m.setPaintProperty(layer.id, "background-color", "#0c1210");
+            if (layer.type === "fill" && /water/.test(layer.id))
+              m.setPaintProperty(layer.id, "fill-color", "#12233d");
           }
           m.addSource("road-warnings", {
             type: "geojson",
@@ -102,10 +106,10 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
             "match",
             ["get", "condition"],
             "INCIDENT",
-            "#fa8d91",
+            "#f3867a",
             "DARK",
-            "#e9b66f",
-            "#bba9e9",
+            "#f2b65e",
+            "#b9a6ee",
           ];
           m.addLayer({
             id: "warning-glow",
@@ -149,17 +153,17 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
             id: "route-casing",
             type: "line",
             source: "route",
-            paint: { "line-color": "#ffffff", "line-width": 10 },
+            paint: { "line-color": "#ecf1ea", "line-width": 10 },
           });
           m.addLayer({
             id: "route-line",
             type: "line",
             source: "route",
-            paint: { "line-color": "#3be1bd", "line-width": 5 },
+            paint: { "line-color": "#4fd1b0", "line-width": 5 },
           });
           for (const [id, color, dash] of [
-            ["history", "#718096", false],
-            ["reference", "#7db7ff", true],
+            ["history", "#8d9c95", false],
+            ["reference", "#7fb0f2", true],
           ] as const) {
             m.addSource(id, {
               type: "geojson",
@@ -186,7 +190,7 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
               "source-layer": "building",
               minzoom: 14,
               paint: {
-                "fill-extrusion-color": "#24394a",
+                "fill-extrusion-color": "#24302b",
                 "fill-extrusion-height": [
                   "coalesce",
                   ["get", "render_height"],
@@ -296,7 +300,7 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
               },
             ]
           : []),
-        ...(i.mode === "DEMO" && i.sosAt
+        ...(i.mode !== "LIVE" && i.sosAt
           ? openPlaces.map((p) => ({
               point: p.point,
               label: p.name,
@@ -661,7 +665,7 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
         {threeD ? "2D" : "3D"}
       </button>
       <div className="map-label">
-        {i.mode === "DEMO"
+        {i.mode !== "LIVE"
           ? t("BẢN ĐỒ MÔ PHỎNG", "SIMULATED MAP")
           : t("VỊ TRÍ ĐƯỢC CHIA SẺ", "SHARED LOCATION")}
       </div>

@@ -75,12 +75,12 @@ export type Event = {
   at: string;
   type: string;
   message: Pair;
-  source: "SIMULATED" | "LIVE";
+  source: "SIMULATED" | "LIVE" | "REHEARSAL";
   refs: string[];
 };
 export type Incident = {
   id: string;
-  mode: "DEMO" | "LIVE";
+  mode: "DEMO" | "LIVE" | "TEAM";
   locale: Locale;
   status:
     | "READY"
@@ -106,6 +106,15 @@ export type Incident = {
   risk: 1 | 2 | 3 | 4;
   scenarioMinute?: number;
   coordination?: Coordination;
+  supportProfiles?: {
+    memberId: string;
+    name: string;
+    role: Member["role"];
+    joined: boolean;
+    callConsent: boolean;
+    onDuty: boolean;
+    source: "TEAM" | "LIVE";
+  }[];
   sosAt: string | null;
   replies: Reply[];
   plans: Plan[];

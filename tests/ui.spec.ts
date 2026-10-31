@@ -1,6 +1,156 @@
 import { test, expect } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { places, isOpen } from "../lib/city";
+test("team roleplay calls only invited people, including late Dung and a receiving teammate", async ({
+  page,
+  context,
+}) => {
+  test.setTimeout(60000);
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page.goto("/team?lang=en");
+  const lobby = page.getByRole("region", {
+    name: "Support profiles",
+    exact: true,
+  });
+  await expect(lobby).toBeVisible();
+  const create = async (name: string, role: string) => {
+    await lobby.getByLabel("Team member name", { exact: true }).fill(name);
+    await lobby.getByLabel("Role to play", { exact: true }).selectOption(role);
+    await lobby
+      .getByRole("button", { name: "Create role link", exact: true })
+      .click();
+    const link = lobby.getByLabel(`Role link for ${name}`, { exact: true });
+    await expect(link).toHaveValue(/\/join\//);
+    return await link.inputValue();
+  };
+  const dungLink = await create("Dũng", "CONTACT");
+  const venueLink = await create("Thu", "PARTNER");
+  const maiLink = await create("Mai", "CONTACT");
+  const dung = await context.newPage(),
+    venue = await context.newPage(),
+    mai = await context.newPage();
+  await mai.goto(maiLink);
+  await mai
+    .getByRole("button", {
+      name: "Join role & allow in-app calls",
+      exact: true,
+    })
+    .click();
+  await expect(
+    lobby.getByText("Ready to receive calls", { exact: true }),
+  ).toHaveCount(1);
+  await page
+    .locator(".phone-shell")
+    .getByRole("button", { name: "SOS · I need help", exact: true })
+    .click();
+  await expect(
+    mai.getByRole("button", { name: "Answer call", exact: true }),
+  ).toBeVisible();
+  await dung.goto(dungLink);
+  await dung
+    .getByRole("button", {
+      name: "Join role & allow in-app calls",
+      exact: true,
+    })
+    .click();
+  await expect(
+    dung.getByRole("button", { name: "Answer call", exact: true }),
+  ).toBeVisible({ timeout: 15000 });
+  await dung.getByRole("button", { name: "Answer call", exact: true }).click();
+  await dung
+    .getByLabel("Reply to AI in this call", { exact: true })
+    .fill("I am on my way, arriving in 10 minutes.");
+  await dung
+    .getByRole("button", { name: "Send your commitment", exact: true })
+    .click();
+  await venue.goto(venueLink);
+  await venue
+    .getByRole("button", {
+      name: "Join role & allow in-app calls",
+      exact: true,
+    })
+    .click();
+  await venue
+    .getByLabel("Roleplay venue", { exact: true })
+    .selectOption("venue-cafe");
+  await expect(
+    venue.getByRole("button", { name: "Answer call", exact: true }),
+  ).toBeVisible({ timeout: 15000 });
+  await venue.getByRole("button", { name: "Answer call", exact: true }).click();
+  await venue
+    .getByLabel("Reply to AI in this call", { exact: true })
+    .fill("I accept. You can wait here; staff are at the main entrance.");
+  await venue
+    .getByRole("button", { name: "Send your commitment", exact: true })
+    .click();
+  await expect(page.locator(".coordination-plan")).toContainText("Thu");
+  const state = await (await page.request.get("/api/state?scope=team")).json();
+  expect(state.incident.mode).toBe("TEAM");
+  expect(
+    state.incident.coordination.calls
+      .map((c: { name: string }) => c.name)
+      .sort(),
+  ).toEqual(["Dũng", "Mai", "Thu"]);
+  expect(
+    state.incident.coordination.calls.find(
+      (c: { name: string }) => c.name === "Mai",
+    ).state,
+  ).toBe("RINGING");
+  expect(state.incident.plans.at(-1).route.source).toBe("SIMULATED");
+  expect(state.incident.plans.at(-1).acceptedAt).toBeNull();
+  mkdirSync(".impeccable/review", { recursive: true });
+  await page.screenshot({
+    path: ".impeccable/review/team-desktop.png",
+    fullPage: true,
+    animations: "disabled",
+    timeout: 15000,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: ".impeccable/review/team-mobile.png",
+    fullPage: true,
+    animations: "disabled",
+    timeout: 15000,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await venue.screenshot({
+    path: ".impeccable/review/team-recipient.png",
+    fullPage: true,
+    animations: "disabled",
+    timeout: 15000,
+  });
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page
+    .locator(".phone-shell")
+    .getByRole("button", { name: "Accept this plan", exact: true })
+    .click();
+  await page
+    .locator(".phone-shell")
+    .getByRole("button", { name: "I have met my helper", exact: true })
+    .click();
+  await venue
+    .getByRole("button", { name: "I have met the person", exact: true })
+    .click();
+  await expect
+    .poll(
+      async () =>
+        (await (await page.request.get("/api/state?scope=team")).json())
+          .incident.status,
+    )
+    .toBe("COMPLETE");
+  await page.goto("/demo/command-center?lang=en");
+  await expect(
+    page.getByRole("link", { name: "Open team roleplay", exact: true }),
+  ).toBeVisible({ timeout: 20000 });
+  const scripted = await (
+    await page.request.get("/api/state?scope=demo")
+  ).json();
+  expect(scripted.incident.id).not.toBe(state.incident.id);
+});
 test("parallel calls yield a sourced plan and two-sided demo handoff", async ({
   page,
 }) => {
@@ -311,7 +461,7 @@ test("SOS scan, place profiles, shared opening hours and repeated new sessions",
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1600, height: 1000 });
-  await page.goto("/demo/command-center?lang=en", {
+  await page.goto("/team?lang=en", {
     waitUntil: "domcontentloaded",
   });
   await expect(page.getByText("Connected", { exact: true })).toBeVisible();
@@ -347,6 +497,7 @@ test("SOS scan, place profiles, shared opening hours and repeated new sessions",
   await page
     .getByRole("button", { name: "Close details", exact: true })
     .click();
+  await page.locator(".guardian-map").scrollIntoViewIfNeeded();
   expect(
     await page.evaluate(() => {
       const legend = document
@@ -382,7 +533,7 @@ test("SOS scan, place profiles, shared opening hours and repeated new sessions",
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  const old = (await (await page.request.get("/api/state?scope=demo")).json())
+  const old = (await (await page.request.get("/api/state?scope=team")).json())
     .incident.id;
   await page
     .locator(".phone-language")
@@ -390,13 +541,13 @@ test("SOS scan, place profiles, shared opening hours and repeated new sessions",
     .click();
   await expect(page.locator("[data-venue-id]")).toHaveCount(0);
   await expect(page.locator(".map-warning-legend")).toHaveCount(0);
-  const next = (await (await page.request.get("/api/state?scope=demo")).json())
+  const next = (await (await page.request.get("/api/state?scope=team")).json())
     .incident;
   expect(next.id).not.toBe(old);
   expect(next.sosAt).toBeNull();
   expect(
     (
-      await page.request.get(`/api/record/${old}?format=json&scope=demo`)
+      await page.request.get(`/api/record/${old}?format=json&scope=team`)
     ).status(),
   ).toBe(200);
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -450,14 +601,13 @@ test("phone simulator keeps its own scrolling screen and working app tabs at 390
   await expect(
     phone.getByRole("heading", { name: "Your people" }),
   ).toBeVisible();
-  await phone.locator(".phone-invites>summary").click();
-  await phone.getByLabel("Recipient name", { exact: true }).fill("Demo friend");
-  await phone
-    .getByRole("button", { name: "Create invitation", exact: true })
-    .click();
+  await expect(phone.locator(".phone-invites")).toHaveCount(0);
   await expect(
-    phone.getByLabel("Share this link with the recipient"),
-  ).toHaveValue(/\/join\//);
+    phone.getByRole("link", {
+      name: "Invite your team in a separate room",
+      exact: true,
+    }),
+  ).toHaveAttribute("href", "/team");
   await phone
     .locator(".phone-app-nav")
     .getByRole("button", { name: "Record" })
@@ -470,6 +620,6 @@ test("phone simulator keeps its own scrolling screen and working app tabs at 390
     .getByRole("button", { name: "Companion" })
     .click();
   await expect(
-    phone.getByRole("button", { name: "SOS · I need help" }),
+    phone.getByRole("link", { name: "SOS with your own team" }),
   ).toBeVisible();
 });
