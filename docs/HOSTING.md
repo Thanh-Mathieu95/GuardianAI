@@ -1,5 +1,9 @@
 # Chuẩn bị host Guardian AI
 
+## Bản demo miễn phí được chọn
+
+Người dùng chọn Render Free và chấp nhận server ngủ/gián đoạn. Bản đầu chạy AI OFF, SQLite và ghi âm tạm trên filesystem của service, không gắn disk trả phí. Đặt `GUARDIAN_DEMO_HOSTING=1` cả khi build và chạy để hiển thị giới hạn dữ liệu. Dữ liệu có thể mất khi restart/redeploy; chỉ dùng dữ liệu mô phỏng. Đây chưa phải bản runtime Supabase bền vững hoặc dịch vụ bảo vệ người thật.
+
 ## Trạng thái
 
 Đã bổ sung lệnh khởi động cho môi trường hosting và ví dụ cấu hình server. Chưa tạo dịch vụ cloud hoặc xác nhận một URL công khai hoạt động. Kiến trúc đích Vercel + Node backend + Supabase vẫn được mô tả trong [DEPLOYMENT.md](DEPLOYMENT.md).
