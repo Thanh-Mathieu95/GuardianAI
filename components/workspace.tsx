@@ -35,6 +35,7 @@ import { useLanguage } from "./language";
 import GuardianMap from "./guardian-map";
 import { connectVoice, type Voice } from "./voice";
 import { CommandTools } from "./command-tools";
+import { CallBoard } from "./call-board";
 import { LanguageSwitch } from "./language";
 export default function Workspace({
   demo = false,
@@ -85,11 +86,13 @@ export default function Workspace({
   async function fetchJSON(url: string, body?: unknown) {
     const res = await fetch("/api/" + url, {
       cache: "no-store",
+      headers: { "x-guardian-mode": demo ? "demo" : "live" },
       ...(body
         ? {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "x-guardian-mode": demo ? "demo" : "live",
               "x-guardian-ai-code": aiCode,
             },
             body: JSON.stringify(body),
@@ -102,7 +105,7 @@ export default function Workspace({
   }
   async function action(action: string, fields: Record<string, unknown> = {}) {
     if (
-      ["new", "demo", "cancel", "stop"].includes(action) ||
+      ["new", "demo", "call-demo", "cancel", "stop"].includes(action) ||
       (action === "ai" && fields.enabled === false)
     ) {
       await voice.current?.close();
@@ -166,6 +169,8 @@ export default function Workspace({
     stopGps();
     stopVoice();
     setProposal("");
+    setMessage("");
+    setPhoneTab("companion");
   }, [data?.incident.id]);
   useEffect(() => {
     if (data && data.incident.locale !== locale)
@@ -277,8 +282,14 @@ export default function Workspace({
         },
         tool: async (name, args) => {
           if (name === "request_help") {
-            setProposal(String(args.summary || ""));
-            return { confirmationRequired: true };
+            const summary = String(args.summary || "").slice(0, 2000);
+            if (!demo) {
+              const result = await action("ai-sos", { text: summary });
+              if (result.blocked) setError(result.blocked);
+              return result;
+            }
+            setProposal(summary);
+            return { confirmationRequired: true, simulation: true };
           }
           return {
             status: current.current?.incident.status,
@@ -296,7 +307,10 @@ export default function Workspace({
                       `/api/audio/${id}?id=${audioId}&seq=${seq}`,
                       {
                         method: "POST",
-                        headers: { "Content-Type": blob.type || "audio/webm" },
+                        headers: {
+                          "Content-Type": blob.type || "audio/webm",
+                          "x-guardian-mode": demo ? "demo" : "live",
+                        },
                         body: blob,
                       },
                     );
@@ -370,7 +384,7 @@ export default function Workspace({
       <div className="workspace-source">
         <span className="source">
           {live
-            ? t("THỬ TRÊN THIẾT BỊ", "DEVICE TRIAL")
+            ? t("ĐỒNG HÀNH TRỰC TIẾP", "LIVE COMPANION")
             : t("MÔ PHỎNG", "SIMULATION")}
         </span>
         <p>
@@ -415,23 +429,33 @@ export default function Workspace({
         <section className="director">
           <div>
             <h1>
-              {i.demo
-                ? translate(stages[Math.max(0, i.demo.step)])
-                : t(
-                    "Một lời cầu cứu. Cùng tìm cách giúp.",
-                    "One request. A coordinated response.",
-                  )}
+              {i.coordination?.autoplay
+                ? t(
+                    "AI điều phối các cuộc gọi trong app",
+                    "AI coordinates the in-app calls",
+                  )
+                : i.demo
+                  ? translate(stages[Math.max(0, i.demo.step)])
+                  : t(
+                      "Một lời cầu cứu. Cùng tìm cách giúp.",
+                      "One request. A coordinated response.",
+                    )}
             </h1>
             <p role="status">
-              {i.demo
+              {i.coordination?.autoplay
                 ? t(
-                    `${i.replies.length} người nhận · ${i.plans.length} phương án · ${i.seals.length} lần niêm phong`,
-                    `${i.replies.length} recipients · ${i.plans.length} plans · ${i.seals.length} seals`,
+                    "Mở một cuộc gọi để xem lời thoại. Chấp nhận phương án, xác nhận gặp ở hai phía rồi mở hồ sơ.",
+                    "Open a call to inspect the conversation. Accept a plan, confirm both sides of the meeting, then open the record.",
                   )
-                : t(
-                    "Hai phút theo dõi lời đồng ý, thay đổi phương án và hồ sơ cuối cùng.",
-                    "Two minutes following commitments, changing plans and the final record.",
-                  )}
+                : i.demo
+                  ? t(
+                      `${i.replies.length} người nhận · ${i.plans.length} phương án · ${i.seals.length} lần niêm phong`,
+                      `${i.replies.length} recipients · ${i.plans.length} plans · ${i.seals.length} seals`,
+                    )
+                  : t(
+                      "Hai phút theo dõi lời đồng ý, thay đổi phương án và hồ sơ cuối cùng.",
+                      "Two minutes following commitments, changing plans and the final record.",
+                    )}
             </p>
           </div>
           <div className="actions">
@@ -450,6 +474,13 @@ export default function Workspace({
             >
               {i.demo ? <RotateCcw size={17} /> : <Play size={17} />}{" "}
               {i.demo ? t("Chạy lại", "Run again") : t("Chạy demo", "Run demo")}
+            </button>
+            <button
+              disabled={busy || running || !online}
+              onClick={() => void run(() => action("call-demo"))}
+            >
+              <Phone size={17} />
+              {t("Demo gọi song song", "Parallel-call demo")}
             </button>
             {running && (
               <>
@@ -525,6 +556,22 @@ export default function Workspace({
       )}
       <nav className="workspace-tabs" aria-label={t("Chức năng", "Workspace")}>
         <button
+          className="mobile-new-session"
+          aria-label={t("Phiên mới", "New session")}
+          title={t("Phiên mới", "New session")}
+          disabled={busy}
+          onClick={() =>
+            void run(async () => {
+              await action("new", { mode: i.mode, locale });
+              setPhoneTab("companion");
+              setTab("journey");
+            })
+          }
+        >
+          <RotateCcw size={17} />
+          {t("Phiên mới", "New session")}
+        </button>
+        <button
           aria-pressed={tab === "journey"}
           onClick={() => setTab("journey")}
         >
@@ -579,6 +626,21 @@ export default function Workspace({
             <div className="phone-screen">
               <div className="phone-language">
                 <h2>Guardian AI</h2>
+                <button
+                  className="new-session-icon"
+                  title={t("Phiên mới", "New session")}
+                  aria-label={t("Phiên mới", "New session")}
+                  disabled={busy}
+                  onClick={() =>
+                    void run(async () => {
+                      await action("new", { mode: i.mode, locale });
+                      setPhoneTab("companion");
+                      setTab("journey");
+                    })
+                  }
+                >
+                  <RotateCcw size={17} />
+                </button>
                 <LanguageSwitch />
               </div>
               <section className="companion" hidden={phoneTab !== "companion"}>
@@ -692,6 +754,44 @@ export default function Workspace({
                 )}
                 {!ended && !running && (
                   <>
+                    {live && (
+                      <div className="live-setup">
+                        <p>
+                          {t(
+                            "AI có thể tự phát SOS khi cuộc trò chuyện cho thấy bạn cần giúp. Chỉ người đã tham gia nhận yêu cầu; lời đồng ý phải do họ gửi.",
+                            "AI can activate SOS when your conversation indicates you need help. Only joined recipients receive requests; they must send their own acceptance.",
+                          )}
+                        </p>
+                        <div className="actions">
+                          <button onClick={startGps} disabled={ended}>
+                            <MapPin size={17} />
+                            {gps
+                              ? t("Dừng GPS", "Stop GPS")
+                              : t(
+                                  "Bật GPS để sẵn sàng SOS",
+                                  "Enable GPS for SOS",
+                                )}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setPhoneTab("contacts");
+                              setTab("people");
+                            }}
+                          >
+                            <Users size={17} />
+                            {t("Mời người nhận thật", "Invite real recipients")}
+                          </button>
+                        </div>
+                        <small>
+                          {gps
+                            ? t("GPS đang cập nhật", "GPS updates active")
+                            : t(
+                                "Chưa có GPS hiện tại · SOS chưa thể gửi",
+                                "Current GPS required before SOS can be sent",
+                              )}
+                        </small>
+                      </div>
+                    )}
                     <details className="phone-request">
                       <summary>
                         {t(
@@ -836,6 +936,22 @@ export default function Workspace({
                           >
                             {t("Tôi đã gặp người giúp", "I have met my helper")}
                           </button>
+                          {demo && i.coordination?.autoplay && (
+                            <button
+                              disabled={busy}
+                              onClick={() =>
+                                void run(() =>
+                                  action("demo-received", { planId: plan.id }),
+                                )
+                              }
+                            >
+                              <Check size={17} />
+                              {t(
+                                "Mô phỏng: điểm tiếp nhận xác nhận gặp",
+                                "Simulate: venue confirms meeting",
+                              )}
+                            </button>
+                          )}
                           {plan.userArrived && i.status !== "COMPLETE" && (
                             <p>
                               {t(
@@ -900,8 +1016,8 @@ export default function Workspace({
                   </summary>
                   <p>
                     {t(
-                      "Nội dung gửi tới OpenAI khi bật. Bạn luôn tự quyết định SOS và cuộc gọi khẩn cấp.",
-                      "Content is sent to OpenAI when enabled. You decide on SOS and emergency calls.",
+                      "Nội dung gửi tới OpenAI khi bật. Trong app thật, AI được phép tự phát SOS khi cần hỗ trợ. Bạn vẫn tự chọn tuyến đi và bấm cuộc gọi khẩn cấp.",
+                      "Content is sent to OpenAI when enabled. In the live app, AI may activate SOS when help is needed. You still accept walking routes and initiate emergency calls.",
                     )}
                   </p>
                   <label className="check">
@@ -920,8 +1036,8 @@ export default function Workspace({
                       }}
                     />
                     {t(
-                      "Đồng ý gửi nội dung tới OpenAI",
-                      "I consent to sending content to OpenAI",
+                      "Đồng ý dùng AI và cho AI tự phát SOS trong app thật",
+                      "I consent to AI processing and autonomous SOS in the live app",
                     )}
                   </label>
                   {data.config.aiAccessRequired && (
@@ -1003,7 +1119,9 @@ export default function Workspace({
                             const result = await action("chat", {
                               text: message,
                             });
-                            if (result.intent === "SOS") setProposal(message);
+                            if (result.intent === "SOS" && demo)
+                              setProposal(message);
+                            if (result.blocked) setError(result.blocked);
                             if (result.reply) setMessage("");
                           })
                         }
@@ -1118,6 +1236,12 @@ export default function Workspace({
               </section>
               {phoneTab === "contacts" && (
                 <section className="phone-sheet">
+                  <CallBoard
+                    incident={i}
+                    cancel={(callId) =>
+                      void run(() => action("cancel-call", { callId }))
+                    }
+                  />
                   <h2>{t("Người bên cạnh bạn", "Your people")}</h2>
                   <p>
                     {t(
@@ -1237,7 +1361,7 @@ export default function Workspace({
                     className="button primary"
                     target="_blank"
                     rel="noreferrer"
-                    href={`/api/record/${i.id}?lang=${locale}`}
+                    href={`/api/record/${i.id}?lang=${locale}&scope=${demo ? "demo" : "live"}`}
                   >
                     <FileText size={16} />
                     {t("Mở hồ sơ đầy đủ", "Open full record")}
@@ -1413,12 +1537,18 @@ export default function Workspace({
                 <Users size={28} />
                 <p>
                   {t(
-                    "Chưa có lời xác nhận. Mời người thân hoặc chạy demo để bắt đầu.",
-                    "No confirmations yet. Invite contacts or run the demo to begin.",
+                    "Chưa có lời xác nhận. Mời người nhận tham gia và chờ họ trả lời yêu cầu SOS.",
+                    "No confirmations yet. Invite recipients and wait for them to reply to an SOS request.",
                   )}
                 </p>
               </div>
             )}
+            <CallBoard
+              incident={i}
+              cancel={(callId) =>
+                void run(() => action("cancel-call", { callId }))
+              }
+            />{" "}
             {i.replies.map((r) => (
               <article
                 className={`commitment ${r.state === "REVOKED" ? "revoked" : ""}`}
@@ -1621,10 +1751,12 @@ export default function Workspace({
                     className="primary"
                     disabled={busy || running}
                     onClick={() =>
-                      void run(() => action("new", { mode: "LIVE", locale }))
+                      void run(() =>
+                        action("new", { mode: demo ? "DEMO" : "LIVE", locale }),
+                      )
                     }
                   >
-                    {t("Tạo phiên thử trên thiết bị", "Create device trial")}
+                    {t("Tạo phiên mới", "New session")}
                   </button>
                 ) : (
                   <button className="primary" onClick={startGps}>
@@ -1634,14 +1766,17 @@ export default function Workspace({
                       : t("Cho phép và chia sẻ GPS", "Allow and share GPS")}
                   </button>
                 )}
-                <button
-                  disabled={busy || running}
-                  onClick={() =>
-                    void run(() => action("new", { mode: "DEMO", locale }))
-                  }
+                <Link
+                  className="button"
+                  href={demo ? "/phone" : "/demo/command-center"}
                 >
-                  {t("Phiên mô phỏng mới", "New simulation")}
-                </button>
+                  {demo
+                    ? t("Mở app thật riêng", "Open separate live app")
+                    : t(
+                        "Mở demo riêng cho giám khảo",
+                        "Open separate judge demo",
+                      )}
+                </Link>
               </div>
               <small>
                 {t(
@@ -1734,7 +1869,7 @@ export default function Workspace({
               className="button primary"
               target="_blank"
               rel="noreferrer"
-              href={`/api/record/${i.id}?lang=${locale}`}
+              href={`/api/record/${i.id}?lang=${locale}&scope=${demo ? "demo" : "live"}`}
             >
               <FileText size={17} />
               {t("Mở / In hồ sơ", "Open / Print record")}
@@ -1795,7 +1930,10 @@ export default function Workspace({
           ))}
           {i.recordings.map((r) => (
             <article key={r.id}>
-              <audio controls src={`/api/audio/${i.id}/${r.id}`} />
+              <audio
+                controls
+                src={`/api/audio/${i.id}/${r.id}?scope=${demo ? "demo" : "live"}`}
+              />
               <small>
                 {r.bytes} bytes · SHA-256 {r.hash}
               </small>
@@ -1818,7 +1956,7 @@ export default function Workspace({
               className="button"
               target="_blank"
               rel="noreferrer"
-              href={`/api/record/${i.id}?format=json`}
+              href={`/api/record/${i.id}?format=json&scope=${demo ? "demo" : "live"}`}
             >
               {t("Mở dữ liệu JSON", "Open JSON record")}
             </a>
@@ -1860,6 +1998,20 @@ export default function Workspace({
         </section>
       )}
       <footer className="workspace-footer">
+        <button
+          className="new-session-button"
+          disabled={busy}
+          onClick={() =>
+            void run(async () => {
+              await action("new", { mode: i.mode, locale });
+              setPhoneTab("companion");
+              setTab("journey");
+            })
+          }
+        >
+          <RotateCcw size={15} />
+          {t("Phiên mới", "New session")}
+        </button>
         <span role="status">
           {status(i.status)} ·{" "}
           {Math.floor((Date.now() - Date.parse(i.createdAt)) / 60000)
@@ -1874,7 +2026,9 @@ export default function Workspace({
         <Link href="/demo/command-center">
           {t("Trung tâm", "Command center")}
         </Link>
-        <Link href="/demo/phone">{t("Điện thoại", "Phone")}</Link>
+        <Link href={demo ? "/demo/phone" : "/phone"}>
+          {t("Điện thoại", "Phone")}
+        </Link>
         <span>
           {i.ai.status === "LIVE"
             ? t(

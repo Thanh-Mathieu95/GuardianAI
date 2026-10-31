@@ -13,3 +13,6 @@ Audio is opt-in and split into chunks; retries must match their original bytes, 
 Invitations are bearer credentials; only token hashes are stored. Contacts see a session after being included in its recipient list. Partners do not see the walker's precise location before acceptance. Owners can read their records and audio; joined contacts obtain the current report after signal loss. The current preview shares report metadata, not a downloadable audio attachment, with contacts. Record deletion is atomic and invalidates the old record chain; it does not revoke copies a recipient already downloaded.
 
 Real recipients must keep their page open. No SMS, PSTN calling, native push or emergency dispatch service is included. Browser GPS and timers may pause when a phone locks. This implementation supports supervised demonstrations, not a guarantee of protection or an emergency response network.
+
+
+The in-app call extension is described in [IN-APP-COORDINATION.md](IN-APP-COORDINATION.md). Call records, event deduplication, attempts, deadlines, transcripts and partner profiles are stored in the same versioned account payload and hash-chained incident snapshots. Separate signed demo/live owner cookies isolate their incidents and member lists. No telephone gateway was added.

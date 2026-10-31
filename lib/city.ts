@@ -32,6 +32,29 @@ const origin =
   )[0] || nearestNode(anchor);
 export const cityStart = nodes[origin];
 export const cityEdges = raw.edges;
+export function roadCondition(edgeId: string) {
+  const n = Number(edgeId.slice(1));
+  return {
+    lighting: n % 7 === 0 ? "LOW" : "LIT",
+    activity: n % 5 === 0 ? "QUIET" : "BUSY",
+    incidentRisk: n % 19 === 0 ? 0.7 : 0,
+    source: "SIMULATED" as const,
+  };
+}
+export const roadWarnings = raw.edges
+  .filter((e) => {
+    const c = roadCondition(e.id);
+    return c.lighting === "LOW" || c.activity === "QUIET" || c.incidentRisk > 0;
+  })
+  .map((e) => ({
+    ...e,
+    ...roadCondition(e.id),
+    condition: roadCondition(e.id).incidentRisk
+      ? "INCIDENT"
+      : roadCondition(e.id).lighting === "LOW"
+        ? "DARK"
+        : "QUIET",
+  }));
 export const kinds: Pair[] = [
   ["Cửa hàng tiện lợi", "Convenience store"],
   ["Khách sạn", "Hotel"],
@@ -89,6 +112,66 @@ export function isOpen(p: (typeof places)[number], minute = 22 * 60 + 15) {
     ? minute >= p.open || minute < p.close - 1440
     : minute >= p.open && minute < p.close;
 }
+export function placeProfile(
+  p: (typeof places)[number],
+  minute = 22 * 60 + 15,
+) {
+  const services: Pair[] = [];
+  if (p.staffed)
+    services.push([
+      "Có nhân viên theo hồ sơ mô phỏng",
+      "Staffed in the simulated profile",
+    ]);
+  if (p.waiting) services.push(["Có chỗ ngồi chờ", "Seated waiting area"]);
+  if (p.firstAid)
+    services.push(["Hỗ trợ sơ cứu cơ bản", "Basic first-aid capability"]);
+  if ([0, 1, 3, 7].includes(p.kind))
+    services.push(["Có thể sạc điện thoại", "Phone charging capability"]);
+  const goods: Pair[] = [0, 3, 4, 7].includes(p.kind)
+    ? [
+        ["Nước uống", "Drinking water"],
+        ["Thức ăn", "Food"],
+      ]
+    : p.kind === 2
+      ? [["Thuốc và vật tư y tế", "Medicines and medical supplies"]]
+      : [];
+  const limitations: Pair[] = [
+    [
+      "Còn mở không có nghĩa đã đồng ý tiếp nhận; phải chờ phản hồi.",
+      "Open does not mean reception is confirmed; a response is required.",
+    ],
+  ];
+  if (p.kind === 6)
+    limitations.push([
+      "ATM hoạt động không đồng nghĩa có người trực hay chỗ chờ.",
+      "An operating ATM does not imply staff or a waiting area.",
+    ]);
+  if ([2, 9].includes(p.kind))
+    limitations.push([
+      "Không phải khoa cấp cứu.",
+      "This is not an emergency department.",
+    ]);
+  if (p.kind === 8)
+    limitations.push([
+      "Giờ hành chính khác trực ban; cần hỏi khả năng tiếp nhận.",
+      "Office hours differ from duty coverage; ask about reception.",
+    ]);
+  return {
+    id: p.id,
+    name: p.name,
+    category: kinds[p.kind],
+    hours: p.hours,
+    openingStatus: isOpen(p, minute) ? ("OPEN" as const) : ("CLOSED" as const),
+    services,
+    goods,
+    limitations,
+    staffed: p.staffed,
+    waiting: p.waiting,
+    firstAid: p.firstAid,
+    point: p.point,
+    source: "SIMULATED" as const,
+  };
+}
 export function walkingRoute(
   from: Point,
   to: Point,
@@ -126,10 +209,12 @@ export function walkingRoute(
       const length = edge.points
         .slice(1)
         .reduce((sum, p, n) => sum + meters(edge.points[n], p), 0);
-      const index = Number(edge.id.slice(1));
+      const index = Number(edge.id.slice(1)),
+        condition = roadCondition(edge.id);
       const factor = simulation
         ? (index % 7 === 0 ? 1.8 : 1) *
           (index % 5 === 0 ? 1.25 : 1) *
+          (1 + condition.incidentRisk) *
           (variant === 1 && index % 3 === 0 ? 1.4 : 1)
         : 1;
       const score = best + length * factor;

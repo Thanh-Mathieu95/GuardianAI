@@ -14,6 +14,9 @@ import { choose } from "@/lib/types";
 import { states, errors } from "@/lib/copy";
 import { useLanguage, LanguageSwitch } from "./language";
 import { connectVoice, type Voice } from "./voice";
+import type { AppCall } from "@/lib/coordination-types";
+import { RecipientCall } from "./recipient-call";
+import { PartnerProfileForm } from "./partner-profile";
 type View = {
   member: Omit<Member, "tokenHash" | "createdAt">;
   config: { ai: boolean };
@@ -29,6 +32,7 @@ type View = {
     trip: Incident["trip"];
     shared: boolean;
     events: Event[];
+    calls: AppCall[];
   } | null;
 };
 export default function Receiver({ token }: { token: string }) {
@@ -42,7 +46,8 @@ export default function Receiver({ token }: { token: string }) {
     [consent, setConsent] = useState(false),
     [talking, setTalking] = useState(false);
   const voice = useRef<Voice | null>(null),
-    current = useRef(view);
+    current = useRef(view),
+    heartbeatAt = useRef(0);
   current.current = view;
   async function api(body?: unknown) {
     const r = await fetch("/api/join/" + token, {
@@ -65,8 +70,10 @@ export default function Receiver({ token }: { token: string }) {
     try {
       await fn();
       setView(await api());
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "REQUEST_FAILED");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -80,6 +87,10 @@ export default function Receiver({ token }: { token: string }) {
         if (alive) {
           setView(d);
           setOnline(true);
+        }
+        if (d.member.joined && Date.now() - heartbeatAt.current > 10000) {
+          heartbeatAt.current = Date.now();
+          await api({ action: "heartbeat" });
         }
       } catch (e) {
         if (alive) {
@@ -115,14 +126,36 @@ export default function Receiver({ token }: { token: string }) {
     }
     if (!i) return;
     const incidentId = i.id;
+    const voiceMessageIds = new Map<string, string>();
+    const call = i.calls?.find((c) =>
+      ["CONNECTED", "CONVERSING"].includes(c.state),
+    );
     voice.current = await connectVoice(
-      () => api({ action: "voice", consent: true, locale }),
+      () =>
+        api({
+          action: "voice",
+          consent: true,
+          locale,
+          ...(call ? { callId: call.id } : {}),
+        }),
       {
-        transcript: (who, text) => {
+        transcript: (who, text, transcriptId) => {
           if (who === "You" && current.current?.incident?.id === incidentId)
-            void api({ action: "reply", incidentId, text }).catch((e) =>
-              setError(e.message),
-            );
+            void api(
+              call
+                ? {
+                    action: "call-message",
+                    incidentId,
+                    callId: call.id,
+                    attempt: call.attempt,
+                    messageId:
+                      voiceMessageIds.get(transcriptId) ||
+                      (voiceMessageIds.set(transcriptId, crypto.randomUUID()),
+                      voiceMessageIds.get(transcriptId)!),
+                    text,
+                  }
+                : { action: "reply", incidentId, text },
+            ).catch((e) => setError(e.message));
         },
         tool: async () => ({}),
         error: setError,
@@ -217,8 +250,31 @@ export default function Receiver({ token }: { token: string }) {
                 : t("Đang kết nối lại", "Reconnecting")}
             </span>
           </div>
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={!!m!.callConsentAt}
+              disabled={busy}
+              onChange={(e) =>
+                void run(() =>
+                  api({ action: "call-consent", enabled: e.target.checked }),
+                )
+              }
+            />
+            {t(
+              "Đồng ý nhận cuộc gọi AI trong app khi trang đang mở",
+              "Allow AI calls in the app while this page is open",
+            )}
+          </label>
           {m!.role === "PARTNER" && (
             <div className="partner-setup">
+              <PartnerProfileForm
+                profile={m!.profile}
+                busy={busy}
+                save={async (body) => {
+                  await run(() => api(body));
+                }}
+              />
               <h2>{t("Sẵn sàng tiếp nhận?", "Ready to offer support?")}</h2>
               <p>
                 {t(
@@ -275,6 +331,22 @@ export default function Receiver({ token }: { token: string }) {
               <p role="status">
                 {states[i.status] ? choose(states[i.status], locale) : i.status}
               </p>
+              {i.calls
+                ?.filter((c) =>
+                  ["CALLING", "RINGING", "CONNECTED", "CONVERSING"].includes(
+                    c.state,
+                  ),
+                )
+                .map((c) => (
+                  <RecipientCall
+                    key={c.id}
+                    call={c}
+                    busy={busy}
+                    api={async (body) => {
+                      return await run(() => api(body));
+                    }}
+                  />
+                ))}
               {i.location ? (
                 <div className="shared-location">
                   <MapPin size={20} />

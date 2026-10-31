@@ -15,7 +15,7 @@ if (!existsSync(server)) {
   process.exit(1);
 }
 // Keep a relative SQLite path anchored to the project, not the standalone folder.
-if (!process.env.DATABASE_URL)
+if (!process.env.DATABASE_URL && process.env.DATABASE_PATH !== ":memory:")
   process.env.DATABASE_PATH = path.resolve(
     process.env.DATABASE_PATH || "data/guardian.sqlite",
   );

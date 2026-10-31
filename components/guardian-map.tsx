@@ -4,7 +4,18 @@ import type { Incident } from "@/lib/types";
 import { useLanguage } from "./language";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MapType, GeoJSONSource, Marker } from "maplibre-gl";
-import { places, isOpen } from "@/lib/city";
+import { places, isOpen, roadWarnings } from "@/lib/city";
+import { venuePaths, VenueSymbol } from "./venue-symbol";
+import { PlaceDetails } from "./place-details";
+import {
+  Moon,
+  Footprints,
+  TriangleAlert,
+  X,
+  ScanLine,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
 export default function GuardianMap({ incident: i }: { incident: Incident }) {
   const { t } = useLanguage(),
     box = useRef<HTMLDivElement>(null),
@@ -14,6 +25,20 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
     [failed, setFailed] = useState(""),
     [attempt, setAttempt] = useState(0);
   const [threeD, setThreeD] = useState(true);
+  const [selectedVenue, setSelectedVenue] = useState<string | null>(null),
+    [selectedRoad, setSelectedRoad] = useState<string | null>(null),
+    [scanning, setScanning] = useState(false),
+    [scanEpoch, setScanEpoch] = useState(0);
+  const radar = useRef<HTMLDivElement>(null);
+  const minute = i.scenarioMinute ?? 1335,
+    showArea = i.mode === "DEMO" && !!i.sosAt,
+    openPlaces = places.filter((p) => isOpen(p, minute));
+  const selectedPlace = showArea
+    ? openPlaces.find((p) => p.id === selectedVenue)
+    : undefined;
+  const road = showArea
+    ? roadWarnings.find((r) => r.id === selectedRoad)
+    : undefined;
   const cameraKey = useRef("");
   const plan = i.plans.findLast((p) => !p.invalidatedAt);
   useEffect(() => {
@@ -48,10 +73,74 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
         m.addControl(new lib.NavigationControl(), "top-right");
         m.on("style.load", () => {
           if (disposed) return;
-          for(const layer of m.getStyle().layers){
-            if(layer.type==='symbol'&&layer.layout?.['text-field']){m.setPaintProperty(layer.id,'text-color','#b3c4d4');m.setPaintProperty(layer.id,'text-halo-color','#080f18');m.setPaintProperty(layer.id,'text-halo-width',1.4);}
-            if(layer.type==='line'&&/road|street|highway|transportation/.test(layer.id)&&!/rail|bridge|tunnel|case/.test(layer.id))m.setPaintProperty(layer.id,'line-color','#435b70');
+          for (const layer of m.getStyle().layers) {
+            if (layer.type === "symbol" && layer.layout?.["text-field"]) {
+              m.setPaintProperty(layer.id, "text-color", "#b3c4d4");
+              m.setPaintProperty(layer.id, "text-halo-color", "#080f18");
+              m.setPaintProperty(layer.id, "text-halo-width", 1.4);
+            }
+            if (
+              layer.type === "line" &&
+              /road|street|highway|transportation/.test(layer.id) &&
+              !/rail|bridge|tunnel|case/.test(layer.id)
+            )
+              m.setPaintProperty(layer.id, "line-color", "#435b70");
           }
+          m.addSource("road-warnings", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] },
+          });
+          const warningColor: [
+            "match",
+            ["get", string],
+            string,
+            string,
+            string,
+            string,
+            string,
+          ] = [
+            "match",
+            ["get", "condition"],
+            "INCIDENT",
+            "#fa8d91",
+            "DARK",
+            "#e9b66f",
+            "#bba9e9",
+          ];
+          m.addLayer({
+            id: "warning-glow",
+            type: "line",
+            source: "road-warnings",
+            paint: {
+              "line-color": [...warningColor],
+              "line-width": 15,
+              "line-blur": 7,
+              "line-opacity": 0.45,
+            },
+          });
+          m.addLayer({
+            id: "warning-line",
+            type: "line",
+            source: "road-warnings",
+            paint: {
+              "line-color": [...warningColor],
+              "line-width": 3,
+              "line-opacity": 0.9,
+            },
+          });
+          m.on("click", "warning-line", (event) => {
+            const id = event.features?.[0]?.properties?.id;
+            if (typeof id === "string") {
+              setSelectedRoad(id);
+              setSelectedVenue(null);
+            }
+          });
+          m.on("mouseenter", "warning-line", () => {
+            m.getCanvas().style.cursor = "pointer";
+          });
+          m.on("mouseleave", "warning-line", () => {
+            m.getCanvas().style.cursor = "";
+          });
           m.addSource("route", {
             type: "geojson",
             data: { type: "FeatureCollection", features: [] },
@@ -146,25 +235,86 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
     };
   }, [attempt]);
   useEffect(() => {
+    setSelectedVenue(null);
+    setSelectedRoad(null);
+    if (
+      !i.sosAt ||
+      ["COMPLETE", "CANCELLED", "SIGNAL_LOST"].includes(i.status)
+    ) {
+      setScanning(false);
+      return;
+    }
+    setScanEpoch((n) => n + 1);
+    setScanning(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const timer = setTimeout(() => setScanning(false), 3400);
+    return () => clearTimeout(timer);
+  }, [i.id, i.sosAt]);
+  useEffect(() => {
+    if (["COMPLETE", "CANCELLED", "SIGNAL_LOST"].includes(i.status))
+      setScanning(false);
+  }, [i.status]);
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !ready || !radar.current || !i.location) return;
+    const position = () => {
+      if (!radar.current) return;
+      const p = m.project([i.location!.lng, i.location!.lat]);
+      radar.current.style.left = `${p.x}px`;
+      radar.current.style.top = `${p.y}px`;
+    };
+    position();
+    m.on("move", position);
+    m.on("resize", position);
+    return () => {
+      m.off("move", position);
+      m.off("resize", position);
+    };
+  }, [ready, i.location?.lat, i.location?.lng, scanning]);
+  useEffect(() => {
     const m = map.current;
     if (!m || !ready) return;
     void import("maplibre-gl").then((lib) => {
       if (map.current !== m) return;
       markers.current.forEach((x) => x.remove());
       markers.current = [];
-      const locations = [
+      const locations: {
+        point: { lat: number; lng: number };
+        label: string;
+        confirmed: boolean;
+        venueId?: string;
+        kind?: number;
+        state?: string;
+        user?: boolean;
+      }[] = [
         ...(i.location
-          ? [{ point: i.location, label: t("Bạn", "You"), confirmed: false }]
+          ? [
+              {
+                point: i.location,
+                label: t("Bạn", "You"),
+                confirmed: false,
+                user: true,
+              },
+            ]
           : []),
         ...(i.mode === "DEMO" && i.sosAt
-          ? places
-              .filter(
-                (p) => isOpen(p) && !i.replies.some((r) => r.memberId === p.id),
-              )
-              .map((p) => ({ point: p.point, label: p.name, confirmed: false }))
+          ? openPlaces.map((p) => ({
+              point: p.point,
+              label: p.name,
+              confirmed: i.replies.some(
+                (r) => r.memberId === p.id && r.state === "ACCEPTED",
+              ),
+              venueId: p.id,
+              kind: p.kind,
+              state: i.replies.find((r) => r.memberId === p.id)?.state,
+            }))
           : []),
         ...i.replies
-          .filter((r) => r.role === "PARTNER" && r.location)
+          .filter(
+            (r) =>
+              r.role === "PARTNER" &&
+              r.location &&
+              !(i.mode === "DEMO" && places.some((p) => p.id === r.memberId)),
+          )
           .map((r) => ({
             point: r.location!,
             label: r.name,
@@ -174,6 +324,11 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
       for (const p of locations) {
         const el = document.createElement("button");
         el.className = "venue-pin";
+        if (p.venueId) {
+          el.dataset.venueId = p.venueId;
+          el.dataset.open = "true";
+          el.classList.add("venue-discovered");
+        }
         el.classList.add(
           p.confirmed
             ? "pin-confirmed"
@@ -207,18 +362,84 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
         }
         mark.setAttribute("stroke", "currentColor");
         mark.setAttribute("stroke-width", "2");
-        svg.appendChild(mark);
+        if (p.kind !== undefined) {
+          for (const d of venuePaths[p.kind] || venuePaths[0]) {
+            const path = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "path",
+            );
+            path.setAttribute("d", d);
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "currentColor");
+            path.setAttribute("stroke-width", "1.7");
+            path.setAttribute("stroke-linecap", "round");
+            path.setAttribute("stroke-linejoin", "round");
+            svg.appendChild(path);
+          }
+        } else svg.appendChild(mark);
         el.appendChild(svg);
+        if (p.venueId) {
+          const label = document.createElement("span");
+          label.className = "venue-pin-name";
+          label.textContent = p.label;
+          el.appendChild(label);
+          const badge = document.createElement("span");
+          badge.className = `venue-pin-badge ${p.confirmed ? "badge-confirmed" : "badge-open"}`;
+          badge.setAttribute("aria-hidden", "true");
+          if (p.confirmed) {
+            const check = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "svg",
+            );
+            check.setAttribute("viewBox", "0 0 24 24");
+            check.setAttribute("width", "12");
+            check.setAttribute("height", "12");
+            const path = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "path",
+            );
+            path.setAttribute("d", "m5 12 4 4 10-10");
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", "currentColor");
+            path.setAttribute("stroke-width", "3");
+            check.appendChild(path);
+            badge.appendChild(check);
+          }
+          el.appendChild(badge);
+          el.addEventListener("click", (event) => {
+            event.stopPropagation();
+            setSelectedVenue(p.venueId!);
+            setSelectedRoad(null);
+          });
+        }
         el.setAttribute("aria-label", p.label);
         el.title = p.label;
-        const popup = new lib.Popup({ offset: 20 }).setText(p.label);
-        markers.current.push(
-          new lib.Marker({ element: el })
-            .setLngLat([p.point.lng, p.point.lat])
-            .setPopup(popup)
-            .addTo(m),
-        );
+        const marker = new lib.Marker({ element: el }).setLngLat([
+          p.point.lng,
+          p.point.lat,
+        ]);
+        if (!p.venueId)
+          marker.setPopup(new lib.Popup({ offset: 20 }).setText(p.label));
+        markers.current.push(marker.addTo(m));
       }
+      (m.getSource("road-warnings") as GeoJSONSource)?.setData({
+        type: "FeatureCollection",
+        features: showArea
+          ? roadWarnings.map((r) => ({
+              type: "Feature",
+              properties: {
+                id: r.id,
+                condition: r.condition,
+                street: r.name,
+                source: r.source,
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: r.points.map((p) => [p.lng, p.lat]),
+              },
+            }))
+          : [],
+      });
       const points = plan?.route.points || [];
       const line = (points: { lat: number; lng: number }[]) => ({
         type: "Feature" as const,
@@ -254,13 +475,22 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
             ]
           : [],
       });
-      const focusPoints = i.reference?.route.points || points;
-      const nextCameraKey = `${i.id}:${i.reference?.name || plan?.id || "overview"}`;
+      const focusPoints =
+        i.reference?.route.points ||
+        (points.length
+          ? points
+          : showArea
+            ? [
+                ...(i.location ? [i.location] : []),
+                ...openPlaces.map((p) => p.point),
+              ]
+            : []);
+      const nextCameraKey = `${i.id}:${i.reference?.name || plan?.id || (showArea ? `area-${minute}` : "overview")}`;
       if (focusPoints.length && cameraKey.current !== nextCameraKey) {
         const bounds = new lib.LngLatBounds();
         focusPoints.forEach((p) => bounds.extend([p.lng, p.lat]));
         m.fitBounds(bounds, {
-          padding: 70,
+          padding: { top: 100, bottom: 85, left: 55, right: 55 },
           maxZoom: 17,
           duration: window.matchMedia("(prefers-reduced-motion: reduce)")
             .matches
@@ -283,16 +513,149 @@ export default function GuardianMap({ incident: i }: { incident: Incident }) {
         cameraKey.current = nextCameraKey;
       }
     });
-  }, [ready, i.updatedAt, i.reference?.name]);
+  }, [ready, i.updatedAt, i.reference?.name, minute]);
   return (
     <div className="guardian-map">
       <div ref={box} className="map-canvas" />
+      {scanning && (
+        <div
+          ref={radar}
+          key={scanEpoch}
+          className="sos-radar"
+          aria-hidden="true"
+        >
+          <div className="radar-sweep" />
+          <div className="radar-ring" />
+          <div className="radar-ring radar-ring-delayed" />
+        </div>
+      )}
+      {!!i.sosAt && (
+        <div
+          className={`sos-scan-status ${scanning ? "is-scanning" : ""}`}
+          role="status"
+        >
+          <ScanLine size={16} />
+          <span>
+            {scanning
+              ? t("Đang quét dữ liệu khu vực…", "Scanning area data…")
+              : showArea
+                ? t(
+                    `${openPlaces.length} điểm mở · ${places.length - openPlaces.length} điểm đóng đã ẩn`,
+                    `${openPlaces.length} open places · ${places.length - openPlaces.length} closed hidden`,
+                  )
+                : t(
+                    "Đang phối hợp với người đã tham gia",
+                    "Coordinating with joined recipients",
+                  )}
+          </span>
+          {showArea && <small>SIMULATED</small>}
+        </div>
+      )}
+      {showArea && (
+        <div
+          className="map-warning-legend"
+          aria-label={t(
+            "Chú giải dữ liệu đường mô phỏng",
+            "Simulated road-data legend",
+          )}
+        >
+          <span className="legend-dark">
+            <Moon size={13} />
+            {t("Thiếu sáng", "Low light")}
+          </span>
+          <span className="legend-quiet">
+            <Footprints size={13} />
+            {t("Vắng", "Quiet")}
+          </span>
+          <span className="legend-incident">
+            <TriangleAlert size={13} />
+            {t("Có cảnh báo", "Incident flag")}
+          </span>
+        </div>
+      )}
+      {selectedPlace && (
+        <section
+          className="map-place-card"
+          aria-label={`${selectedPlace.name} ${t("Chi tiết", "Details")}`}
+        >
+          <header>
+            <div>
+              <h3>{selectedPlace.name}</h3>
+              <p>
+                {i.replies.some(
+                  (r) =>
+                    r.memberId === selectedPlace.id && r.state === "ACCEPTED",
+                ) ? (
+                  <>
+                    <CheckCircle2 size={14} />
+                    {t("Đã đồng ý tiếp nhận", "Reception confirmed")}
+                  </>
+                ) : (
+                  <>
+                    <Clock size={14} />
+                    {t(
+                      "Đang mở · chưa xác nhận tiếp nhận",
+                      "Open · reception unconfirmed",
+                    )}
+                  </>
+                )}
+              </p>
+            </div>
+            <button
+              aria-label={t("Đóng chi tiết", "Close details")}
+              onClick={() => setSelectedVenue(null)}
+            >
+              <X size={17} />
+            </button>
+          </header>
+          <PlaceDetails place={selectedPlace} minute={minute} />
+        </section>
+      )}
+      {road && (
+        <section
+          className="map-road-card"
+          aria-label={t("Chi tiết đoạn đường", "Street segment details")}
+        >
+          <button
+            aria-label={t("Đóng cảnh báo đường", "Close road details")}
+            onClick={() => setSelectedRoad(null)}
+          >
+            <X size={16} />
+          </button>
+          <h3>{road.name}</h3>
+          <p>
+            {road.condition === "DARK"
+              ? t("Đoạn đường thiếu ánh sáng", "Low-light street segment")
+              : road.condition === "QUIET"
+                ? t(
+                    "Đoạn đường ít người qua lại",
+                    "Low-footfall street segment",
+                  )
+                : t(
+                    "Đoạn đường có cảnh báo sự cố",
+                    "Street segment with an incident flag",
+                  )}
+          </p>
+          <small>
+            {t(
+              "Tình trạng mô phỏng; chưa kiểm chứng thực địa. Bộ định tuyến dùng dữ liệu này để tăng chi phí đi qua.",
+              "Simulated condition; not field verified. The router increases the cost of using this segment.",
+            )}
+          </small>
+        </section>
+      )}
       <button
         className="map-3d"
         aria-pressed={threeD}
         onClick={() => {
           setThreeD(!threeD);
-          map.current?.easeTo({ pitch: threeD ? 0 : 50, duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 500 });
+          map.current?.easeTo({
+            pitch: threeD ? 0 : 50,
+            duration: window.matchMedia("(prefers-reduced-motion: reduce)")
+              .matches
+              ? 0
+              : 500,
+          });
         }}
       >
         {threeD ? "2D" : "3D"}

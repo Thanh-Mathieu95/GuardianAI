@@ -12,7 +12,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const origin = "http://localhost:3131";
 const url =
   origin +
-  (process.argv.includes("--phone") ? "/demo/phone" : "/demo/command-center");
+  (process.argv.includes("--phone") ? "/phone" : "/demo/command-center");
 async function healthy() {
   try {
     const r = await fetch(origin + "/api/health", {
@@ -25,6 +25,12 @@ async function healthy() {
   }
 }
 async function main() {
+  // A user may click the Desktop button while a new version is being built.
+  // Wait for Next's build lock so a second server does not lock its output.
+  for (let n = 0; existsSync(path.join(root, ".next", "lock")) && n < 120; n++)
+    await new Promise((r) => setTimeout(r, 500));
+  if (existsSync(path.join(root, ".next", "lock")))
+    throw Error("GuardianAI is still updating. Please try again shortly.");
   if (!(await healthy())) {
     if (!existsSync(path.join(root, ".next/standalone/server.js"))) {
       console.log("Preparing GuardianAI. The first build may take a minute.");

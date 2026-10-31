@@ -1,3 +1,4 @@
+import type { Coordination, PartnerProfile } from "./coordination-types";
 export type Locale = "vi" | "en";
 export type Point = { lat: number; lng: number };
 export type Pair = [string, string];
@@ -10,6 +11,9 @@ export type Member = {
   onDuty: boolean;
   location: Point | null;
   createdAt: string;
+  callConsentAt?: string | null;
+  lastSeenAt?: string | null;
+  profile?: PartnerProfile;
 };
 export type Reply = {
   id: string;
@@ -37,6 +41,8 @@ export type Reply = {
   viaAlley: boolean;
   conditions: string[];
   handoff: boolean;
+  evidenceIds?: string[];
+  profile?: PartnerProfile;
 };
 export type Route = {
   points: Point[];
@@ -98,6 +104,8 @@ export type Incident = {
     canMove: boolean;
   };
   risk: 1 | 2 | 3 | 4;
+  scenarioMinute?: number;
+  coordination?: Coordination;
   sosAt: string | null;
   replies: Reply[];
   plans: Plan[];

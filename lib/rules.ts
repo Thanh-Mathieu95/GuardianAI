@@ -1,5 +1,6 @@
-import { cityStart, walkingRoute } from "./city";
+import { cityStart, walkingRoute, places, isOpen } from "./city";
 import { z } from "zod";
+import { opening } from "./directory";
 import type { Incident, Reply, Point, Route } from "./types";
 export const fold = (s: string) =>
   s
@@ -169,6 +170,15 @@ export function distance(a: Point, b: Point) {
 }
 export function admission(i: Incident, r: Reply, time = Date.now()): string[] {
   const why: string[] = [];
+  const profile =
+    i.mode === "DEMO" ? places.find((p) => p.id === r.memberId) : undefined;
+  if (profile && !isOpen(profile, i.scenarioMinute)) why.push("VENUE_CLOSED");
+  if (i.mode === "LIVE" && r.profile) {
+    if (opening(r.profile, time) !== "OPEN") why.push("VENUE_HOURS_UNVERIFIED");
+    if (!r.profile.staffed || !r.profile.receiving || !r.profile.waiting)
+      why.push("VENUE_CAPABILITY_MISSING");
+    if (r.profile.source !== "PARTNER") why.push("UNVERIFIED_PROFILE");
+  }
   if (r.role !== "PARTNER" || r.state !== "ACCEPTED" || !r.quote)
     why.push("NOT_CONFIRMED");
   if (!r.location) why.push("NO_VENUE_LOCATION");

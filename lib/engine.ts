@@ -1,4 +1,20 @@
-import { places, isOpen } from "./city";
+import { places, isOpen, placeProfile } from "./city";
+import {
+  coordination,
+  enqueueIncident,
+  pump,
+  cancelCalls,
+  callActive,
+  callTerminal,
+  transition,
+  utterance,
+  intro,
+  deadlines,
+  assignCalls,
+  findCall,
+} from "./calls";
+import { opening } from "./directory";
+import { callAssistant } from "./ai";
 import { randomBytes, randomUUID } from "node:crypto";
 import { Repository, digest } from "./repository";
 import {
@@ -127,10 +143,10 @@ const blankReply = (m: Member, simulated = false): Reply => ({
 export class Engine {
   private queues = new Map<string, Promise<unknown>>();
   constructor(public repo = new Repository()) {}
-  async account(id: string) {
+  async account(id: string, mode: Incident["mode"] = "DEMO") {
     let a = await this.repo.load(id);
     if (!a) {
-      a = { id, version: 0, incident: fresh(), members: [], history: [] };
+      a = { id, version: 0, incident: fresh(mode), members: [], history: [] };
       await this.repo.save(a, true);
     }
     return a;
@@ -142,6 +158,9 @@ export class Engine {
       .then(async () => {
         const a = await this.account(id);
         const result = await fn(a);
+        if (terminal(a.incident) || a.incident.status === "SIGNAL_LOST")
+          cancelCalls(a.incident);
+        else if (a.incident.sosAt) assignCalls(a.incident, this.callMembers(a));
         await this.repo.save(a);
         return result;
       });
@@ -158,6 +177,7 @@ export class Engine {
       old.status = "CANCELLED";
       old.generation++;
       if (old.demo) old.demo.status = "STOPPED";
+      cancelCalls(old);
       seal(old, ["Phiên đã dừng", "Session stopped"]);
     }
     await this.repo.save(a);
@@ -193,8 +213,11 @@ export class Engine {
     for (const m of members.filter(
       (m) => m.joined && (m.role === "CONTACT" || m.onDuty),
     )) {
-      if (!i.replies.some((r) => r.memberId === m.id))
-        i.replies.push(blankReply(m, i.mode === "DEMO"));
+      if (!i.replies.some((r) => r.memberId === m.id)) {
+        const r = blankReply(m, i.mode === "DEMO");
+        r.profile = m.profile;
+        i.replies.push(r);
+      }
     }
     event(i, "CONTACTS_ALERTED", [
       `${i.replies.length} người nhận trong app; chưa có xác nhận`,
@@ -223,10 +246,36 @@ export class Engine {
       "Đã nhận SOS. Đang chờ người nhận trả lời.",
       "SOS received. Waiting for recipients to respond.",
     ]);
-    if (i.mode === "LIVE") this.alert(i, a.members);
-    else this.alert(i, this.demoMembers());
+    const members = this.callMembers(a);
+    this.alert(i, members);
+    enqueueIncident(i, members);
     seal(i, ["Đã ghi nhận yêu cầu hỗ trợ", "Support request recorded"]);
     if (!i.replies.length) i.status = "NO_SUPPORT";
+  }
+  async autoSos(a: Account, text: string) {
+    const i = a.incident;
+    if (!i.ai.enabled || !i.ai.consentedAt)
+      throw new Error("AI_CONSENT_REQUIRED");
+    if (i.mode !== "LIVE") throw new Error("LIVE_ONLY");
+    if (terminal(i)) throw new Error("SESSION_ENDED");
+    if (i.sosAt) return { autoSos: true, alreadyActive: true };
+    if (
+      !i.location ||
+      i.location.source !== "LIVE" ||
+      Date.now() - Date.parse(i.location.at) > 90000
+    ) {
+      event(i, "AI_SOS_BLOCKED", [
+        "AI nhận thấy cần SOS. Hãy bật GPS hiện tại rồi gửi lại yêu cầu; chưa báo người nhận.",
+        "AI identified a need for SOS. Enable current GPS and retry; recipients have not been alerted.",
+      ]);
+      return { autoSos: false, blocked: "CURRENT_LOCATION_REQUIRED" };
+    }
+    await this.sos(a, text);
+    event(i, "AI_SOS", [
+      "AI đã tự kích hoạt SOS từ cuộc trò chuyện. Chỉ người đã tham gia nhận yêu cầu trong app.",
+      "AI activated SOS from the conversation. Requests go only to joined in-app recipients.",
+    ]);
+    return { autoSos: true, recipients: i.replies.length };
   }
   demoMembers(): Member[] {
     return [
@@ -258,14 +307,169 @@ export class Engine {
           joined: true,
           onDuty: true,
           createdAt: now(),
+          callConsentAt: now(),
+          lastSeenAt: now(),
+          ...("location" in m && m.location
+            ? { profile: this.demoProfile(m.id) }
+            : {}),
         }) as Member,
     );
   }
-  async reply(i: Incident, memberId: string, text: string, useAI = true) {
+  demoProfile(id: string) {
+    const p = places.find((p) => p.id === id);
+    if (!p) return undefined;
+    const details = placeProfile(p);
+    return {
+      kind: details.category[1],
+      address: p.name,
+      contact: "in-app:" + id,
+      contactVerifiedAt: now(),
+      timezone: "Asia/Ho_Chi_Minh",
+      hours: [
+        { days: [0, 1, 2, 3, 4, 5, 6], open: p.open, close: p.close % 1440 },
+      ],
+      updatedAt: now(),
+      source: "SIMULATED" as const,
+      receiving: true,
+      staffed: true,
+      waiting: true,
+      accessible: true,
+      limitations: "SIMULATED",
+      entrance: "Main entrance",
+      meeting: "Staff at entrance",
+    };
+  }
+  callMembers(a: Account) {
+    return a.incident.mode === "DEMO" ? this.demoMembers() : a.members;
+  }
+  async callMessage(
+    a: Account,
+    memberId: string,
+    callId: string,
+    text: string,
+    messageId: string,
+    attempt: number,
+  ) {
+    const i = a.incident,
+      c = findCall(i, memberId, callId);
+    if (terminal(i) || i.status === "SIGNAL_LOST")
+      throw new Error("SESSION_ENDED");
+    if (c.turns.some((t) => t.id === messageId)) return { duplicate: true };
+    if (c.attempt !== attempt || !["CONNECTED", "CONVERSING"].includes(c.state))
+      throw new Error("CALL_NOT_CONNECTED");
+    if (c.turns.filter((t) => t.who === "RECIPIENT").length >= 4)
+      throw new Error("CALL_TURN_LIMIT");
+    if (i.transcript.some((t) => t.id === messageId))
+      throw new Error("EVIDENCE_ID_ALREADY_USED");
+    const evidence = utterance(i, c, "RECIPIENT", text, messageId);
+    if (c.purpose === "INQUIRY")
+      await this.reply(i, memberId, text, true, evidence);
+    else {
+      original(i, c.name, text, evidence);
+      event(
+        i,
+        "TASK_RESPONSE",
+        [
+          "Đã ghi phản hồi nhiệm vụ; không tự xác nhận đã gặp.",
+          "Task response recorded; handoff has not been assumed.",
+        ],
+        [c.id, c.planId!, evidence],
+      );
+    }
+    const r = i.replies.find((r) => r.memberId === memberId);
+    const done =
+      c.purpose === "ASSIGNMENT" ||
+      (r && r.state !== "CLARIFY" && r.state !== "RINGING") ||
+      c.turns.filter((t) => t.who === "RECIPIENT").length >= 4;
+    let answer =
+      i.locale === "vi"
+        ? "Bạn có thể nói rõ bạn đồng ý giúp việc gì và trong bao lâu không?"
+        : "What specific help can you confirm, and for how long?";
+    if (done)
+      answer =
+        i.locale === "vi"
+          ? "Cảm ơn. Tôi đã gửi nguyên văn lời bạn tới bộ điều phối. Việc hỗ trợ vẫn cần được theo dõi và xác nhận."
+          : "Thank you. Your exact statement has been sent to the coordinator. Support still needs tracking and confirmation.";
+    else if (i.ai.enabled && aiConfigured() && i.ai.calls < 40) {
+      i.ai.calls++;
+      try {
+        answer = await callAssistant(i.locale, c);
+      } catch {
+        /* bounded question remains available */
+      }
+    }
+    utterance(i, c, "AI", answer);
+    if (done) transition(i, c, "COMPLETED", "STATEMENT_RECORDED");
+    else transition(i, c, "CONVERSING");
+    if (activePlan(i)) coordination(i).outcome = "OFFER_AVAILABLE";
+    pump(i, this.callMembers(a));
+    return { reply: answer };
+  }
+  async runCalls(a: Account, time = Date.now()) {
+    const i = a.incident,
+      s = coordination(i),
+      members = this.callMembers(a);
+    if (i.demo) return;
+    deadlines(i, time);
+    pump(i, members, time);
+    if (i.mode !== "DEMO" || !s.autoplay) return;
+    const vi = i.locale === "vi";
+    for (const c of s.calls.filter(callActive)) {
+      if (time - Date.parse(c.updatedAt) < 1800) continue;
+      if (c.state === "CALLING")
+        transition(i, c, "RINGING", "SIMULATED_DELIVERY", time);
+      else if (c.state === "RINGING") {
+        transition(i, c, "CONVERSING", "SIMULATED_ANSWER", time);
+        utterance(i, c, "AI", intro(i, c));
+      } else if (c.state === "CONVERSING") {
+        const lines: Record<string, Pair> = {
+          "venue-cafe": [
+            "Đồng ý, bạn có thể ngồi chờ ở cửa chính; có nhân viên tiếp nhận.",
+            "I accept. You can wait here; staff will meet you at the main entrance.",
+          ],
+          "venue-hotel": [
+            "Đồng ý, vào chờ qua cửa sau trong hẻm.",
+            "I accept. You can wait here through the back entrance in the alley.",
+          ],
+          "venue-shop": [
+            "Đồng ý, bạn có thể vào chờ ở cửa chính.",
+            "I accept. You can wait here by the main entrance.",
+          ],
+          "contact-linh": [
+            "Tôi đang đến đón, 10 phút nữa tới.",
+            "I am on my way to pick you up, arriving in 10 minutes.",
+          ],
+          "contact-minh": ["Tôi sẽ giữ liên lạc.", "I will stay in touch."],
+        };
+        const text =
+          c.purpose === "ASSIGNMENT"
+            ? vi
+              ? "Tôi đã nhận nhiệm vụ; sẽ báo lại khi gặp."
+              : "I received the task and will confirm when we meet."
+            : lines[c.memberId]?.[vi ? 0 : 1];
+        if (text)
+          await this.callMessage(
+            a,
+            c.memberId,
+            c.id,
+            text,
+            randomUUID(),
+            c.attempt,
+          );
+      }
+    }
+  }
+  async reply(
+    i: Incident,
+    memberId: string,
+    text: string,
+    useAI = true,
+    evidenceId: string = randomUUID(),
+  ) {
     if (terminal(i)) throw new Error("SESSION_ENDED");
     const r = i.replies.find((r) => r.memberId === memberId);
     if (!r) throw new Error("NO_ACTIVE_REQUEST");
-    original(i, r.name, text);
+    original(i, r.name, text, evidenceId);
     let x = ruleExtract(text);
     if (useAI && i.ai.enabled && aiConfigured() && i.ai.calls < 40) {
       i.ai.calls++;
@@ -299,6 +503,7 @@ export class Engine {
       return;
     }
     const wasAccepted = r.state === "ACCEPTED";
+    r.evidenceIds = [evidenceId];
     r.state = x.decision === "DECLINED" && wasAccepted ? "REVOKED" : x.decision;
     r.quote = x.quote;
     r.offer = x.offer;
@@ -312,6 +517,25 @@ export class Engine {
     r.discreet = x.discreet;
     r.viaAlley = x.viaAlley;
     r.conditions = x.conditions;
+    if (i.mode === "DEMO" && i.demo && !coordination(i).autoplay) {
+      const c = coordination(i).calls.find(
+        (c) =>
+          c.memberId === memberId &&
+          c.purpose === "INQUIRY" &&
+          !callTerminal(c),
+      );
+      if (c && callActive(c)) {
+        if (!c.turns.length) utterance(i, c, "AI", intro(i, c));
+        utterance(i, c, "RECIPIENT", text, evidenceId);
+        transition(
+          i,
+          c,
+          x.decision === "CLARIFY" ? "CONVERSING" : "COMPLETED",
+          "SIMULATED_SCRIPT_RESPONSE",
+        );
+        pump(i, this.demoMembers());
+      }
+    }
     event(
       i,
       "REPLY",
@@ -324,7 +548,7 @@ export class Engine {
     await this.plan(i);
   }
   async plan(i: Incident, time = Date.now()) {
-    if (terminal(i)) return;
+    if (terminal(i) || i.status === "SIGNAL_LOST") return;
     const current = activePlan(i);
     if (current) {
       const r = i.replies.find((r) => r.id === current.replyId);
@@ -355,7 +579,7 @@ export class Engine {
           !admission(i, r, time).length &&
           (i.mode !== "DEMO" ||
             !places.some((p) => p.id === r.memberId) ||
-            isOpen(places.find((p) => p.id === r.memberId)!)),
+            isOpen(places.find((p) => p.id === r.memberId)!, i.scenarioMinute)),
       )
       .sort(
         (a, b) =>
@@ -567,7 +791,7 @@ export class Engine {
         "AI chưa trả lời; SOS bằng nút vẫn dùng được.",
         "AI did not respond; the SOS button still works.",
       ]);
-      return { reply: "", intent: "CHAT", reason: i.ai.error };
+      return { reply: "", intent: hit ? "SOS" : "CHAT", reason: i.ai.error };
     }
   }
   lose(i: Incident) {
@@ -585,7 +809,11 @@ export class Engine {
   }
   async tick(a: Account, time = Date.now()) {
     const i = a.incident;
-    if (terminal(i)) return false;
+    if (terminal(i)) {
+      cancelCalls(i);
+      return false;
+    }
+    await this.runCalls(a, time);
     if (
       i.demo?.status === "RUNNING" &&
       !i.demo.paused &&
