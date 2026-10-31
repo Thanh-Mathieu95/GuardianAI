@@ -1,56 +1,61 @@
-# Chuẩn bị host Guardian AI
+# Hosting Guardian AI
 
-## Bản demo miễn phí được chọn
+## Cấu hình được chọn
 
-Người dùng chọn Render Free và chấp nhận server ngủ/gián đoạn. Bản đầu chạy AI OFF, SQLite và ghi âm tạm trên filesystem của service, không gắn disk trả phí. Đặt `GUARDIAN_DEMO_HOSTING=1` cả khi build và chạy để hiển thị giới hạn dữ liệu. Dữ liệu có thể mất khi restart/redeploy; chỉ dùng dữ liệu mô phỏng. Đây chưa phải bản runtime Supabase bền vững hoặc dịch vụ bảo vệ người thật.
+Cloudflare Worker là điểm truy cập HTTPS, chuyển tiếp trang, asset và API tới một dịch vụ Next.js/Node trên Render. Supabase PostgreSQL giữ sự cố, lịch sử, mạng lưới và hạn mức; Supabase Storage giữ các chunk ghi âm trong bucket private `guardianai-recordings`.
 
-## Trạng thái
+Người dùng chọn Render Free. Server có thể ngủ và tác vụ đang chạy có thể gián đoạn. Dữ liệu đã commit trong Supabase được giữ qua restart, nhưng bản demo không bảo đảm giám sát liên tục cho người thật. AI mặc định OFF; chưa cấu hình cuộc gọi số thật.
 
-Đã bổ sung lệnh khởi động cho môi trường hosting và ví dụ cấu hình server. Chưa tạo dịch vụ cloud hoặc xác nhận một URL công khai hoạt động. Kiến trúc đích Vercel + Node backend + Supabase vẫn được mô tả trong [DEPLOYMENT.md](DEPLOYMENT.md).
+## Backend
 
-Người dùng chọn Cloudflare làm điểm truy cập frontend thay cho Vercel. Bước chuẩn bị có Worker tại `cloudflare/worker.mjs`, chuyển tiếp trang, asset và API về cùng backend Node để giữ một origin cho cookie, link mời và SSE. Next.js vẫn render trên Node; đây không phải một engine thứ hai trên Workers.
+- Build: `npm ci --include=dev && npm run build`.
+- Start: `npm run start:host`, lắng nghe `0.0.0.0` và cổng `PORT` của dịch vụ.
+- `/api/health` chỉ xác nhận HTTP process sống để Render có thể chuyển deployment trước khi instance cũ nhả khóa.
+- `/api/readiness` chờ kết nối PostgreSQL, phục hồi cache và commit các cập nhật khởi động trước khi báo sẵn sàng.
+- Chỉ chạy một instance. Khóa advisory qua session pooler chặn hai backend cùng nắm engine; không dùng transaction pooler cho kết nối giữ khóa.
 
-Trước khi deploy Worker, đặt `BACKEND_ORIGIN` trong cấu hình runtime thành origin HTTPS của backend đã kiểm chứng và chọn đúng Cloudflare account. Worker trả 503 khi thiếu cấu hình, không dùng URL giả. Từ root, chạy `npm --prefix cloudflare ci`, `npm --prefix cloudflare run check`, rồi `npm --prefix cloudflare run deploy` sau khi có quyền Cloudflare và backend sẵn sàng. `workers.dev` chưa được tạo trong bước chuẩn bị. Kiểm tra proxy cục bộ bằng `npm --prefix cloudflare test`.
+## Biến môi trường
 
-Supabase chưa thay thế Store/Network SQLite trong runtime. Chưa công bố bản triển khai hoàn chỉnh hoặc deploy backend không có lưu trữ bền vững. Cần tài khoản/project được xác định và hoàn tất migration theo `SUPABASE-ARCHITECTURE.md` trước khi xác nhận đích Cloudflare + Render + Supabase đã hoạt động.
-
-## Runtime hiện tại
-
-Ứng dụng cần Node.js 24, một tiến trình chạy liên tục, SQLite và thư mục ghi âm có thể ghi. Không triển khai engine hiện tại như static site hoặc trên filesystem serverless tạm thời rồi coi là đã lưu dữ liệu bền vững.
-
-- Cài và build: `npm ci && npm run build`.
-- Khởi động: `npm run start:host`.
-- Lệnh hosting lắng nghe `0.0.0.0`; Next.js đọc cổng từ biến `PORT` do dịch vụ cung cấp. Lệnh `npm start` vẫn dành cho localhost.
-- Health check: `/api/health`.
-- Chạy một instance; chưa bật autoscaling.
-
-## Biến môi trường hosting
-
-| Biến | Cách cấu hình |
+| Biến | Mục đích |
 | --- | --- |
-| `NODE_ENV` | `production` |
-| `AI_PROVIDER` | `OFF` cho lần kiểm tra mô phỏng đầu tiên |
-| `PUBLIC_URL` | Origin HTTPS của deployment thực tế, không chứa đường dẫn |
-| `GUARDIAN_SESSION_SECRET` | Giá trị ngẫu nhiên dài, ổn định qua các lần restart, lưu trong secret của dịch vụ |
-| `GUARDIAN_DB_PATH` | File SQLite trong volume bền vững nếu dùng runtime SQLite |
-| `GUARDIAN_RECORDINGS_DIR` | Thư mục trong cùng volume bền vững nếu dùng ghi âm cục bộ |
+| `AI_PROVIDER` | `OFF` cho demo miễn phí |
+| `GUARDIAN_DEMO_HOSTING` | `1` khi build và chạy để hiển thị giới hạn hosting |
+| `PUBLIC_URL` | Origin HTTPS Cloudflare thực tế, không có đường dẫn |
+| `GUARDIAN_POSTGRES_URL` | PostgreSQL session pooler, cổng 5432, tài khoản backend chỉ được DML trong schema `guardian_ai` |
+| `GUARDIAN_SESSION_SECRET` | Khóa ngẫu nhiên ổn định qua restart; ký capability và mã hóa token người nhận |
+| `GUARDIAN_SUPABASE_URL` | Origin HTTPS project Supabase |
+| `GUARDIAN_SUPABASE_SERVICE_KEY` | Chỉ ở server, dùng truy cập bucket ghi âm private |
+| `GUARDIAN_RECORDINGS_DIR` | Cache ghi âm tạm tại backend; nội dung được phục hồi từ Storage |
 
-Không chép `.env.local`, database hay ghi âm trên máy lên bản build. Chưa bật gateway gọi điện hoặc AI live trong lần kiểm tra đầu. Các khóa tích hợp chỉ nhập bằng cơ chế secret của nhà cung cấp khi cần bật chức năng tương ứng.
+Không đưa secret, database hoặc ghi âm cá nhân vào source/build. Chứng chỉ `supabase/prod-ca-2021.crt` là CA công khai; kết nối PostgreSQL vẫn xác minh CA và hostname.
 
-## Phương án demo một dịch vụ Node
+## Lưu trữ và quyền truy cập
 
-Nếu chọn host bản hiện tại trước khi chuyển Supabase, Render hỗ trợ Next.js dưới dạng Node web service. SQLite và ghi âm phải đặt trên persistent disk, ví dụ mount `/var/data`, database `/var/data/guardian.sqlite`, ghi âm `/var/data/recordings`.
+Schema `guardian_ai` tách khỏi các bảng `public` của ứng dụng có sẵn. Các bảng đều bật RLS và không cấp quyền cho `anon`/`authenticated`. Backend có role riêng với quyền đọc/ghi schema này, không có quyền tạo bảng. Token người nhận được tra cứu qua hash và mã hóa khi lưu; không thay đổi khóa phiên tùy tiện nếu còn cần phục hồi token.
 
-Đây là phương án chuyển tiếp cần người dùng chọn, không thay thế hợp đồng migration Supabase. Persistent disk yêu cầu dịch vụ trả phí; chưa tạo hoặc mua dịch vụ trong bước chuẩn bị. Dịch vụ một instance vẫn có gián đoạn khi restart/redeploy và không bảo đảm khôi phục tác vụ đang chạy như một job runner bền vững.
+SQLite trong RAM chỉ là bộ nhớ làm việc cho interpreter hiện có, được dựng lại từ PostgreSQL khi khởi động. Incident, snapshot và report revision được commit cùng transaction; ghi có compare-and-swap revision. HTTP chờ commit và SSE nhận bản trạng thái đã chụp sau commit. Lỗi persistence trả 503 và không xác nhận thành công từ cache chưa lưu.
 
-## Kiểm tra trước khi bàn giao URL
+Ghi âm dùng object theo incident/session/seq và manifest checksum trong PostgreSQL. Retry khác nội dung bị từ chối; tải đi qua API kiểm tra quyền. Xóa transcript xử lý cả chunk Storage, manifest, replay và report dẫn xuất. Bucket không có policy cho client đọc công khai.
 
-1. Build sạch trên Linux và kiểm tra server nhận cổng do dịch vụ cấp.
-2. Mở trang chính, command center, điện thoại và health trên HTTPS.
-3. Chạy toàn bộ demo qua engine với AI OFF; không gọi số thật.
-4. Thử hai phiên riêng tư, xác nhận dữ liệu và quyền truy cập không bị trộn.
-5. Mở liên kết người nhận trên thiết bị khác; kiểm tra cookie, Origin, SSE và polling.
-6. Restart/redeploy rồi kiểm tra hồ sơ còn trong kho lưu trữ; ghi nhận tác vụ bị gián đoạn.
-7. Kiểm tra micro/GPS khi được cấp quyền và khi bị từ chối, rồi mới bật tích hợp live có kiểm soát.
+## Cloudflare
 
-Tài liệu nhà cung cấp: [Next.js trên Render](https://render.com/docs/deploy-nextjs-app), [persistent disks](https://render.com/docs/disks), [giới hạn free tier](https://render.com/docs/free).
+Worker ở `cloudflare/worker.mjs`; `BACKEND_ORIGIN` trỏ tới dịch vụ Render. Worker giữ Origin/cookie/body stream, thay header forwarding và không cache response phiên. Next.js vẫn render trên Node, không có engine/SQLite thứ hai trong Workers.
+
+```sh
+npm --prefix cloudflare ci
+npm --prefix cloudflare test
+npm --prefix cloudflare run check
+npm --prefix cloudflare run deploy
+```
+
+Chọn đúng account Cloudflare trước khi deploy. Sau khi có URL Worker, đặt `PUBLIC_URL` cho backend và kiểm tra link người nhận dùng đúng origin này.
+
+## Kiểm chứng
+
+- `npm run typecheck`, `npm test`, `npm run build`.
+- `scripts/verify-persistence.ts`: commit PostgreSQL thật, cô lập owner, conflict revision, hash chain và reconnect.
+- `scripts/verify-runtime.ts write/read`: hai tiến trình độc lập kiểm tra phục hồi incident, network, token, settings và ghi âm private; chỉ dùng dữ liệu QA tự tạo.
+- `tests/api.integration.ts` trên QA riêng với AI OFF, gateway tắt và Supabase thật.
+- Kiểm tra HTTPS, browser, hai phiên độc lập, SSE/polling và liên kết người nhận sau khi deploy.
+
+Các script cần khóa runtime độc quyền; không chạy kiểm tra trực tiếp vào cùng database khi backend production đang nắm khóa. Timer/tiến trình mô phỏng bị ngắt khi server ngủ; khởi động lại đánh dấu các cuộc gọi đang chạy là gián đoạn, không tự gọi lại số thật. Chưa có job runner nhiều instance hoặc khả năng chịu lỗi liên tục.

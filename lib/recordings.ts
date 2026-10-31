@@ -1,6 +1,6 @@
 // Conversation audio kept for the evidence dossier. Chunks are appended in order as they are
 // recorded, so a phone that is snatched or switched off still leaves everything up to the last chunk.
-import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import type { Incident } from "./types";
@@ -40,4 +40,13 @@ export function readRecording(i: Incident, session: string) {
 export function deleteRecordings(i: Incident) {
   rmSync(path.join(root(), i.id), { recursive: true, force: true });
   i.recordings = [];
+}
+export function restoreRecordingCache(i: Incident, session: string, data: Buffer) {
+  const recording = i.recordings?.find(r => r.session === session);
+  if (!recording || !/^[a-z0-9-]{8,40}$/i.test(session) || !types[recording.mime]) throw new Error("Phiên ghi âm không hợp lệ.");
+  if (data.length !== recording.bytes || createHash("sha256").update(data).digest("hex") !== recording.sha256)
+    throw new Error("Ghi âm không khớp manifest đã lưu.");
+  const target = file(i.id, recording);
+  mkdirSync(path.dirname(target), { recursive: true });
+  writeFileSync(target, data);
 }

@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <body>
         {process.env.GUARDIAN_DEMO_HOSTING === "1" && (
           <aside role="note" style={{ padding: "10px 16px", background: "#fff4d6", color: "#493100", fontSize: "14px", lineHeight: 1.5 }}>
-            Bản demo miễn phí · Máy chủ có thể ngủ; phiên thử và hồ sơ có thể mất khi khởi động lại. Chỉ dùng dữ liệu mô phỏng.
+            Bản demo miễn phí · Máy chủ có thể ngủ hoặc gián đoạn. Chỉ dùng dữ liệu mô phỏng, chưa dùng cho tình huống khẩn cấp thật.
           </aside>
         )}
         <LanguageProvider>{children}</LanguageProvider>
