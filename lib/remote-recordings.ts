@@ -5,6 +5,17 @@ import type { GuardianEngine } from "./engine";
 import type { Incident } from "./types";
 
 const bucket = "guardianai-recordings";
+const mutations = new Map<string, Promise<void>>();
+async function recordingMutation<T>(id: string, work: () => Promise<T>): Promise<T> {
+  const previous = mutations.get(id) ?? Promise.resolve();
+  let release!: () => void;
+  const lock = new Promise<void>(resolve => { release = resolve; });
+  const next = previous.then(() => lock);
+  mutations.set(id,next);
+  await previous;
+  try { return await work(); }
+  finally { release(); if (mutations.get(id) === next) mutations.delete(id); }
+}
 const hash = (data: Buffer) => createHash("sha256").update(data).digest("hex");
 async function storage(path: string, options: RequestInit = {}) {
   const url = process.env.GUARDIAN_SUPABASE_URL, key = process.env.GUARDIAN_SUPABASE_SERVICE_KEY;
@@ -45,7 +56,11 @@ export async function readDurableRecording(incident: Incident, session: string) 
   return { recording, data };
 }
 
-export async function addDurableRecording(engine: GuardianEngine, incident: Incident, session: string, seq: number, mime: string, data: Buffer) {
+export function addDurableRecording(engine: GuardianEngine, incident: Incident, session: string, seq: number, mime: string, data: Buffer) {
+  return recordingMutation(incident.id, () => addChunk(engine,incident,session,seq,mime,data));
+}
+async function addChunk(engine: GuardianEngine, incident: Incident, session: string, seq: number, mime: string, data: Buffer) {
+  if (incident.recordingsDeletedAt) throw new Error("Ghi âm đã được xóa; không nhận lại đoạn cũ.");
   const runtime = await durableRuntime();
   if (!runtime) return engine.addRecording(incident,session,seq,mime,data);
   if (!/^[a-z0-9-]{8,40}$/i.test(session) || !Number.isInteger(seq) || seq < 0 ||
@@ -82,7 +97,10 @@ export async function addDurableRecording(engine: GuardianEngine, incident: Inci
   return engine.addRecording(incident,session,seq,mime,data);
 }
 
-export async function deleteDurableRecordings(incident: Incident) {
+export function deleteDurableRecordings(incident: Incident) {
+  return recordingMutation(incident.id, () => deleteChunks(incident));
+}
+async function deleteChunks(incident: Incident) {
   const runtime = await durableRuntime();
   if (runtime) {
     await runtime.flush();

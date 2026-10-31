@@ -13,6 +13,7 @@ const root = () => path.resolve(/* turbopackIgnore: true */ process.env.GUARDIAN
 const file = (incident: string, r: Pick<Recording, "session" | "mime">) => path.join(root(), incident, `${r.session}.${types[r.mime]}`);
 
 export function appendRecording(i: Incident, session: string, seq: number, mime: string, data: Buffer) {
+  if (i.recordingsDeletedAt) throw new Error("Ghi âm đã được xóa; không nhận lại đoạn cũ.");
   if (!/^[a-z0-9-]{8,40}$/i.test(session)) throw new Error("Phiên ghi âm không hợp lệ.");
   if (!types[mime]) throw new Error("Định dạng ghi âm không được hỗ trợ.");
   if (!data.length || data.length > MAX_CHUNK_BYTES) throw new Error("Đoạn ghi âm rỗng hoặc quá lớn.");
@@ -26,7 +27,8 @@ export function appendRecording(i: Incident, session: string, seq: number, mime:
   r ??= list[list.push({ session, mime, startedAt: now, updatedAt: now, chunks: 0, bytes: 0, sha256: "" }) - 1];
   const target = file(i.id, r);
   mkdirSync(path.dirname(target), { recursive: true });
-  appendFileSync(target, data);
+  if (started) writeFileSync(target, data);
+  else appendFileSync(target, data);
   r.chunks++; r.bytes += data.length; r.updatedAt = now;
   r.sha256 = createHash("sha256").update(readFileSync(target)).digest("hex");
   return { recording: r, started };
@@ -40,6 +42,7 @@ export function readRecording(i: Incident, session: string) {
 export function deleteRecordings(i: Incident) {
   rmSync(path.join(root(), i.id), { recursive: true, force: true });
   i.recordings = [];
+  i.recordingsDeletedAt = new Date().toISOString();
 }
 export function restoreRecordingCache(i: Incident, session: string, data: Buffer) {
   const recording = i.recordings?.find(r => r.session === session);
