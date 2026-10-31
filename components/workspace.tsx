@@ -602,7 +602,7 @@ export default function Workspace({
       {tab === "journey" && (
         <div className="journey-grid">
           <div
-            className={`phone-shell ${plan ? "has-plan" : ""}`}
+            className={`phone-shell ${plan ? "has-plan" : ""} ${live ? "is-live" : ""}`}
             aria-label={t(
               "Mô phỏng điện thoại Guardian AI",
               "Guardian AI phone simulator",
@@ -756,12 +756,20 @@ export default function Workspace({
                   <>
                     {live && (
                       <div className="live-setup">
-                        <p>
-                          {t(
-                            "AI có thể tự phát SOS khi cuộc trò chuyện cho thấy bạn cần giúp. Chỉ người đã tham gia nhận yêu cầu; lời đồng ý phải do họ gửi.",
-                            "AI can activate SOS when your conversation indicates you need help. Only joined recipients receive requests; they must send their own acceptance.",
-                          )}
-                        </p>
+                        <details>
+                          <summary>
+                            {t(
+                              "AI xử lý SOS thế nào?",
+                              "How does AI activate SOS?",
+                            )}
+                          </summary>
+                          <p>
+                            {t(
+                              "AI có thể tự phát SOS khi cuộc trò chuyện cho thấy bạn cần giúp. Chỉ người đã tham gia nhận yêu cầu; lời đồng ý phải do họ gửi.",
+                              "AI can activate SOS when your conversation indicates you need help. Only joined recipients receive requests; they must send their own acceptance.",
+                            )}
+                          </p>
+                        </details>
                         <div className="actions">
                           <button onClick={startGps} disabled={ended}>
                             <MapPin size={17} />

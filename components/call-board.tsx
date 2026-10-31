@@ -4,7 +4,6 @@ import {
   PhoneOff,
   Radio,
   MessageSquare,
-  Check,
   Volume2,
 } from "lucide-react";
 import type { Incident } from "@/lib/types";
@@ -56,11 +55,7 @@ export function CallBoard({
           >
             <summary>
               <span className="call-person">
-                {c.state === "COMPLETED" ? (
-                  <Check size={17} />
-                ) : (
-                  <PhoneCall size={17} />
-                )}
+                <PhoneCall size={17} />
                 <b>{c.name}</b>
               </span>
               <span>{callLabels[c.state][locale === "vi" ? 0 : 1]}</span>
