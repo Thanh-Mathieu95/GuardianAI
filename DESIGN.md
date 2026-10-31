@@ -1,344 +1,303 @@
 ---
-name: "Guardian AI"
-description: "A dark operational workspace for sourced human commitments and the next action."
+name: Guardian AI
+description: A sealed minute of who helped, what they promised, and where to go next.
 colors:
-  bg: "#080f18"
-  panel: "#101b28"
-  panel2: "#142232"
-  border: "#223142"
-  text: "#e5edf5"
-  muted: "#a5b4c5"
-  cyan: "#3be1bd"
-  blue: "#7db7ff"
-  amber: "#e9b66f"
-  red: "#fa8d91"
-  quiet-road: "#bba9e9"
-  primary-fill: "#72dfbd"
-  primary-hover: "#a1ecd4"
-  primary-ink: "#07261e"
-  control-hover: "#1b3042"
-  field-border: "#3b5168"
-  sos-fill: "#943b48"
-  sos-rule: "#c86c78"
-  white: "#fff"
-  dock-active: "#15362f"
-  dock-rule: "#2e7966"
-  phone-frame: "#050a10"
-  phone-frame-border: "#3b4a5b"
-  phone-screen: "#0d1823"
-  phone-mic: "#123e35"
-  phone-mic-text: "#7eebce"
-  phone-mic-border: "#3c927b"
-  phone-mic-hover: "#1c5145"
-  phone-mic-hover-border: "#9df4dc"
-  phone-nav: "#09131d"
+  paper: "#f6f7f5"
+  sheet: "#ffffff"
+  sheet-tint: "#eef0ec"
+  rule-grey: "#e6e8e3"
+  hairline: "#c8ccd4"
+  steel-rule: "#a3a9b8"
+  ink: "#1b2550"
+  ink-muted: "#4a5378"
+  ink-struck: "#8a90a8"
+  ballpoint-blue: "#2a4cc0"
+  ballpoint-deep: "#1e3a8a"
+  ballpoint-wash: "#e8edfb"
+  seal-red: "#d22f27"
+  seal-deep: "#8f1d17"
+  support-amber: "#a86200"
+  support-amber-deep: "#6e4100"
+  support-amber-wash: "#fbf1dc"
+  night-ground: "#141c3f"
+  night-shell: "#0f1533"
+  night-sheet: "#1a2350"
+  night-raised: "#212b5e"
+  night-rule: "#2c3770"
+  night-text: "#eef0f8"
+  night-muted: "#a9b2d6"
+  night-blue: "#7f9cff"
+  night-amber: "#f0b44c"
+  night-red: "#ff5a4c"
 typography:
+  display:
+    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    fontSize: "28px"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-0.7px"
   headline:
-    fontFamily: "Arial, Segoe UI, sans-serif"
-    fontSize: "22px"
-    fontWeight: 700
-    lineHeight: 1.18
-    letterSpacing: "-0.02em"
-  section:
-    fontFamily: "Arial, Segoe UI, sans-serif"
-    fontSize: "19px"
-    fontWeight: 700
-    lineHeight: 1.35
-    letterSpacing: "-0.02em"
+    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    fontSize: "21px"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.3px"
   title:
-    fontFamily: "Arial, Segoe UI, sans-serif"
-    fontSize: "15px"
-    fontWeight: 700
-    lineHeight: 1.4
+    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    fontSize: "18px"
+    fontWeight: 600
+    lineHeight: 1.3
   body:
-    fontFamily: "Arial, Segoe UI, sans-serif"
+    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
     fontSize: "14px"
     fontWeight: 400
-    lineHeight: 1.6
-  label:
-    fontFamily: "Arial, Segoe UI, sans-serif"
+    lineHeight: 1.5
+    fontFeature: "tnum"
+  clause:
+    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
     fontSize: "13px"
     fontWeight: 400
-    lineHeight: 1.6
-  metadata:
-    fontFamily: "Arial, Segoe UI, sans-serif"
-    fontSize: "12px"
-    fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.5
+    fontFeature: "tnum"
+  minute-title:
+    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    fontSize: "13px"
+    fontWeight: 700
+    letterSpacing: "0.14em"
+  label:
+    fontFamily: "Be Vietnam Pro, Segoe UI, system-ui, sans-serif"
+    fontSize: "10.5px"
+    fontWeight: 700
+    letterSpacing: "0.1em"
 rounded:
-  control: "8px"
-  panel: "10px"
-  sos: "14px"
-  map-label: "6px"
-  voice: "50%"
-  phone-shell: "44px"
-  phone-screen: "28px 28px 12px 12px"
-  phone-plan: "16px"
-  phone-control: "13px"
-  conversation: "12px"
+  sheet: "2px"
+  code: "0px"
+  device: "28px"
+  mark: "50%"
 spacing:
-  compact: "7px"
-  control: "10px"
-  grid: "12px"
-  inset: "14px"
-  mobile-panel: "16px"
-  workspace: "18px"
-  panel: "20px"
+  xs: "4px"
+  sm: "8px"
+  md: "14px"
+  lg: "20px"
+  xl: "28px"
 components:
   button-default:
-    backgroundColor: "{colors.panel2}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.control}"
-    padding: "10px 16px"
+    backgroundColor: "{colors.sheet}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sheet}"
+    padding: "9px 14px"
   button-default-hover:
-    backgroundColor: "{colors.control-hover}"
+    backgroundColor: "{colors.sheet-tint}"
   button-primary:
-    backgroundColor: "{colors.primary-fill}"
-    textColor: "{colors.primary-ink}"
-    rounded: "{rounded.control}"
-    padding: "10px 16px"
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.sheet}"
+    rounded: "{rounded.sheet}"
+    padding: "9px 14px"
   button-primary-hover:
-    backgroundColor: "{colors.primary-hover}"
+    backgroundColor: "{colors.ballpoint-blue}"
   button-sos:
-    backgroundColor: "{colors.sos-fill}"
-    textColor: "{colors.white}"
-    rounded: "{rounded.sos}"
-    padding: "10px 16px"
-    width: "100%"
+    backgroundColor: "{colors.seal-red}"
+    textColor: "{colors.sheet}"
+    rounded: "{rounded.sheet}"
+    padding: "12px 14px"
   input-field:
-    backgroundColor: "{colors.bg}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.control}"
-    padding: "11px 12px"
+    backgroundColor: "{colors.sheet}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sheet}"
+    padding: "10px"
   panel:
-    backgroundColor: "{colors.panel}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.panel}"
-    padding: "20px"
-  dock-active:
-    backgroundColor: "{colors.dock-active}"
-    textColor: "{colors.cyan}"
-    rounded: "{rounded.control}"
-    padding: "8px 10px"
-  source-label:
-    textColor: "{colors.amber}"
-    padding: "5px 8px"
-  tool-disclosure:
-    backgroundColor: "{colors.panel}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.control}"
-    padding: "0 14px"
-  commitment-row:
-    textColor: "{colors.text}"
-    padding: "12px 0"
-  phone-microphone:
-    backgroundColor: "{colors.phone-mic}"
-    textColor: "{colors.phone-mic-text}"
-    rounded: "{rounded.voice}"
-    width: "108px"
-    height: "108px"
-  phone-shell:
-    backgroundColor: "{colors.phone-frame}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.phone-shell}"
-    width: "100%"
-    height: "780px"
-    padding: "8px"
-  phone-screen:
-    backgroundColor: "{colors.phone-screen}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.phone-screen}"
-    height: "calc(100% - 122px)"
-  call-row:
-    textColor: "{colors.text}"
-    padding: "10px 0"
-  call-turn:
-    backgroundColor: "{colors.panel2}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.conversation}"
-    padding: "12px"
-  recipient-call:
-    backgroundColor: "{colors.panel}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.phone-plan}"
-    padding: "24px"
-  assignment-row:
-    textColor: "{colors.text}"
-    padding: "10px 0"
+    backgroundColor: "{colors.sheet}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sheet}"
+  venue-code:
+    textColor: "{colors.ink}"
+    typography: "{typography.label}"
+    rounded: "{rounded.code}"
+    padding: "0 4px"
+  tab-active:
+    textColor: "{colors.ballpoint-blue}"
+    padding: "10px 0 12px"
+  night-screen:
+    backgroundColor: "{colors.night-ground}"
+    textColor: "{colors.night-text}"
+    rounded: "{rounded.device}"
+  night-button:
+    backgroundColor: "{colors.night-sheet}"
+    textColor: "{colors.night-text}"
+    rounded: "{rounded.sheet}"
 ---
 
 # Design System: Guardian AI
 
 ## Overview
 
-**Creative North Star: "The Command Center"**
+**Creative North Star: "The Sealed Minute"** (Biên bản niêm phong)
 
-The operational workspace is a dark command center: an interactive physical phone simulator, a central map and a coordination panel share a continuous night background. Cyan identifies confirmed or primary coordination, blue supports reference information, amber marks unresolved or simulated information, and muted borders separate dense content.
+Every incident is a minute being drawn up in real time. The command center reads as an official record on cool white paper: ballpoint blue-black ink for text and rules, ballpoint blue for quotes, routes and live state, and one vermilion seal that appears only when a place has actually agreed to take the person in. Each offer from a helper becomes a numbered clause ("Điều 2 · Nơi đến") with the helper's own words quoted beneath it, so a viewer can check every AI conclusion against what was said.
 
-The interface keeps the need, original human replies, proposed action and user acceptance legible together. The phone has its own scrolling screen, shared VI/EN strip, contact and record sheets, and internal navigation. Rounded command panels organize tools and evidence; the desktop bottom dock replaces the workspace header. Vietnamese and English retain the same compact system-font structure.
+Density is high and deliberate: three columns of record (minute, map, call register) sit on one screen for a projector audience, framed by 1px ink rules rather than cards floating on shadows. States are printed marks rather than colored badges: a confirmed clause is stamped, a withdrawn one is struck through in red, and an unanswered one is a dotted blank line waiting to be filled.
 
-This record describes the implemented system in `app/command.css`, `components/workspace.tsx`, `components/guardian-map.tsx` and the command, call, recipient and place components, including inherited rules from `app/globals.css`. The map discovery, call coordination and LIVE setup additions extend the existing world. The command stylesheet loads after the global stylesheet. Its tokens are scoped to the workspace, not the root. The landing page retains its header and existing paper presentation; the recipient page retains its light paper presentation with a scoped dark in-app call panel, while loading and covert screens retain their existing styles. Frontmatter describes the command system, not an asserted global conversion.
-
-The TEAM support-profile extension reuses the incumbent semantic roles and component structure. Its documentation below does not approve a visual-world replacement. The current stylesheet has broader palette and font-family drift from the frontmatter; those pre-existing differences remain outside this extension and have not been promoted into new tokens.
-
-Browser captures and functional checks are separate evidence; this source extraction asserts no visual-review verdict. Sidecar ramps are generated swatch previews, not additional runtime tokens. This document describes presentation and does not certify deployment or transport capabilities.
+The phone companion is the same document carried at night. Inside the phone screen the ground inverts to deep ink and the paper palette shifts to its night equivalents, so the person alone in the street gets a dark, low-glare screen while the record stays recognisably the same system. The world explicitly rejects the near-black neon command console it replaced.
 
 **Key Characteristics:**
-- Dark continuous workspace with two levels of panel fill.
-- Map-centered operational grid and a fixed bottom dock.
-- Eight-pixel command controls, ten-pixel panels and a physical phone frame.
-- Explicit provenance, original quotes and acceptance states.
-- Support profiles distinguish real teammate replies from simulated roleplay locations.
+- Cool paper ground, ink text, 1px ink frames, 2px corners everywhere.
+- One seal red, reserved for SOS, danger and the confirmation stamp.
+- States drawn as marks on paper: sealed, struck through, dotted blank.
+- Venue codes (Q-27, T-01, K-02) shared verbatim by map labels and minute clauses.
+- Tabular numerals throughout; times and counters never jitter.
+- Night inversion scoped to the phone screen only.
 
 ## Colors
 
-The workspace uses a near-black blue ground, two blue-gray panel layers, pale text and restrained semantic accents. Exact reusable values are in frontmatter.
+A paper-and-ballpoint palette: near-neutral cool greys, two inks of blue, one red reserved for authority and danger, and a narrow amber for one specific meaning.
 
 ### Primary
-- **Cyan**: verified labels, accepted status, primary assignment names and selected dock text.
-- **Primary fill, hover and ink**: a softer green button fill, lighter hover and dark label; the primary button is not filled directly with the cyan token.
+- **Ballpoint Blue-Black** (ink): all body text, panel frames, the top bar rule, primary buttons, the venue code box. It is the color of the record itself.
+- **Ballpoint Blue** (ballpoint-blue): verbatim quotes, clause numbers, the route line (graded from ink to blue along its length), live dots, focus rings, active tabs, primary-button hover. Blue means "said" or "live".
+- **Deep Ballpoint** (ballpoint-deep) and **Blue Wash** (ballpoint-wash): text and fill for confirmed venue markers, confirmed candidate letters and status chips.
 
 ### Secondary
-- **Blue**: support assignments, reference routes, conversing/completed call rows and general focus.
-- **Amber**: source tags, unresolved commitment states, backup assignments and synthetic low-light road warnings.
-- **Quiet-road lavender**: synthetic low-footfall road segments and their legend label.
-- **Red**: emergency boundaries, synthetic incident-road warnings, declined/error call names and withdrawn-state decoration; SOS retains its dedicated fill and border.
+- **Seal Vermilion** (seal-red): the SOS button and timer, the round seal on the confirmed clause, the strike-through line on withdrawn clauses, risky-route dashes and incident markers on the map. **Seal Deep** (seal-deep) carries declined and failed text where the bright red would be too loud at small sizes.
+
+### Tertiary
+- **Support Amber** (support-amber, with support-amber-deep text and support-amber-wash fill): markers for venues on the partner support list, observed dark streets on the map, connection and real-call warnings, the demo-mode badge. Nothing else.
 
 ### Neutral
-- **Background**, **panel**, **panel 2** and **border**: continuous ground, primary regions, nested controls and fine separation.
-- **Text** and **muted**: foreground hierarchy across operational surfaces.
-- **Control hover** and **field border**: interactive boundaries and hover fill.
-- **Dock active** and **dock rule**: the selected navigation surface and its border.
+- **Paper** (paper): page ground.
+- **Sheet** (sheet): panels, inputs, buttons, map overlays.
+- **Sheet Tint** (sheet-tint): button hover, agent cards, metric tiles, call lanes.
+- **Rule Grey** (rule-grey): inner dividers inside lists and lanes.
+- **Hairline** (hairline): clause separators, input strokes, secondary borders.
+- **Steel Rule** (steel-rule): default button and pill strokes, idle dots.
+- **Ink Muted** (ink-muted): secondary text, pending clauses, timestamps.
+- **Ink Struck** (ink-struck): text of struck-through clauses and superseded routes.
 
-**The Source Before Status Rule.** Keep simulation, device-trial and reference-route labels next to the information they qualify; color does not replace explicit status.
+### Night (phone screen only)
+- **Night Ground** (night-ground) under **Night Text** (night-text), with **Night Blue** (night-blue) as the accent, **Night Muted** (night-muted) for secondary text, **Night Rule** (night-rule) for borders, **Night Sheet** / **Night Raised** for message cards and buttons, **Night Shell** for the device bezel. **Night Amber** and **Night Red** replace the day amber and red so warnings stay legible on ink.
 
-Simple confirmed, available and user markers retain their existing state colors. Discovered open venues add a blue-toned icon tile and blue open badge; an accepted venue uses the green confirmed treatment and check badge. Hover or keyboard focus reveals its name. Opening hours alone never produce the confirmed treatment.
+### Named Rules
+**The One Seal Rule.** Seal red appears only for SOS, danger, strike-throughs and the confirmation stamp. A red element that is not one of those dilutes the stamp.
 
-The map uses a solid cyan active route at 5px over a 10px white casing, a dashed blue reference route at 4px, and a muted history route at 3px and 0.45 opacity. These are distinct route meanings, not interchangeable decorative lines. A reference-route label explicitly says reception is unconfirmed.
+**The Amber Means Support-List Rule.** Amber marks partner support-list venues and warnings, nothing decorative. If it is not a support-list marker or a caution, it is not amber.
 
-**The Call Is Not Consent Rule.** Show conversing and completed calls in blue with a phone icon. Reserve acceptance treatments for sourced commitments; answering or ending a call does not confirm help.
-
-**The Roleplay Provenance Rule.** Label TEAM as simulated locations with participant-authored replies. A ready support profile means available for an in-app call, not acceptance of an incident.
+**The Scoped Night Rule.** The night palette is applied by redefining the same tokens on the phone screen and standalone phone root, never by inverting the whole page. The command center stays on paper.
 
 ## Typography
 
-The workspace explicitly uses Arial, followed by Segoe UI and sans-serif, with 14px body text. This is the selected operational face; the separately styled landing page continues to load Be Vietnam Pro through the app layout. There is no oversized display role in the command workspace.
+**Display Font:** Be Vietnam Pro (with Segoe UI, system-ui, sans-serif)
+**Body Font:** Be Vietnam Pro
+**Label Font:** Be Vietnam Pro, uppercase with wide tracking
 
-The frontmatter headline, section and title roles reflect the workspace's base h1, h2 and h3. The scenario director uses 20px. Inside the phone, the sticky app name uses 17px, reduced to 16px on small screens, the voice heading uses 21px at weight 500, and contact/record sheet headings use 23px. An active plan or LIVE setup compacts the voice heading to 17px. Structural headings remain bold. Metadata and operational states generally use 12px; field labels and disclosure summaries use 13px. Paragraphs use line height 1.6, commitment quotes use 1.5, and time values inherit tabular numerals.
+**Character:** One humanist sans with full Vietnamese diacritics, loaded through next/font at weights 400 to 700. Hierarchy comes from weight, tracking and case, the way a typed official form separates its headings from its entries.
 
-Do not infer that every inherited heading has been normalized: more specific setup and record selectors still carry their existing sizes. Small badges in command disclosures and some mobile labels currently fall to 11px; these exceptions are not a new typography role.
+### Hierarchy
+- **Display** (600, 28px, -0.7px): page and receiver headings ("Cửa hàng").
+- **Headline** (600, 21px, -0.3px): panel titles, the selected venue name on the right column.
+- **Title** (600, 18px): card headings on the receiver page.
+- **Body** (400, 14px, 1.5): default text; 16px at 1650px and wider for projector viewing.
+- **Clause** (400, 13px, 1.5): minute entries; names in 700.
+- **Minute Title** (700, 13px, 0.14em, uppercase): "BIÊN BẢN ĐIỀU PHỐI", centered over a 96px ink rule.
+- **Label** (700, 10.5px, 0.1em, uppercase): clause numbers ("ĐIỀU 1 · DỰ PHÒNG") and venue codes.
+
+### Persuade scale (landing `/` only)
+The public landing (`app/landing.css`) adds a display scale the working screens never use: hero 800 `clamp(38px, 4.6vw, 68px)` at -0.035em; section heads 800 `clamp(30px, 3.4vw, 48px)` at -0.03em; night-band line 700 `clamp(26px, 3.4vw, 46px)`; step numerals 800 56px in ballpoint blue; lead copy `clamp(17px, 1.5vw, 20px)`; body 16px. Everything below 16px follows the ramp above.
+
+### Named Rules
+**The Tabular Record Rule.** `font-variant-numeric: tabular-nums` is set at the root. Timers, clause numbers, ETAs and timestamps must line up column to column.
+
+**The Quote Is Italic Blue Rule.** A helper's own words render in italic ballpoint blue inside curly quotes, directly beneath the clause they support. AI paraphrase stays upright ink.
 
 ## Layout
 
-The workspace has no rendered landing header. It starts with source status and mode navigation. DEMO adds its scenario director and an explanation that its named people are scripted; TEAM adds Support profiles. The existing exploration/activity tools remain collapsible. The desktop journey grid is **380px / flexible map / 320px**, with 12px gaps. Outer padding is 14px by 18px, with 88px reserved below for the dock. Panels use 20px padding. The map's normal height is `clamp(450px, 68vh, 820px)` and its region remains sticky at a 12px top offset on wide layouts.
+The command center is a full-width record (max 2300px, 30px gutters; 42px at 1650px and wider; 20px under 1200px; 14px under 800px). Above the work area sit stacked ink-ruled bars: the showcase head (brand and minute number, act title, SOS timer in seal red, demo controls), a one-line narration, the venue directory summary and the agent activity strip.
 
-At 1100px and above the three-column layout remains. From 761px through 1099px, the grid becomes a 320px companion plus flexible map, followed by a full-width coordination region using three columns. At 760px and below, it stacks with 10px outer gutters and places the map first. The map becomes 380px tall. The dedicated phone mode caps its workspace at 520px, hides the map, coordination, director and command tools at every breakpoint, and keeps the companion visible.
+The work row is three columns: the phone companion on the left, the light map in the center with its legend and an ink-ruled simulation bar along the bottom, and on the right a fixed column holding the selected venue and the minute of clauses. Under 1200px the operations panel drops below as a full-width row. Under 800px everything stacks.
 
-The bottom dock is 64px high. Navigation occupies 355px on desktop and the footer occupies the remaining width; both are fixed at the bottom with z-index 50. On small screens, navigation gets the width minus 100px, with an icon presentation, and the language footer occupies the last 100px. The source JSX retains text inside the navigation buttons. The dedicated phone route hides this external dock and footer; its own bottom navigation remains inside the device frame.
+The receiver page (`/r/<token>`) is a single 520px column of stacked bordered cards with 12px gaps, built for a phone held in one hand.
 
-LIVE setup uses an 8px/6px voice-hero inset, a 72px microphone and a 17px heading, with supporting hero copy hidden. The AI explanation is a disclosure, while GPS status/actions and the existing consent controls remain available. This compact arrangement keeps the manual SOS action before the phone navigation. DEMO retains its scenario controls. New session is available in the phone strip and command controls, retains the current mode and returns to the companion view. TEAM, DEMO and LIVE are independent session scopes: TEAM uses participant-authored replies with simulated locations, DEMO uses scripted participants, and LIVE uses actual readiness and GPS.
-
-The phone shell is 380px wide at most and 780px high on desktop, with 8px frame padding and an isolated stacking context. Its 46px status bar, 86px by 22px camera island, hardware details, 52px app navigation and home indicator frame an independently scrolling screen. The screen height is `calc(100% - 122px)`, with horizontal overflow hidden and contained overscroll. At tablet widths the shell caps at 320px; on small command layouts it caps at 370px and uses a 760px height. The dedicated small-screen phone route uses `calc(100dvh - 24px)` with a 620px minimum height. Its app navigation stays outside the scrolling screen.
-
-Panel toggles collapse the left or right grid column. Map-only mode removes surrounding director and tool regions and uses a map height based on the viewport. A 0.35s grid-column transition supports these changes and is disabled for reduced motion. Catalog content uses an auto-fitting grid with a 270px minimum card width, a 400px maximum scroll region and 10px gaps.
-
-Synthetic road warnings and discovered venue details are map-local overlays. The legend sits 104px above the map bottom, or 145px when a plan overlay is present. Venue details start 103px from the top, use a maximum width of 330px within the map and scroll independently when needed. A call list caps its height at 580px with its own scrollbar; individual recipient conversations remain native expandable rows.
-
-Support profiles appear in the main TEAM command view and inside the existing people tab, with that tab now labeled ?H? s? h? tr?? / ?Support profiles.? The invitation form wraps with 12px gaps and 220px flex bases for its labels. Link rows wrap with 10px gaps and a 260px flex basis for the link field. The readiness roster uses three columns for name, role and status; at 760px and below it becomes two columns with status on its own full-width row. The containing panel uses 20px padding, reduced to 16px on small screens.
+Spacing is tight and utilitarian (most gaps 8 to 20px). Clauses are separated by hairline rules with 10px vertical padding, not by gaps.
 
 ## Elevation & Depth
 
-Command panels use tonal layering and one-pixel borders. The physical phone shell adds an ambient shadow (`0 18px 45px #0005`), and its microphone action has a smaller shadow (`0 9px 24px #0003`). The connected microphone adds a breathing glow (`0 0 25px #3be1bd35` at its midpoint). These shadows belong to the device and its main action, not every command panel. The fixed dock, sticky map, absolute map annotations and library popups establish spatial order. Their positioning is functional rather than a general floating-card motif.
+Flat by default. Depth comes from 1px ink frames and hairline dividers, the way a printed form separates its fields. The map is the only layered surface: a light positron basemap with pale extruded buildings (#dfe2e8 at 0.9 opacity) and route lines drawn above it.
 
-**The Bordered Depth Rule.** Separate command panels with fills and fine borders; reserve ambient shadows for the physical phone frame and its microphone action.
+### Shadow Vocabulary
+- **Device bezel** (`box-shadow: 0 15px 40px rgba(8,12,36,0.15), 0 0 0 3px #141c3f`): only on the phone shell, so the phone reads as an object placed on the paper.
+- **Modal lift** (`box-shadow: 0 30px 120px rgba(27,37,80,0.22)`): only on modal sheets over a blue-wash backdrop.
+- **SOS lift** (`box-shadow: 0 4px 14px rgba(8,12,36,0.3)`): only on the phone's SOS button.
 
-The map initializes with a pitched dark basemap and optional building extrusions when the expected source exists. Camera framing animates over 900ms for a route and 600ms for a location, each reduced to zero when reduced motion is requested. The 2D/3D toggle uses 500ms and now also reduces its duration to zero under that preference. Rendering and availability depend on map resources; these are source behaviors, not verified visual results.
-
-SOS adds a short, location-centered sweep rather than continuous ambient motion: a 2.2s linear rotation, two 2.2s expanding rings separated by 1.1s, and a 3.4s display window. It stops for ended or signal-lost sessions. Venue discovery uses a 0.5s opacity/brightness entrance. Reduced motion suppresses the radar and disables these animations while keeping textual status. These effects indicate coordination activity and synthetic discovery, not a measured physical scanning radius.
+### Named Rules
+**The Ruled Not Raised Rule.** Panels, cards, lanes and map controls carry a 1px border and no shadow. A shadow on a panel turns the record back into a dashboard.
 
 ## Shapes
 
-Command controls and tools use 8px corners; main command panels and the map use 10px. The phone shell uses 44px, while its screen uses 28px upper and 12px lower corners. Its next-action panel uses 16px, SOS uses 14px, and contact and selected-navigation controls use 13px. The microphone is circular. Small map labels use 6px, with reference annotations using a local 7px radius; source tags remain rectangular.
+Corners are 2px on every sheet, input, button, pill, chip and map label: square enough to read as cut paper, soft enough not to look broken. The venue code box is the one fully square element (0px), like a stamped registration number. Circles are reserved for marks: map pins, live dots, the voice orb and the seal. The phone shell (35px) and screen (28px) are the only large radii, because they depict a physical device. Receiver-page ring buttons are pill-shaped (40px) as a phone call-screen convention.
 
 ## Components
 
 ### Buttons
+- **Shape:** gently squared (2px).
+- **Default:** white sheet, ink text, 1px steel-rule stroke, 9px 14px, weight 500. Hover tints the sheet and turns the stroke to ink.
+- **Primary:** ink fill with white text, weight 600. Hover shifts fill and stroke to ballpoint blue.
+- **SOS:** seal-red fill, white 16px 700 label tracked 1.4px, small pale-red subline. Hover brightens to night red.
+- **Focus:** 2px ballpoint-blue outline, 3px offset, on every interactive element.
+- **Disabled:** 40% opacity, not-allowed cursor.
 
-Default buttons use panel 2, pale text and a border; hover changes the fill to control hover and the border to cyan. Primary buttons use the dedicated green fill, dark text and matching border, with the lighter green hover. They inherit 10px by 16px padding, an 8px icon gap and the global 44px minimum height. The scenario director, map toolbar, simulation controls and 3D toggle now explicitly enforce a 44px minimum height.
-
-The in-phone SOS action is full width, at least 52px high, with a 14px bold label, muted red fill and a lighter red border. Disabled buttons retain the global 0.45 opacity. Keyboard focus uses the global 3px outline with 3px offset; the workspace blue token supplies its general color, while the companion currently inherits a separate lighter blue focus value.
-
-### Voice Control
-
-The phone microphone is a centered 108px circle with a dark green fill, pale green icon and green border. It contracts to 72px when a plan is present or the LIVE setup is shown, leaving room for the next action. A separate 12px label explains start, setup, unavailable, ended or connected behavior; accessible button names also follow those states. Before consent, activation opens the voice settings and scrolls them into view, using immediate scrolling for reduced motion. The connected state adds a 1.8s ease-in-out breathing glow; reduced motion disables it. The state follows the established voice connection, not measured microphone amplitude. The older settings orb is hidden inside the phone and is no longer the main control.
-
-### Chips
-
-The noninteractive source label uses amber text on a dark brown fill with a warm border, 12px bold text, 0.055em tracking and 5px by 8px padding. It describes simulation or device-trial provenance. Do not turn it into a decorative heading or invent hover states for it.
+### Chips and Pills
+- **Style:** 11px weight 500 text, white sheet, 1px steel-rule stroke, 2px corners, 3px 8px.
+- **Status chips:** confirmed uses blue wash with ballpoint text; declined uses rule grey with seal-deep text.
 
 ### Cards / Containers
-
-The coordination panel retains panel fill, the border token, 10px corners and 20px padding. Inside the phone, companion content uses the screen fill without an extra border or corner radius, 20px side padding and a final 6px top inset beneath the sticky language strip. Nested place disclosures use panel 2, 8px corners and 10px padding. Coordination assignments are separated by border rules; primary names are cyan, support names blue and backup names amber. Unused assignments are reduced to 0.65 opacity but retain their textual role.
+- **Corner Style:** 2px.
+- **Background:** white sheet on paper; agent cards and call lanes on sheet tint.
+- **Shadow Strategy:** none (see Elevation).
+- **Border:** 1px ink for top-level panels and bars; 1px hairline for inner cards.
+- **Internal Padding:** 11 to 20px.
 
 ### Inputs / Fields
-
-Workspace fields use background fill, pale text, the field border and 8px corners, retaining 11px by 12px padding and a 44px minimum height. General textareas retain a 100px minimum height and vertical resize; the phone request field overrides its minimum to 85px with 13px text. Field labels stay visible outside the control. Explicit companion field overrides now apply the same dark fill, field border and pale text.
+- **Style:** white sheet, 1px hairline stroke, 2px corners, 10px padding, ballpoint-blue caret.
+- **Focus:** 2px ballpoint-blue outline at 3px offset.
+- **Labels:** 12px ink, stacked 8px above the field.
 
 ### Navigation
+- **Tabs:** 11px muted text with a 2px transparent bottom rule; active tab turns ballpoint blue with a blue underline.
+- **Top bar:** brand mark in a 1px ink frame, a vertical rule before the minute number, SOS timer, then demo controls as square icon buttons.
 
-The bottom dock contains companion, Support profiles and record controls with SVG icons and explicit pressed state. The selected item uses cyan text, dock-active fill and dock-rule border. The footer contains VI/EN switching, route links and an explicit AI-result state. The selected language now uses cyan fill, dark primary ink and a cyan border.
+### The Minute (signature component)
+The right column's record. A centered uppercase title over a short ink rule, the "Lập lúc 10:00 · kế hoạch v1" line, then an ordered list of clauses separated by hairlines. Each clause has a head line (clause number and role in uppercase blue label on the left, status in 11px bold ink on the right), the helper's name in bold preceded by its venue code box, the instruction text, and when sealed the verbatim quote in italic blue. Clauses sort sealed, then accepted, then pending, then struck.
 
-Mode navigation uses wrapping outlined links with 8px gaps, 8px corners, 13px text and 44px minimum height. The current mode uses the existing active surface and cyan text, while hover uses panel 2. The phone-only layout hides this external mode row. The DEMO notice explicitly directs own-team invitations to TEAM; its actual invite controls are hidden rather than offered beside scripted people.
+- **Sealed:** clause number turns seal red; a round red SVG seal (two concentric rings, "ĐÃ / XÁC NHẬN / time") sits at the right, rotated -11deg at 90% opacity, and stamps in over 260ms (`cubic-bezier(0.16, 1, 0.3, 1)`, from scale 1.35 and zero opacity). Reduced motion removes the animation.
+- **Accepted (ok):** ink text, instruction clamped to two lines.
+- **Pending:** muted text with a dotted blank line where the answer will go.
+- **Struck:** name and text in ink-struck grey with a 1px seal-red line-through, status in seal red, code box stroke softened to steel.
 
-### Phone Simulator
+### Venue Codes
+A letter for venue kind plus a two-digit index (Q-27 quán, T-01 cửa hàng tiện lợi, K-02 khách sạn). The same code labels the map pin ("Q-27 · Quán Cháo Ấm") and the minute clause, so the eye can jump between the map and the record.
 
-The device is an interactive surface, not a static mockup. A shared sticky strip at the top of its screen keeps Guardian AI, New session and VI/EN controls available across companion, contact and record views. The internal navigation uses SVG icons, localized accessible names and explicit pressed states. Contact and record sheets stay inside the frame; switching tabs preserves the companion state. Where invitations are supported, the contacts sheet contains a native disclosure with recipient name, role, create-link action and selectable invitation output. Scripted DEMO directs the user to TEAM instead of presenting real invitation forms. Record content exposes plan/seal counts, recent events and the record link without leaving the phone composition. The status-bar clock derives from session data, while the island and hardware details are decorative.
+### Map
+Light positron basemap. The active route is a 5px line graded from ink to ballpoint blue over an 11px white casing; superseded routes are 3px dashed ink-struck; the free-walk route is dashed blue; risky segments are 2px dashed seal red with a faint red blur; observed dark streets are dashed amber. Pins are 21px circles: blue wash for confirmed, amber wash for support-list, rule grey with a dashed stroke for unknown or closed. Map controls and overlays use the 1px ink frame and 2px corners.
 
-### Tool Disclosures and Commitment Rows
+### Phone Companion (night)
+The phone screen redefines the ink, muted, blue, amber, red and hairline tokens to their night values. Message cards sit on night sheet with night-rule borders; the voice orb is a ballpoint-blue disc with a night-blue ring; buttons inside the screen take night sheet fill and night-rule strokes, with a night-blue stroke on hover.
 
-Exploration and agent activity use native disclosures with panel fill, border, 8px corners and 14px horizontal padding. Their summaries have a 44px minimum height and 13px text. Exploration exposes simulated venues, operating-time filtering and explicitly unconfirmed reference routes. Activity views show source quotes and recorded events without implying that a visual tab establishes a particular transport architecture.
-
-Commitment rows use 12px vertical padding, a fine top rule and a 7px internal gap. A bold name precedes a textual state and a 12px muted italic quote. Unresolved states remain amber; accepted uses cyan, revoked or declined uses red, and on-the-way or keep-contact uses blue. Assignment rows use 10px vertical padding and keep the role next to its person. Original quotes remain distinct from translated interface labels and proposed actions.
-
-### Synthetic Map Conditions and Venue Details
-
-Road overlays appear for a DEMO SOS, using amber for low light, lavender for quiet streets and red for incident flags. A 3px line at 0.9 opacity sits above a 15px blurred underlay at 0.45 opacity. The icon-and-text legend carries the same semantics. The map and discovery state expose simulation provenance; a selected road explicitly says its condition is simulated and not field verified. These layers are absent from the LIVE discovery view.
-
-Open venues use category SVGs, a state badge and a name revealed on hover/focus. A selected venue opens an in-map details card with hours, open/closed text, staffing, waiting and first-aid capabilities, services, goods and limitations. `SIMULATED` stays beside synthetic venue profiles. Reception remains visibly unconfirmed until an original acceptance exists; confirmed reception changes both the status wording and icon. The recipient's editable venue profile uses the existing light-page fields and disclosure, and labels its contents as self-reported rather than acceptance.
-
-### In-App Calls and LIVE Setup
-
-The call board uses an 18px heading, a mode label, numeric activity summary and ruled disclosure rows. Each 64px-minimum summary carries a phone icon, recipient name, explicit call state and inquiry/task purpose. Conversing and completed names are blue; declined/error names are red. There is no cyan checkmark for call completion. Original turns appear in 12px-radius containers: assistant turns use panel 2, recipient turns use background, with 14px message text and 12px speaker/source metadata. Connection history, cancellation and limits remain progressively disclosed.
-
-The recipient page stays in its light world. Its private call panel uses a dark panel fill, pale text, 16px corners and 24px padding, while retaining the recipient page's type family. Incoming calls expose Answer, Busy and Decline; connected conversations expose reply and end actions. Copy differentiates a support inquiry from a task sent after user acceptance. The panel shows that recipient's conversation, with statements attributed to their source. An in-app call is not presented as a telephone-network call.
-
-The LIVE phone retains visible GPS readiness and consent. The compact AI explanation states that AI can activate an in-app SOS after consent and current GPS, while recipients must send their own acceptance. Plan acceptance and emergency dialing remain explicit user actions. Independent TEAM/DEMO/LIVE mode labels, records and New session behavior keep roleplay participants, scripted fixtures and LIVE requests distinguishable.
-
-### TEAM Support Profiles
-
-?H? s? h? tr?? / ?Support profiles? is the same component in the existing people tab and the main TEAM command view. It reuses panel fill, a fine border and the existing 12px corner value. Its heading is a local 24px/1.3 treatment with a blue people icon; introductory copy stays at 14px. The form combines a visible member-name label, a native Contact/Friend versus Receiving venue selector and a primary Create role link action. Controls retain a 44px minimum height. Generated-link rows keep the member name, selectable read-only link, Copy/Copied feedback and Open role action together.
-
-The dense readiness roster uses 13px text, 12px row padding and rules rather than cards. Each row keeps name, role and an explicit readiness reason together. Waiting, missing permission, closed role page or incomplete venue setup uses amber status text; ready-to-receive-calls uses blue. The roster announces updates politely and can move a late arrival into readiness after an SOS. Readiness is not rendered as an accepted commitment.
-
-TEAM explains its mixed provenance in both host and recipient views: locations and venues are simulated, while each joined person sends their own private replies. The recipient retains the existing light-page treatment, with a plain roleplay notice and a native simulated-venue selector for receiving roles. Joining the role explicitly includes in-app call permission; the separate consent control remains available. The legacy invitation notice explains how the host can recover the same role link into TEAM instead of suggesting that scripted fixtures will call it. The support profile and reply content remain distinct from the scripted DEMO room.
+### Evidence Dossier
+The exported HTML dossier carries its own inline stylesheet using the same values (ink, blue, muted, hairline line, paper soft, red for critical, amber for warnings) and the same seal SVG, so the printed record matches the screen.
 
 ## Do's and Don'ts
 
 ### Do:
-- Do use the scoped dark palette for operational workspace additions.
-- Do preserve the map, companion and coordination hierarchy with the bottom dock.
-- Do keep original replies and explicit acceptance status beside derived plans.
-- Do retain visible keyboard focus and support Vietnamese and English text.
-- Do keep reference routes visibly labeled as reception unconfirmed.
-
-- Do label synthetic road conditions and venue profiles beside their visual overlays.
-
-- Do keep each support profile?s name, role, invitation and explicit readiness state associated.
+- **Do** frame top-level panels with a 1px ink border and 2px corners on a white sheet over the paper ground.
+- **Do** show every AI conclusion next to the quote that supports it, in italic ballpoint blue.
+- **Do** express state as a printed mark: the seal for confirmed, a red strike-through for withdrawn, a dotted blank for waiting.
+- **Do** give every venue its code and use the same code on the map and in the minute.
+- **Do** keep tabular numerals on anything that counts or tells time.
+- **Do** scope the night palette by redefining tokens on the phone screen root.
+- **Do** respect reduced motion: the seal appears without the stamp animation.
 
 ### Don't:
-- Don't reintroduce the landing header into the operational workspace.
-- Don't use a displayed route or open venue as proof of an accepted commitment.
-- Don't apply the workspace palette globally to surfaces that still use their existing stylesheet.
-- Don't treat this source documentation as browser or visual approval.
-- Don't turn call completion, open hours or a self-reported profile into a confirmed commitment.
-- Don't present TEAM readiness or simulated venue selection as an accepted support commitment.
+- **Don't** use seal red for anything except SOS, danger, strike-throughs and the confirmation stamp.
+- **Don't** use amber except for support-list venue markers and warnings.
+- **Don't** return to a near-black neon console look on the command center: no dark page ground, no glowing accents, no cyan on black.
+- **Don't** put shadows on panels or cards; only the phone bezel, modal and SOS button lift.
+- **Don't** round sheets past 2px or square off the round marks (pins, dots, seal).
+- **Don't** show a confirmation as a colored pill when the seal is available; the stamp is the confirmation.

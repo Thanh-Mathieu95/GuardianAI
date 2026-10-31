@@ -1,0 +1,660 @@
+/* Realtime companion, network panel and receiver page (v1.2). */
+.phone-screen {
+  position: relative;
+}
+.companion-panel {
+  display: grid;
+  gap: 8px;
+  margin: 8px 14px 0;
+}
+.companion-voice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a2350;
+  border: 1px solid #2c3770;
+  border-radius: 2px;
+  padding: 8px;
+}
+.companion-voice > div {
+  flex: 1;
+  display: grid;
+}
+.companion-voice small,
+.companion-note,
+.trip-card small,
+.checkin-alert small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.companion-voice button {
+  padding: 8px 10px;
+}
+.companion-start {
+  flex: 1;
+}
+.companion-voice .danger,
+.rx-decline {
+  background: #4a1a22;
+  border-color: #ff5a4c;
+  color: #ffd3cf;
+}
+.rt-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 4px rgba(127,156,255,0.2);
+  animation: rtPulse 1.6s infinite;
+}
+.rt-dot.speaking {
+  background: var(--blue);
+  animation-duration: 0.6s;
+}
+@keyframes rtPulse {
+  50% {
+    box-shadow: 0 0 0 9px rgba(127,156,255,0.07);
+  }
+}
+.companion-note {
+  margin: 0;
+}
+.contact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.contact-chip {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  background: #212b5e;
+  border: 1px solid #2c3770;
+}
+.contact-chip.ON_THE_WAY,
+.contact-chip.ANSWERED {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+.contact-chip.MISSED {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.contact-chip.RINGING {
+  animation: rtPulse 1.2s infinite;
+}
+.checkin-alert,
+.trip-card,
+.incoming-call {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 2px;
+  padding: 9px 10px;
+  background: #212b5e;
+  border: 1px solid #2c3770;
+}
+.checkin-alert {
+  background: #212b5e;
+  border-color: var(--red);
+}
+.checkin-alert > div,
+.trip-card > div {
+  flex: 1;
+  display: grid;
+}
+.trip-card.done {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+.trip-card button,
+.checkin-alert button,
+.incoming-call button {
+  padding: 6px 9px;
+  font-size: 12px;
+}
+.trip-start {
+  width: 100%;
+}
+.trip-form {
+  display: grid;
+  grid-template-columns: 1fr 64px auto;
+  gap: 6px;
+}
+.trip-form input {
+  min-width: 0;
+}
+.incoming-call {
+  flex-wrap: wrap;
+  border-color: var(--cyan);
+  animation: rtPulse 1.2s infinite;
+}
+.incoming-call > div {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.incoming-call.connected {
+  animation: none;
+}
+.fake-call-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #141c3f;
+  color: #eef0f8;
+}
+.fake-call-screen span {
+  color: #eef0f8;
+  font-size: 13px;
+}
+.fake-call-screen b {
+  font-size: 30px;
+  font-weight: 500;
+}
+.fake-call-screen time {
+  color: #eef0f8;
+}
+.fake-wave {
+  width: 70px;
+  height: 6px;
+  border-radius: 2px;
+  background: #2c3770;
+  margin: 26px 0;
+}
+.fake-wave.on {
+  background: #4cc38a;
+  animation: rtPulse 0.6s infinite;
+}
+.fake-call-actions {
+  display: flex;
+  gap: 54px;
+  margin-top: 60px;
+}
+.fake-call-actions button {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+}
+.fake-call-actions .hangup {
+  background: #ff5a4c;
+  border-color: #ff5a4c;
+  color: #eef0f8;
+}
+.fake-call-actions .pickup {
+  background: #4cc38a;
+  border-color: #4cc38a;
+  color: #eef0f8;
+}
+.fake-call-screen.ringing b {
+  animation: rtPulse 1.2s infinite;
+}
+.call-113 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 2px;
+  background: #4a1a22;
+  border: 1px solid #ff5a4c;
+  color: #ffd3cf;
+  font-weight: 700;
+}
+.network-panel {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--panel2);
+}
+.network-settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+.network-settings label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.network-settings small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+}
+.member-list {
+  display: grid;
+  gap: 8px;
+}
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+.member > div {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.member small {
+  color: var(--muted);
+}
+.member code {
+  font-size: 11px;
+  color: var(--blue);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.member button {
+  padding: 7px;
+}
+.member-add {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  align-items: center;
+}
+.network-panel input,
+.network-panel select,
+.trip-form input,
+.rx input {
+  background: #ffffff;
+  border: 1px solid #c8ccd4;
+  color: var(--text);
+  border-radius: 2px;
+  padding: 8px 10px;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .member-add {
+    grid-template-columns: 1fr;
+  }
+}
+/* Receiver page for contacts and partners, phone-first. */
+.rx {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+  display: grid;
+  gap: 12px;
+}
+.rx-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rx-top b span {
+  color: var(--cyan);
+}
+.rx-role {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  border: 1px solid #c8ccd4;
+}
+.rx-role.PARTNER {
+  color: var(--amber);
+}
+.rx-role.CONTACT {
+  color: var(--cyan);
+}
+.rx-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--red);
+}
+.rx-dot.on {
+  background: var(--cyan);
+}
+.rx h1 {
+  font-size: 26px;
+}
+.rx-muted,
+.rx-fine {
+  color: var(--muted);
+  font-size: 12px;
+}
+.rx-error {
+  color: var(--red);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.rx-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+.rx-card h2 {
+  font-size: 18px;
+}
+.rx-row {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+.rx-idle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 2px;
+  border: 1px dashed #c8ccd4;
+  color: var(--muted);
+}
+.rx-ring {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(246,247,245,0.95);
+}
+.rx-ring b {
+  font-size: 26px;
+}
+.rx-ring > div:last-child {
+  display: flex;
+  gap: 18px;
+  margin-top: 30px;
+}
+.rx-ring-pulse {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fbe9e7;
+  color: #8f1d17;
+  animation: rtPulse 1s infinite;
+}
+.rx-accept,
+.rx-ring .rx-decline {
+  min-width: 120px;
+  padding: 16px 18px;
+  border-radius: 40px;
+  font-size: 17px;
+}
+.rx-accept {
+  background: #1b2550;
+  border-color: #1b2550;
+  color: #ffffff;
+}
+.rx-call {
+  justify-items: center;
+  text-align: center;
+}
+.rx-orb {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #2a4cc0;
+  animation: rtPulse 2s infinite;
+}
+.rx-orb.speaking {
+  animation-duration: 0.6s;
+}
+.rx-lines {
+  width: 100%;
+  max-height: 200px;
+  overflow: auto;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  font-size: 13px;
+}
+.rx-lines span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+.rx-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rx-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rx-actions button {
+  flex: 1;
+}
+.rx-link {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--blue);
+}
+.rx-id-card {
+  padding: 8px 10px;
+  border-radius: 2px;
+  background: #fbf1dc;
+  border: 1px solid #a86200;
+}
+.rx-dest {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--cyan);
+}
+.rx-covert {
+  color: var(--amber);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-weight: 700;
+}
+.rx-feed {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: #1b2550;
+}
+.rx-feed time {
+  color: var(--muted);
+  margin-right: 6px;
+}
+.rx-arm {
+  padding: 14px;
+}
+.rx .wide {
+  width: 100%;
+}
+.mic-meter {
+  display: block;
+  height: 5px;
+  margin: 4px 0 3px;
+  border-radius: 2px;
+  background: #141c3f;
+  overflow: hidden;
+}
+.mic-meter > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #7f9cff;
+  transition: width 0.08s linear;
+}
+.mic-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.mic-select select {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  padding: 4px 6px;
+  background: #141c3f;
+  border: 1px solid #2c3770;
+  color: var(--text);
+  border-radius: 2px;
+}
+.network-preview {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+/* Center voice orb: the talk button that reacts to the voice level. */
+.voice-orb-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 6px;
+}
+.voice-orb {
+  --level: 0;
+  position: relative;
+  width: 136px;
+  height: 136px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transform: scale(calc(1 + var(--level) * 0.22));
+  transition: transform 0.07s ease-out;
+}
+.voice-orb:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.orb-core {
+  position: relative;
+  z-index: 2;
+  width: 98px;
+  height: 98px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: #2a4cc0;
+  border: 1px solid #7f9cff;
+  box-shadow: 0 10px 28px rgba(8,12,36,0.45);
+}
+.orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  opacity: 0;
+  pointer-events: none;
+}
+.voice-orb-wrap.idle .orb-core {
+  animation: orbBreath 3s ease-in-out infinite;
+}
+.voice-orb-wrap.live .orb-ring {
+  animation: orbRipple 2.4s ease-out infinite;
+}
+.voice-orb-wrap.live .r2 {
+  animation-delay: 0.8s;
+}
+.voice-orb-wrap.live .r3 {
+  animation-delay: 1.6s;
+}
+.voice-orb-wrap.listening .orb-ring {
+  animation-duration: 2s;
+}
+.voice-orb-wrap.ai .orb-core {
+  background: #3d5fe0;
+}
+.voice-orb-wrap.ai .orb-ring {
+  border-color: var(--blue);
+  animation-duration: 1.2s;
+}
+.voice-orb-wrap.user .orb-core {
+  background: #a86200;
+  border-color: #f0b44c;
+}
+.voice-orb-wrap.user .orb-ring {
+  border-color: var(--amber);
+  animation-duration: 0.9s;
+}
+@keyframes orbRipple {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.28);
+  }
+}
+@keyframes orbBreath {
+  50% {
+    transform: scale(0.93);
+    filter: brightness(1.12);
+  }
+}
+.orb-spin {
+  animation: orbSpin 1s linear infinite;
+}
+@keyframes orbSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.orb-status {
+  text-align: center;
+  display: grid;
+  gap: 2px;
+}
+.orb-status b {
+  font-size: 15px;
+}
+.orb-status small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.orb-actions {
+  display: flex;
+  gap: 16px;
+}
+.orb-actions button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.orb-fake {
+  font-size: 12px;
+  padding: 7px 12px;
+}
+.rec-dot { color: #ffd3cf; font-weight: 600; }
+.rec-toggle { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.rec-toggle input { margin: 0; accent-color: #ffd3cf; }

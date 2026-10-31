@@ -1,0 +1,40 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { mkdtempSync, existsSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { createHash } from "node:crypto";
+process.env.GUARDIAN_RECORDINGS_DIR = mkdtempSync(path.join(tmpdir(), "guardian-rec-"));
+import { GuardianEngine } from "../lib/engine";
+import { Store } from "../lib/store";
+import { AIService } from "../lib/ai";
+import { readRecording, deleteRecordings } from "../lib/recordings";
+import { dossierHtml, dossier } from "../lib/evidence";
+
+test("Recording chunks are appended in order, retries are ignored, and the file hash is sealed into the dossier", async () => {
+  const e = new GuardianEngine(new Store(":memory:"), 1, new AIService(() => null));
+  const i = e.create("owner");
+  await e.sos(i, "Có người đi theo tôi");
+  const a = Buffer.from("chunk-a"), b = Buffer.from("chunk-b");
+  e.addRecording(i, "session-0001", 0, "audio/webm", a);
+  e.addRecording(i, "session-0001", 0, "audio/webm", a);
+  assert.throws(() => e.addRecording(i, "session-0001", 5, "audio/webm", b), /sai thứ tự/);
+  assert.throws(() => e.addRecording(i, "../etc", 0, "audio/webm", b), /không hợp lệ/);
+  assert.throws(() => e.addRecording(i, "session-0002", 0, "text/html", b), /không được hỗ trợ/);
+  const r = e.addRecording(i, "session-0001", 1, "audio/webm", b);
+  assert.equal(r.chunks, 2);
+  assert.equal(r.sha256, createHash("sha256").update(Buffer.concat([a, b])).digest("hex"));
+  assert.equal(readRecording(i, "session-0001")?.data.toString(), "chunk-achunk-b");
+  assert.equal(i.events.filter(ev => ev.type === "RECORDING_STARTED").length, 1);
+  assert.equal(dossier(i).recordings[0].sha256, r.sha256);
+  e.recordStatement(i, "Nghi phạm", "<script>alert(1)</script>");
+  const html = dossierHtml(i, undefined, "/api/incidents/x/recordings/");
+  for (const heading of ["Tóm tắt sự việc", "Diễn biến chính", "Lời khai của người dùng", "Ghi âm cuộc trò chuyện", "Vị trí và đường đi", "Niêm phong"])
+    assert.ok(html.includes(heading), heading);
+  assert.ok(html.includes('src="/api/incidents/x/recordings/session-0001"'));
+  assert.ok(!html.includes("<script>alert(1)</script>") && html.includes("&lt;script&gt;"));
+  deleteRecordings(i);
+  assert.equal(readRecording(i, "session-0001"), undefined);
+  assert.equal(existsSync(path.join(process.env.GUARDIAN_RECORDINGS_DIR!, i.id)), false);
+  e.close(i, true); e.store.db.close();
+});
