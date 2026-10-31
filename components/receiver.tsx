@@ -46,6 +46,7 @@ export default function Receiver({ token }: { token: string }) {
     [consent, setConsent] = useState(false),
     [talking, setTalking] = useState(false);
   const voice = useRef<Voice | null>(null),
+    voiceCallId = useRef<string | null>(null),
     current = useRef(view),
     heartbeatAt = useRef(0);
   current.current = view;
@@ -115,6 +116,16 @@ export default function Receiver({ token }: { token: string }) {
     voice.current = null;
     setTalking(false);
   }, [i?.id, ended]);
+  useEffect(() => {
+    if (!voiceCallId.current) return;
+    const call = i?.calls?.find((c) => c.id === voiceCallId.current);
+    if (!call || !["CONNECTED", "CONVERSING"].includes(call.state)) {
+      voice.current?.close();
+      voice.current = null;
+      voiceCallId.current = null;
+      setTalking(false);
+    }
+  }, [i?.calls]);
   const reply = (message: string) =>
     api({ action: "reply", text: message, incidentId: i!.id });
   async function startVoice() {
@@ -130,6 +141,7 @@ export default function Receiver({ token }: { token: string }) {
     const call = i.calls?.find((c) =>
       ["CONNECTED", "CONVERSING"].includes(c.state),
     );
+    voiceCallId.current = call?.id || null;
     voice.current = await connectVoice(
       () =>
         api({

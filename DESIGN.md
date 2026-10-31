@@ -12,6 +12,7 @@ colors:
   blue: "#7db7ff"
   amber: "#e9b66f"
   red: "#fa8d91"
+  quiet-road: "#bba9e9"
   primary-fill: "#72dfbd"
   primary-hover: "#a1ecd4"
   primary-ink: "#07261e"
@@ -74,6 +75,7 @@ rounded:
   phone-screen: "28px 28px 12px 12px"
   phone-plan: "16px"
   phone-control: "13px"
+  conversation: "12px"
 spacing:
   compact: "7px"
   control: "10px"
@@ -147,6 +149,19 @@ components:
     textColor: "{colors.text}"
     rounded: "{rounded.phone-screen}"
     height: "calc(100% - 122px)"
+  call-row:
+    textColor: "{colors.text}"
+    padding: "10px 0"
+  call-turn:
+    backgroundColor: "{colors.panel2}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.conversation}"
+    padding: "12px"
+  recipient-call:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.phone-plan}"
+    padding: "24px"
   assignment-row:
     textColor: "{colors.text}"
     padding: "10px 0"
@@ -162,7 +177,7 @@ The operational workspace is a dark command center: an interactive physical phon
 
 The interface keeps the need, original human replies, proposed action and user acceptance legible together. The phone has its own scrolling screen, shared VI/EN strip, contact and record sheets, and internal navigation. Rounded command panels organize tools and evidence; the desktop bottom dock replaces the workspace header. Vietnamese and English retain the same compact system-font structure.
 
-This update records the current local demo source in `app/command.css`, `components/command-tools.tsx`, `components/workspace.tsx` and `components/guardian-map.tsx`, including inherited rules from `app/globals.css`. The command stylesheet loads after the global stylesheet. Its tokens are scoped to the workspace, not the root. The landing page retains its header and existing paper presentation; recipient, loading and covert screens also remain governed by their existing styles. Frontmatter describes the command system, not an asserted global conversion.
+This record describes the implemented system in `app/command.css`, `components/workspace.tsx`, `components/guardian-map.tsx` and the command, call, recipient and place components, including inherited rules from `app/globals.css`. The map discovery, call coordination and LIVE setup additions extend the existing world. The command stylesheet loads after the global stylesheet. Its tokens are scoped to the workspace, not the root. The landing page retains its header and existing paper presentation; the recipient page retains its light paper presentation with a scoped dark in-app call panel, while loading and covert screens retain their existing styles. Frontmatter describes the command system, not an asserted global conversion.
 
 Browser captures and functional checks are separate evidence; this source extraction asserts no visual-review verdict. Sidecar ramps are generated swatch previews, not additional runtime tokens. This document describes presentation and does not certify deployment or transport capabilities.
 
@@ -181,9 +196,10 @@ The workspace uses a near-black blue ground, two blue-gray panel layers, pale te
 - **Primary fill, hover and ink**: a softer green button fill, lighter hover and dark label; the primary button is not filled directly with the cyan token.
 
 ### Secondary
-- **Blue**: support assignments, reference routes and general focus.
-- **Amber**: source tags, commitment-state text and backup assignments.
-- **Red**: emergency boundaries and withdrawn-state decoration; the SOS action has its own deeper fill and pale border.
+- **Blue**: support assignments, reference routes, conversing/completed call rows and general focus.
+- **Amber**: source tags, unresolved commitment states, backup assignments and synthetic low-light road warnings.
+- **Quiet-road lavender**: synthetic low-footfall road segments and their legend label.
+- **Red**: emergency boundaries, synthetic incident-road warnings, declined/error call names and withdrawn-state decoration; SOS retains its dedicated fill and border.
 
 ### Neutral
 - **Background**, **panel**, **panel 2** and **border**: continuous ground, primary regions, nested controls and fine separation.
@@ -193,15 +209,17 @@ The workspace uses a near-black blue ground, two blue-gray panel layers, pale te
 
 **The Source Before Status Rule.** Keep simulation, device-trial and reference-route labels next to the information they qualify; color does not replace explicit status.
 
-Confirmed map markers now use cyan, available markers amber and the user marker blue through explicit state-specific selectors.
+Simple confirmed, available and user markers retain their existing state colors. Discovered open venues add a blue-toned icon tile and blue open badge; an accepted venue uses the green confirmed treatment and check badge. Hover or keyboard focus reveals its name. Opening hours alone never produce the confirmed treatment.
 
 The map uses a solid cyan active route at 5px over a 10px white casing, a dashed blue reference route at 4px, and a muted history route at 3px and 0.45 opacity. These are distinct route meanings, not interchangeable decorative lines. A reference-route label explicitly says reception is unconfirmed.
+
+**The Call Is Not Consent Rule.** Show conversing and completed calls in blue with a phone icon. Reserve acceptance treatments for sourced commitments; answering or ending a call does not confirm help.
 
 ## Typography
 
 The workspace explicitly uses Arial, followed by Segoe UI and sans-serif, with 14px body text. This is the selected operational face; the separately styled landing page continues to load Be Vietnam Pro through the app layout. There is no oversized display role in the command workspace.
 
-The frontmatter headline, section and title roles reflect the workspace's base h1, h2 and h3. The scenario director uses 20px. Inside the phone, the sticky app name uses 18px, the voice heading uses 21px at weight 500, and contact/record sheet headings use 23px. An active plan compacts the voice heading to 17px. Structural headings remain bold. Metadata and operational states generally use 12px; field labels and disclosure summaries use 13px. Paragraphs use line height 1.6, commitment quotes use 1.5, and time values inherit tabular numerals.
+The frontmatter headline, section and title roles reflect the workspace's base h1, h2 and h3. The scenario director uses 20px. Inside the phone, the sticky app name uses 17px, reduced to 16px on small screens, the voice heading uses 21px at weight 500, and contact/record sheet headings use 23px. An active plan or LIVE setup compacts the voice heading to 17px. Structural headings remain bold. Metadata and operational states generally use 12px; field labels and disclosure summaries use 13px. Paragraphs use line height 1.6, commitment quotes use 1.5, and time values inherit tabular numerals.
 
 Do not infer that every inherited heading has been normalized: more specific setup and record selectors still carry their existing sizes. Small badges in command disclosures and some mobile labels currently fall to 11px; these exceptions are not a new typography role.
 
@@ -213,9 +231,13 @@ At 1100px and above the three-column layout remains. From 761px through 1099px, 
 
 The bottom dock is 64px high. Navigation occupies 355px on desktop and the footer occupies the remaining width; both are fixed at the bottom with z-index 50. On small screens, navigation gets the width minus 100px, with an icon presentation, and the language footer occupies the last 100px. The source JSX retains text inside the navigation buttons. The dedicated phone route hides this external dock and footer; its own bottom navigation remains inside the device frame.
 
+LIVE setup uses an 8px/6px voice-hero inset, a 72px microphone and a 17px heading, with supporting hero copy hidden. The AI explanation is a disclosure, while GPS status/actions and the existing consent controls remain available. This compact arrangement keeps the manual SOS action before the phone navigation. DEMO retains its scenario controls. New session is available in the phone strip and command controls, retains the current mode and returns to the companion view; DEMO and LIVE are independent session scopes.
+
 The phone shell is 380px wide at most and 780px high on desktop, with 8px frame padding and an isolated stacking context. Its 46px status bar, 86px by 22px camera island, hardware details, 52px app navigation and home indicator frame an independently scrolling screen. The screen height is `calc(100% - 122px)`, with horizontal overflow hidden and contained overscroll. At tablet widths the shell caps at 320px; on small command layouts it caps at 370px and uses a 760px height. The dedicated small-screen phone route uses `calc(100dvh - 24px)` with a 620px minimum height. Its app navigation stays outside the scrolling screen.
 
 Panel toggles collapse the left or right grid column. Map-only mode removes surrounding director and tool regions and uses a map height based on the viewport. A 0.35s grid-column transition supports these changes and is disabled for reduced motion. Catalog content uses an auto-fitting grid with a 270px minimum card width, a 400px maximum scroll region and 10px gaps.
+
+Synthetic road warnings and discovered venue details are map-local overlays. The legend sits 104px above the map bottom, or 145px when a plan overlay is present. Venue details start 103px from the top, use a maximum width of 330px within the map and scroll independently when needed. A call list caps its height at 580px with its own scrollbar; individual recipient conversations remain native expandable rows.
 
 ## Elevation & Depth
 
@@ -224,6 +246,8 @@ Command panels use tonal layering and one-pixel borders. The physical phone shel
 **The Bordered Depth Rule.** Separate command panels with fills and fine borders; reserve ambient shadows for the physical phone frame and its microphone action.
 
 The map initializes with a pitched dark basemap and optional building extrusions when the expected source exists. Camera framing animates over 900ms for a route and 600ms for a location, each reduced to zero when reduced motion is requested. The 2D/3D toggle uses 500ms and now also reduces its duration to zero under that preference. Rendering and availability depend on map resources; these are source behaviors, not verified visual results.
+
+SOS adds a short, location-centered sweep rather than continuous ambient motion: a 2.2s linear rotation, two 2.2s expanding rings separated by 1.1s, and a 3.4s display window. It stops for ended or signal-lost sessions. Venue discovery uses a 0.5s opacity/brightness entrance. Reduced motion suppresses the radar and disables these animations while keeping textual status. These effects indicate coordination activity and synthetic discovery, not a measured physical scanning radius.
 
 ## Shapes
 
@@ -239,7 +263,7 @@ The in-phone SOS action is full width, at least 52px high, with a 14px bold labe
 
 ### Voice Control
 
-The phone microphone is a centered 108px circle with a dark green fill, pale green icon and green border. It contracts to 72px when a plan is present, leaving room for the next action. A separate 12px label explains start, setup, unavailable, ended or connected behavior; accessible button names also follow those states. Before consent, activation opens the voice settings and scrolls them into view, using immediate scrolling for reduced motion. The connected state adds a 1.8s ease-in-out breathing glow; reduced motion disables it. The state follows the established voice connection, not measured microphone amplitude. The older settings orb is hidden inside the phone and is no longer the main control.
+The phone microphone is a centered 108px circle with a dark green fill, pale green icon and green border. It contracts to 72px when a plan is present or the LIVE setup is shown, leaving room for the next action. A separate 12px label explains start, setup, unavailable, ended or connected behavior; accessible button names also follow those states. Before consent, activation opens the voice settings and scrolls them into view, using immediate scrolling for reduced motion. The connected state adds a 1.8s ease-in-out breathing glow; reduced motion disables it. The state follows the established voice connection, not measured microphone amplitude. The older settings orb is hidden inside the phone and is no longer the main control.
 
 ### Chips
 
@@ -259,13 +283,27 @@ The bottom dock contains companion, people and record controls with SVG icons an
 
 ### Phone Simulator
 
-The device is an interactive surface, not a static mockup. A shared sticky strip at the top of its screen keeps Guardian AI and VI/EN controls available across companion, contact and record views. The internal navigation uses SVG icons, localized accessible names and explicit pressed states. Contact and record sheets stay inside the frame; switching tabs preserves the companion state. The contacts sheet contains a native invitation disclosure with recipient name, role, create-link action and selectable invitation output. Record content exposes plan/seal counts, recent events and the record link without leaving the phone composition. The status-bar clock derives from session data, while the island and hardware details are decorative.
+The device is an interactive surface, not a static mockup. A shared sticky strip at the top of its screen keeps Guardian AI, New session and VI/EN controls available across companion, contact and record views. The internal navigation uses SVG icons, localized accessible names and explicit pressed states. Contact and record sheets stay inside the frame; switching tabs preserves the companion state. The contacts sheet contains a native invitation disclosure with recipient name, role, create-link action and selectable invitation output. Record content exposes plan/seal counts, recent events and the record link without leaving the phone composition. The status-bar clock derives from session data, while the island and hardware details are decorative.
 
 ### Tool Disclosures and Commitment Rows
 
 Exploration and agent activity use native disclosures with panel fill, border, 8px corners and 14px horizontal padding. Their summaries have a 44px minimum height and 13px text. Exploration exposes simulated venues, operating-time filtering and explicitly unconfirmed reference routes. Activity views show source quotes and recorded events without implying that a visual tab establishes a particular transport architecture.
 
 Commitment rows use 12px vertical padding, a fine top rule and a 7px internal gap. A bold name precedes a textual state and a 12px muted italic quote. Unresolved states remain amber; accepted uses cyan, revoked or declined uses red, and on-the-way or keep-contact uses blue. Assignment rows use 10px vertical padding and keep the role next to its person. Original quotes remain distinct from translated interface labels and proposed actions.
+
+### Synthetic Map Conditions and Venue Details
+
+Road overlays appear for a DEMO SOS, using amber for low light, lavender for quiet streets and red for incident flags. A 3px line at 0.9 opacity sits above a 15px blurred underlay at 0.45 opacity. The icon-and-text legend carries the same semantics. The map and discovery state expose simulation provenance; a selected road explicitly says its condition is simulated and not field verified. These layers are absent from the LIVE discovery view.
+
+Open venues use category SVGs, a state badge and a name revealed on hover/focus. A selected venue opens an in-map details card with hours, open/closed text, staffing, waiting and first-aid capabilities, services, goods and limitations. `SIMULATED` stays beside synthetic venue profiles. Reception remains visibly unconfirmed until an original acceptance exists; confirmed reception changes both the status wording and icon. The recipient's editable venue profile uses the existing light-page fields and disclosure, and labels its contents as self-reported rather than acceptance.
+
+### In-App Calls and LIVE Setup
+
+The call board uses an 18px heading, a mode label, numeric activity summary and ruled disclosure rows. Each 64px-minimum summary carries a phone icon, recipient name, explicit call state and inquiry/task purpose. Conversing and completed names are blue; declined/error names are red. There is no cyan checkmark for call completion. Original turns appear in 12px-radius containers: assistant turns use panel 2, recipient turns use background, with 14px message text and 12px speaker/source metadata. Connection history, cancellation and limits remain progressively disclosed.
+
+The recipient page stays in its light world. Its private call panel uses a dark panel fill, pale text, 16px corners and 24px padding, while retaining the recipient page's type family. Incoming calls expose Answer, Busy and Decline; connected conversations expose reply and end actions. Copy differentiates a support inquiry from a task sent after user acceptance. The panel shows that recipient's conversation, with statements attributed to their source. An in-app call is not presented as a telephone-network call.
+
+The LIVE phone retains visible GPS readiness and consent. The compact AI explanation states that AI can activate an in-app SOS after consent and current GPS, while recipients must send their own acceptance. Plan acceptance and emergency dialing remain explicit user actions. Independent DEMO/LIVE mode labels, records and New session behavior prevent a simulated participant or commitment from appearing to be a LIVE one.
 
 ## Do's and Don'ts
 
@@ -276,8 +314,11 @@ Commitment rows use 12px vertical padding, a fine top rule and a 7px internal ga
 - Do retain visible keyboard focus and support Vietnamese and English text.
 - Do keep reference routes visibly labeled as reception unconfirmed.
 
+- Do label synthetic road conditions and venue profiles beside their visual overlays.
+
 ### Don't:
 - Don't reintroduce the landing header into the operational workspace.
 - Don't use a displayed route or open venue as proof of an accepted commitment.
 - Don't apply the workspace palette globally to surfaces that still use their existing stylesheet.
 - Don't treat this source documentation as browser or visual approval.
+- Don't turn call completion, open hours or a self-reported profile into a confirmed commitment.

@@ -86,6 +86,17 @@ test("live recipient answers a private in-app call while judge demo stays separa
   await expect(
     page.getByText("GPS updates active", { exact: true }),
   ).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      const sos = document
+        .querySelector(".phone-shell .sos")!
+        .getBoundingClientRect();
+      const nav = document
+        .querySelector(".phone-app-nav")!
+        .getBoundingClientRect();
+      return sos.top >= 0 && sos.bottom <= nav.top;
+    }),
+  ).toBe(true);
   mkdirSync(".impeccable/review", { recursive: true });
   await page.screenshot({
     path: ".impeccable/review/live-phone.png",
@@ -133,6 +144,12 @@ test("live recipient answers a private in-app call while judge demo stays separa
   await recipient
     .getByRole("button", { name: "Answer call", exact: true })
     .click();
+  await recipient.screenshot({
+    path: ".impeccable/review/recipient.png",
+    animations: "disabled",
+    fullPage: true,
+    timeout: 15000,
+  });
   await recipient
     .getByLabel("Reply to AI in this call", { exact: true })
     .fill("I am on my way, arriving in 10 minutes.");
@@ -155,7 +172,7 @@ test("live recipient answers a private in-app call while judge demo stays separa
   expect(after.incident.id).toBe(live.incident.id);
   expect(after.incident.mode).toBe("LIVE");
   await recipient.screenshot({
-    path: ".impeccable/review/recipient.png",
+    path: ".impeccable/review/recipient-completed.png",
     animations: "disabled",
     fullPage: true,
     timeout: 15000,
@@ -330,6 +347,17 @@ test("SOS scan, place profiles, shared opening hours and repeated new sessions",
   await page
     .getByRole("button", { name: "Close details", exact: true })
     .click();
+  expect(
+    await page.evaluate(() => {
+      const legend = document
+        .querySelector(".map-warning-legend")!
+        .getBoundingClientRect();
+      const dock = document
+        .querySelector(".workspace-footer")!
+        .getBoundingClientRect();
+      return legend.bottom <= dock.top;
+    }),
+  ).toBe(true);
   await page.locator(".guardian-map").screenshot({
     path: ".impeccable/review/sos-map.png",
     animations: "disabled",
