@@ -59,6 +59,53 @@ test("Missing or failed transcript blocks consent; duplicate events and independ
   assert.equal(await broken.ready(10), false);
 });
 
+test("Transcript writes stay ordered after a storage failure and tools remain blocked", async () => {
+  const queue = new TranscriptQueue();
+  const firstStarted = Promise.withResolvers<void>();
+  const releaseFirst = Promise.withResolvers<void>();
+  const events: string[] = [];
+  const storageError = new Error("Simulated transcript storage failure");
+  queue.expect("first-audio");
+  queue.expect("second-audio");
+
+  const firstWrite = queue.append("first-audio", async () => {
+    events.push("first started");
+    firstStarted.resolve();
+    await releaseFirst.promise;
+    events.push("first failed");
+    throw storageError;
+  });
+  const rejectedWrite = assert.rejects(firstWrite, (error) => error === storageError);
+  const secondWrite = queue.append("second-audio", async () => {
+    events.push("second stored");
+  });
+  const ready = queue.ready();
+
+  try {
+    await firstStarted.promise;
+    assert.deepEqual(events, ["first started"]);
+  } finally {
+    releaseFirst.resolve();
+  }
+
+  await rejectedWrite;
+  await secondWrite;
+  assert.deepEqual(events, ["first started", "first failed", "second stored"]);
+  assert.equal(await ready, false, "A later successful write cannot erase a failed transcript");
+});
+
+test("A transcription failure releases waiting tools without granting consent", { timeout: 1000 }, async () => {
+  const queue = new TranscriptQueue();
+  queue.expect("untranscribed-audio");
+  const ready = queue.ready();
+
+  queue.fail("untranscribed-audio");
+
+  // This must resolve from the failure notification, before the 25-second timeout.
+  assert.equal(await ready, false);
+  assert.equal(await queue.ready(), false);
+});
+
 test("Three web partners speak independently: ambiguous stays pending, natural confirmation is extracted, revocation revises the accepted plan", async () => {
   const histories: { speaker: string; text: string }[][] = [];
   const ai = new AIService(() => ({ provider: "OPENAI", key: "mock", model: "mock-model", baseUrl: "https://mock.invalid", timeoutMs: 1000 }), async (_url, init) => {
