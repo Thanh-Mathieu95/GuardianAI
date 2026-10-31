@@ -2,662 +2,551 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
+  HeartHandshake,
   MapPin,
-  Mic,
+  Navigation,
   Phone,
+  PhoneOff,
+  Shield,
   ShieldCheck,
-  Users,
-  FileText,
+  Store,
+  TriangleAlert,
 } from "lucide-react";
-import type { Event, Incident, Member, Plan, Reply } from "@/lib/types";
-import { choose } from "@/lib/types";
-import { states, errors } from "@/lib/copy";
-import { useLanguage, LanguageSwitch } from "./language";
-import { connectVoice, type Voice } from "./voice";
-import type { AppCall } from "@/lib/coordination-types";
-import { RecipientCall } from "./recipient-call";
-import { PartnerProfileForm } from "./partner-profile";
-import { places } from "@/lib/city";
-type View = {
-  mode: Incident["mode"];
-  member: Omit<Member, "tokenHash" | "createdAt">;
-  config: { ai: boolean };
-  incident: {
-    id: string;
-    mode: string;
-    status: string;
-    locale: "vi" | "en";
-    risk: number;
-    reply: Reply;
-    location: Incident["location"];
-    plan: Plan | null;
-    trip: Incident["trip"];
-    shared: boolean;
-    events: Event[];
-    calls: AppCall[];
-  } | null;
-};
+import type { ReceiverView } from "@/lib/receiver";
+import { TranscriptQueue } from "@/lib/transcript-queue";
+import {
+  callOffer,
+  connectRealtime,
+  post,
+  ring,
+  subscribe,
+  unlockAudio,
+  type Peer,
+  type RealtimeSession,
+} from "./client";
+type Line = { speaker: string; text: string };
+const clock = (s: string) =>
+  new Date(s).toLocaleTimeString("vi-VN", { hour12: false });
+const maps = (lat: number, lng: number) =>
+  `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 export default function Receiver({ token }: { token: string }) {
-  const { locale, t } = useLanguage(),
-    [view, setView] = useState<View | null>(null),
+  const [view, setView] = useState<ReceiverView | null>(null),
     [error, setError] = useState(""),
     [online, setOnline] = useState(false),
-    [busy, setBusy] = useState(false),
-    [text, setText] = useState(""),
-    [minutes, setMinutes] = useState(10),
-    [consent, setConsent] = useState(false),
-    [talking, setTalking] = useState(false);
-  const voice = useRef<Voice | null>(null),
-    voiceCallId = useRef<string | null>(null),
-    current = useRef(view),
-    heartbeatAt = useRef(0);
-  current.current = view;
-  async function api(body?: unknown) {
-    const r = await fetch("/api/join/" + token, {
-      cache: "no-store",
-      ...(body
-        ? {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          }
-        : {}),
+    [armed, setArmed] = useState(false),
+    [aiLive, setAiLive] = useState(false),
+    [aiSpeaking, setAiSpeaking] = useState(false),
+    [lines, setLines] = useState<Line[]>([]),
+    [talking, setTalking] = useState<"" | "calling" | "connected">(""),
+    [declinedRing, setDeclinedRing] = useState("");
+  const [partnerText, setPartnerText] = useState("");
+  const [arrivalMinutes, setArrivalMinutes] = useState("");
+  const [aiStarting, setAiStarting] = useState(false);
+  const [userSpeaking, setUserSpeaking] = useState(false);
+  const [micLabel, setMicLabel] = useState("");
+  const aiAttempt = useRef(0);
+  const base = `/api/r/${token}`,
+    rt = useRef<RealtimeSession | null>(null),
+    p2p = useRef<Peer | null>(null),
+    stopRing = useRef<(() => void) | null>(null),
+    callRef = useRef(""),
+    lastRelayed = useRef(""),
+    lastTask = useRef(""),
+    lastProgress = useRef({ bucket: -1, where: "", at: 0 });
+  useEffect(() => {
+    return subscribe<ReceiverView, { type: string; sdp?: string }>(base, {
+      state: setView,
+      online: setOnline,
+      error: setError,
+      signal: async (s) => {
+        if (s.type === "answer" && p2p.current) {
+          await p2p.current.pc.setRemoteDescription({ type: "answer", sdp: s.sdp });
+          setTalking("connected");
+        } else if (s.type === "hangup") endTalk(false);
+      },
     });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    return d;
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base]);
+  const inc = view?.incident,
+    m = view?.member,
+    partnerInc = inc?.kind === "PARTNER" ? inc : null,
+    contactInc = inc?.kind === "CONTACT" ? inc : null,
+    ringing =
+      !!inc &&
+      !inc.closed &&
+      (partnerInc
+        ? partnerInc.call.status === "RINGING"
+        : contactInc?.alert?.status === "RINGING") &&
+      declinedRing !== inc.id;
+  // Ring while an incoming alert is pending.
+  useEffect(() => {
+    if (!ringing || !armed) return;
+    stopRing.current = ring();
+    return () => {
+      stopRing.current?.();
+      stopRing.current = null;
+    };
+  }, [ringing, armed]);
+  // Hang up the AI when the incident ends or the partner lane finishes.
+  useEffect(() => {
+    if ((!rt.current && !aiStarting) || !inc) return;
+    if (inc.closed || (partnerInc && ["DECLINED", "NO_ANSWER", "FAILED"].includes(partnerInc.call.status)))
+      endAI();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inc?.closed, partnerInc?.call.status]);
+  useEffect(() => () => {
+    aiAttempt.current++;
+    rt.current?.close();
+    p2p.current?.close();
+  }, []);
+  // Keep the AI on this call informed: contacts get new incident events, partners get the walker's progress.
+  useEffect(() => {
+    if (!aiLive || !rt.current || !inc) return;
+    if (contactInc) {
+      const events = contactInc.events,
+        idx = events.findIndex((e) => e.id === lastRelayed.current),
+        fresh = (idx < 0 ? events.slice(0, 1) : events.slice(0, idx)).reverse();
+      if (events[0]) lastRelayed.current = events[0].id;
+      if (fresh.length)
+        rt.current.notify(
+          fresh.map((e) => e.summary).join(" | ") +
+            (contactInc.where ? ` | Vị trí hiện tại: ${contactInc.where}` : ""),
+        );
+      return;
+    }
+    const task = partnerInc?.assignment;
+    if (task && task.instruction !== lastTask.current) {
+      lastTask.current = task.instruction;
+      rt.current.notify(`Phương án điều phối giao cho bên bạn (${task.role}): ${task.instruction}. Lý do: ${task.reason}. Báo lại ngắn gọn cho lễ tân và hỏi họ có làm được không.`);
+    }
+    if (partnerInc?.call.status === "CONFIRMED" && partnerInc.where) {
+      const bucket = Math.ceil(partnerInc.distance / 100),
+        last = lastProgress.current;
+      if (bucket !== last.bucket && Date.now() - last.at > 8000) {
+        lastProgress.current = { bucket, where: partnerInc.where, at: Date.now() };
+        rt.current.notify(
+          partnerInc.distance < 40
+            ? `Người cần hỗ trợ đã tới cửa, ${partnerInc.where}.`
+            : `Người cần hỗ trợ đang ở ${partnerInc.where}, cách bạn khoảng ${partnerInc.distance} m${partnerInc.selectedHere ? ", đang đi tới chỗ bạn" : ""}.`,
+        );
+      }
+    }
+  }, [aiLive, inc, contactInc, partnerInc]);
   async function run(fn: () => Promise<unknown>) {
-    setBusy(true);
     setError("");
     try {
       await fn();
-      setView(await api());
-      return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "REQUEST_FAILED");
-      return false;
-    } finally {
-      setBusy(false);
+      setError(e instanceof Error ? e.message : String(e));
     }
   }
-  useEffect(() => {
-    let alive = true,
-      timer: ReturnType<typeof setTimeout>;
-    const poll = async () => {
-      try {
-        const d = await api();
-        if (alive) {
-          setView(d);
-          setOnline(true);
-        }
-        if (d.member.joined && Date.now() - heartbeatAt.current > 10000) {
-          heartbeatAt.current = Date.now();
-          await api({ action: "heartbeat" });
-        }
-      } catch (e) {
-        if (alive) {
-          setOnline(false);
-          setError(e instanceof Error ? e.message : "REQUEST_FAILED");
-        }
-      }
-      if (alive) timer = setTimeout(poll, 1500);
-    };
-    void poll();
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-      voice.current?.close();
-    };
-  }, [token]);
-  const i = view?.incident,
-    m = view?.member,
-    ended = !!i && ["COMPLETE", "CANCELLED"].includes(i.status);
-  useEffect(() => {
-    voice.current?.close();
-    voice.current = null;
-    setTalking(false);
-  }, [i?.id, ended]);
-  useEffect(() => {
-    if (!voiceCallId.current) return;
-    const call = i?.calls?.find((c) => c.id === voiceCallId.current);
-    if (!call || !["CONNECTED", "CONVERSING"].includes(call.state)) {
-      voice.current?.close();
-      voice.current = null;
-      voiceCallId.current = null;
-      setTalking(false);
-    }
-  }, [i?.calls]);
-  const reply = (message: string) =>
-    api({ action: "reply", text: message, incidentId: i!.id });
-  async function startVoice() {
-    if (voice.current) {
-      voice.current.close();
-      voice.current = null;
-      setTalking(false);
-      return;
-    }
-    if (!i) return;
-    const incidentId = i.id;
-    const voiceMessageIds = new Map<string, string>();
-    const call = i.calls?.find((c) =>
-      ["CONNECTED", "CONVERSING"].includes(c.state),
-    );
-    voiceCallId.current = call?.id || null;
-    voice.current = await connectVoice(
-      () =>
-        api({
-          action: "voice",
-          consent: true,
-          locale,
-          ...(call ? { callId: call.id } : {}),
-        }),
-      {
-        transcript: (who, text, transcriptId) => {
-          if (who === "You" && current.current?.incident?.id === incidentId)
-            void api(
-              call
-                ? {
-                    action: "call-message",
-                    incidentId,
-                    callId: call.id,
-                    attempt: call.attempt,
-                    messageId:
-                      voiceMessageIds.get(transcriptId) ||
-                      (voiceMessageIds.set(transcriptId, crypto.randomUUID()),
-                      voiceMessageIds.get(transcriptId)!),
-                    text,
-                  }
-                : { action: "reply", incidentId, text },
-            ).catch((e) => setError(e.message));
-        },
-        tool: async () => ({}),
-        error: setError,
-        ended: () => setTalking(false),
+  function endAI() {
+    aiAttempt.current++;
+    rt.current?.close();
+    rt.current = null;
+    setAiLive(false);
+    setAiSpeaking(false);
+    setUserSpeaking(false);
+    setAiStarting(false);
+  }
+  async function startAI() {
+    if (aiStarting || rt.current) return;
+    const attempt = ++aiAttempt.current;
+    const transcripts = new TranscriptQueue();
+    setAiStarting(true); setError("");
+    const callId = partnerInc?.call.id || "";
+    callRef.current = callId;
+    try {
+    const session = await connectRealtime(() => post(base + "/realtime"), {
+      onInputCommitted: id => transcripts.expect(id),
+      onTranscriptionFailed: id => transcripts.fail(id),
+      onTranscript: (speaker, text, itemId) => {
+        if (attempt !== aiAttempt.current) return;
+        setLines((l) => [...l.slice(-12), { speaker: speaker === "AI" ? "Guardian AI" : "Bạn", text }]);
+          void transcripts.append(itemId, () => post(base + "/transcript", {
+            ...(partnerInc ? { callId } : {}),
+            speaker: speaker === "AI" ? "AI" : "PARTNER",
+            text,
+            itemId,
+          })).catch(() => setError("Chưa gửi được transcript tới bộ điều phối. Hãy thử lại hoặc nhập phản hồi bằng chữ."));
       },
-    );
-    setTalking(true);
+      onSpeaking: setAiSpeaking,
+      onUserSpeaking: setUserSpeaking,
+      onError: setError,
+      onEnd: () => { if (attempt === aiAttempt.current) { setAiLive(false); setAiStarting(false); rt.current = null; } },
+      onTool: async (name, args) => {
+        const note = typeof args.note === "string" ? args.note.slice(0, 300) : "";
+        if (name === "confirm_support" || name === "decline_support") {
+          if (attempt !== aiAttempt.current) return "Phiên thoại đã kết thúc.";
+          if (!(await transcripts.ready())) return "Chưa nhận/lưu đủ transcript gốc nên chưa được xác nhận tiếp nhận. Nhờ đối tác nhắc lại quyết định và điều kiện; không dùng ghi chú của model làm bằng chứng.";
+          if (attempt !== aiAttempt.current) return "Phiên thoại đã kết thúc.";
+          const result = await post<{ admitted: boolean; checks: string[]; support: unknown }>(base + "/decide", { callId, accept: name === "confirm_support", note, fromAI: true });
+          return result.admitted ? "Đã đủ dữ kiện tiếp nhận. Chờ backend lập kế hoạch và người dùng chấp nhận trước khi hướng dẫn." : "Chưa đủ điều kiện tiếp nhận; không khẳng định đã xác nhận. Hỏi lại nếu còn dữ kiện thiếu: " + JSON.stringify(result);
+        }
+        if (name === "on_my_way") {
+          if (!(await transcripts.ready())) return "Mình chưa nghe rõ lời xác nhận. Bạn nhắc lại giúp mình nhé?";
+          await post(base + "/contact", { action: "ON_THE_WAY", fromAI: true });
+          return "Đã báo người dùng rằng bạn đang tới.";
+        }
+        if (name === "report_contact_capability") {
+          if (!(await transcripts.ready())) return "Chưa lưu được lời người thân; hãy hỏi lại, không tự điền khả năng hay ETA.";
+          await post(base + "/contact", { action: args.action, fromAI: true, ...(typeof args.arrival_minutes === "number" && args.action === "ON_THE_WAY" ? { arrivalMinutes: args.arrival_minutes } : {}) });
+          return "Đã gửi tóm tắt khả năng hỗ trợ tới bộ điều phối; không gửi toàn bộ hội thoại.";
+        }
+        return "Không hỗ trợ.";
+      },
+    });
+    if (attempt !== aiAttempt.current) { session.close(); return; }
+    rt.current = session;
+    setMicLabel(session.micLabel);
+    setAiLive(true);
+    } finally { if (attempt === aiAttempt.current) setAiStarting(false); }
   }
-  function setLocation() {
-    if (!navigator.geolocation) {
-      setError("GPS_PERMISSION_REQUIRED");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (p) =>
+  async function answer() {
+    unlockAudio();
+    stopRing.current?.();
+    await run(async () => {
+      if (partnerInc) await post(base + "/answer", { callId: partnerInc.call.id });
+      else await post(base + "/contact", { action: "ANSWER" });
+      setLines([]);
+      if (m?.voiceConfigured && m.voiceEnabled) await startAI();
+    });
+  }
+  async function decline() {
+    stopRing.current?.();
+    if (!inc) return;
+    setDeclinedRing(inc.id);
+    if (partnerInc)
+      await run(() => post(base + "/decide", { callId: partnerInc.call.id, accept: false }));
+  }
+  async function talk() {
+    endAI();
+    await run(async () => {
+      const { peer, sdp } = await callOffer();
+      p2p.current = peer;
+      setTalking("calling");
+      await post(base + "/signal", { type: "offer", sdp });
+    });
+  }
+  function endTalk(notify = true) {
+    p2p.current?.close();
+    p2p.current = null;
+    setTalking("");
+    if (notify) void post(base + "/signal", { type: "hangup" }).catch(() => {});
+  }
+  function shareLocation() {
+    navigator.geolocation?.getCurrentPosition(
+      (pos) =>
         void run(() =>
-          api({
-            action: "location",
-            lat: p.coords.latitude,
-            lng: p.coords.longitude,
-            consent: true,
-          }),
+          post(base + "/location", { lat: pos.coords.latitude, lng: pos.coords.longitude }),
         ),
-      () => setError("GPS_PERMISSION_REQUIRED"),
-      { enableHighAccuracy: true, timeout: 15000 },
+      (e) => setError("Không lấy được GPS: " + e.message),
+      { enableHighAccuracy: true, timeout: 12000 },
     );
   }
+  if (!view)
+    return (
+      <main className="rx">
+        <p className="rx-muted">{error || "Đang kết nối Guardian…"}</p>
+        {error && <a className="rx-link" href="/demo/command-center">Về trung tâm để tạo lại link mời</a>}
+      </main>
+    );
+  const isPartner = m!.role === "PARTNER";
   return (
-    <main className="receiver">
-      <header>
-        <a className="brand" href="/">
-          <ShieldCheck size={23} />
-          Guardian AI
-        </a>
-        <LanguageSwitch />
+    <main className="rx">
+      <header className="rx-top">
+        <span className="mini-shield">
+          <ShieldCheck size={18} />
+        </span>
+        <b>
+          Guardian<span>AI</span>
+        </b>
+        <span className={"rx-role " + m!.role}>
+          {isPartner ? <Store size={13} /> : <HeartHandshake size={13} />}
+          {isPartner ? "ĐIỂM ĐỐI TÁC" : "NGƯỜI THÂN"}
+        </span>
+        <span className={"rx-dot " + (online ? "on" : "")} title={online ? "Đã kết nối" : "Mất kết nối"} />
       </header>
+      <h1>{m!.name}</h1>
+      <p className="rx-muted">{m!.category}</p>
       {error && (
-        <p role="alert" className="error-box">
-          {errors[error]
-            ? choose(errors[error], locale)
-            : t(
-                "Thao tác chưa hoàn tất. Kiểm tra kết nối và quyền truy cập.",
-                "Action not completed. Check connection and permissions.",
-              )}
+        <p className="rx-error" role="alert">
+          <TriangleAlert size={14} /> {error}
         </p>
       )}
-      {!view ? (
-        <div className="loading-inline">
-          <p>{t("Đang mở lời mời…", "Opening your invitation…")}</p>
-        </div>
-      ) : !m!.joined ? (
-        <section className="receiver-welcome">
-          <div className="person-emblem">
-            <Users size={32} />
-          </div>
-          <h1>
-            {t(
-              `Chào ${m!.name}. Cùng có mặt khi cần.`,
-              `Hello ${m!.name}. Be there when it matters.`,
-            )}
-          </h1>
+      {!m!.joined ? (
+        <section className="rx-card">
+          <h2>Lời mời từ {view.userName}</h2>
           <p>
-            {t(
-              "Bạn được mời làm người hỗ trợ. Khi tham gia, bạn có thể nhận yêu cầu trong trang này và chủ động chọn cách giúp.",
-              "You have been invited to help. After joining, you can receive requests here and choose what support to offer.",
-            )}
+            {isPartner
+              ? `${view.userName} mời "${m!.name}" làm điểm hỗ trợ Guardian. Khi có người gần đây cần nơi chờ an toàn, app sẽ đổ chuông và trợ lý AI hỏi bạn có tiếp nhận được không.`
+              : `${view.userName} thêm bạn làm người thân. Khi ${view.userName} gặp nguy hiểm, app sẽ đổ chuông, AI tóm tắt tình hình và bạn xem được vị trí trực tiếp.`}
           </p>
-          <p>
-            {t(
-              "Giữ trang mở. Cuộc gọi trong app cần sự đồng ý của bạn; không gọi số điện thoại hay báo khi khóa màn hình. Link này là riêng tư.",
-              "Keep this page open. In-app calls need your permission; no phone numbers are dialed and there is no locked-screen ringing. This link is private.",
-            )}
+          <p className="rx-fine">
+            Cuộc gọi có trợ lý AI: giọng nói được xử lý bởi OpenAI. Giữ trang này mở để nhận
+            cuộc gọi. Bạn có thể rời mạng lưới bất kỳ lúc nào.
           </p>
           <button
-            className="primary"
-            disabled={busy}
-            onClick={() =>
-              void run(() =>
-                api({
-                  action: "join",
-                  consent: true,
-                  ...(view.mode === "TEAM" ? { calls: true } : {}),
-                }),
-              )
-            }
+            className="primary wide"
+            onClick={() => {
+              unlockAudio();
+              setArmed(true);
+              void run(() => post(base + "/join", { consent: true }));
+            }}
           >
-            <Check size={18} />
-            {view.mode === "TEAM"
-              ? t(
-                  "Tham gia vai & cho phép cuộc gọi trong app",
-                  "Join role & allow in-app calls",
-                )
-              : t("Đồng ý tham gia", "Agree to join")}
+            <Check size={16} /> Đồng ý tham gia
           </button>
         </section>
-      ) : (
-        <section className="receiver-content">
-          <div className="receiver-title">
-            <h1>{m!.name}</h1>
-            <span>
-              {online
-                ? t("Đã kết nối", "Connected")
-                : t("Đang kết nối lại", "Reconnecting")}
-            </span>
-          </div>
-          {view.mode === "TEAM" && (
-            <p className="roleplay-notice">
-              {t(
-                "Bạn đang nhập vai với người thật trong team. Vị trí và địa điểm là mô phỏng; câu trả lời do bạn tự gửi. Giữ trang mở để nhận cuộc gọi.",
-                "You are roleplaying with real teammates. Locations and venues are simulated; you send your own replies. Keep this page open to receive calls.",
-              )}
-            </p>
-          )}
-          {view.mode === "DEMO" && (
-            <p className="roleplay-notice">
-              {t(
-                "Link này thuộc kịch bản cũ nên SOS không gọi tới vai này. Người tạo phòng cần mở Team nhập vai để khôi phục lời mời; link này sẽ tiếp tục dùng được sau khi chuyển.",
-                "This link belongs to the old scripted workspace. The host should open Team roleplay to recover invitations; this link will keep working after recovery.",
-              )}
-            </p>
-          )}
-          <label className="check">
+      ) : !armed ? (
+        <button
+          className="primary wide rx-arm"
+          onClick={() => {
+            unlockAudio();
+            setArmed(true);
+          }}
+        >
+          <Phone size={16} /> Bật chuông nhận cuộc gọi
+        </button>
+      ) : null}
+      {m!.joined && isPartner && (
+        <section className="rx-card rx-row">
+          <label className="checkbox">
             <input
               type="checkbox"
-              checked={!!m!.callConsentAt}
-              disabled={busy}
-              onChange={(e) =>
-                void run(() =>
-                  api({ action: "call-consent", enabled: e.target.checked }),
-                )
-              }
+              checked={m!.onDuty}
+              onChange={(e) => void run(() => post(base + "/duty", { onDuty: e.target.checked }))}
             />
-            {t(
-              "Đồng ý nhận cuộc gọi AI trong app khi trang đang mở",
-              "Allow AI calls in the app while this page is open",
-            )}
+            Đang trực, nhận cuộc gọi SOS
           </label>
-          {m!.role === "PARTNER" && (
-            <div className="partner-setup">
-              {view.mode === "TEAM" && (
-                <label>
-                  {t(
-                    "Chọn vị trí điểm hỗ trợ để nhập vai",
-                    "Choose a roleplay venue location",
-                  )}
-                  <select
-                    aria-label={t("Điểm hỗ trợ nhập vai", "Roleplay venue")}
-                    defaultValue=""
-                    disabled={busy}
-                    onChange={(e) => {
-                      if (e.target.value)
-                        void run(() =>
-                          api({
-                            action: "team-venue",
-                            placeId: e.target.value,
-                          }),
-                        );
-                    }}
-                  >
-                    <option value="">
-                      {t(
-                        "Chọn một điểm mô phỏng…",
-                        "Choose a simulated venue…",
-                      )}
-                    </option>
-                    {places.slice(0, 3).map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-              <PartnerProfileForm
-                profile={m!.profile}
-                busy={busy}
-                save={async (body) => {
-                  await run(() => api(body));
-                }}
-              />
-              <h2>{t("Sẵn sàng tiếp nhận?", "Ready to offer support?")}</h2>
-              <p>
-                {t(
-                  "Cần vị trí của điểm hỗ trợ và trạng thái đang trực trước khi có tuyến hợp lệ.",
-                  "A venue location and on-duty status are needed before a valid route can be proposed.",
-                )}
+          <button onClick={shareLocation}>
+            <MapPin size={14} /> {m!.hasLocation ? "Cập nhật vị trí" : "Đặt vị trí cửa hàng"}
+          </button>
+        </section>
+      )}
+      {ringing && (
+        <div className="rx-ring" role="alertdialog" aria-label="Cuộc gọi đến">
+          <div className="rx-ring-pulse">
+            <Shield size={40} />
+          </div>
+          <b>Guardian SOS</b>
+          <p>
+            {partnerInc
+              ? `Có người cần nơi chờ an toàn · cách bạn ${partnerInc.distance} m`
+              : contactInc?.sos
+                ? `${view.userName} cần hỗ trợ${contactInc.covert ? " · SOS bí mật" : ""}`
+                : `${view.userName} chia sẻ vị trí với bạn`}
+          </p>
+          <small>Guardian AI trao đổi riêng với bạn rồi tổng hợp cho {view.userName}.</small>
+          {(!m!.voiceConfigured || !m!.voiceEnabled) && <small>AI giọng nói chưa sẵn sàng. Bạn có thể nhận thông báo và trả lời trên màn hình.</small>}
+          <div>
+            <button className="rx-accept" onClick={answer} disabled={aiStarting}>
+              <Phone size={22} /> {aiStarting ? "Đang kết nối AI…" : m!.voiceConfigured && m!.voiceEnabled ? "Trả lời bằng AI" : "Nhận thông báo"}
+            </button>
+            <button className="rx-decline" onClick={decline}>
+              <PhoneOff size={22} /> Từ chối
+            </button>
+          </div>
+        </div>
+      )}
+      {m!.joined && inc && !inc.closed && !aiLive && !talking && (!partnerInc || ["CONNECTED", "CONFIRMED"].includes(partnerInc.call.status)) && (
+        <section className="rx-card">
+          <h3>Nói với AI · AI tổng hợp cho {view.userName}</h3>
+          <p>{!m!.voiceConfigured ? "Máy điều phối chưa cấu hình AI thật. Bạn vẫn có thể trả lời bằng chữ ở dưới." : !m!.voiceEnabled ? "Người điều phối cần bật AI cho phiên này trước khi bắt đầu hội thoại." : "Mỗi người có một phiên AI riêng. Dùng tai nghe; micro và giọng nói được kết nối tới OpenAI khi bạn bắt đầu."}</p>
+          <button className="primary" disabled={aiStarting || !m!.voiceConfigured || !m!.voiceEnabled} onClick={() => void run(startAI)}><Phone size={16} />{aiStarting ? "Đang kết nối AI…" : "Nói với Guardian AI"}</button>
+        </section>
+      )}
+      {(aiLive || talking) && (
+        <section className="rx-card rx-call">
+          <div className={"rx-orb " + (aiSpeaking || talking === "connected" ? "speaking" : "")} />
+          <b>
+            {talking === "connected"
+              ? `Đang nói chuyện với ${view.userName}`
+              : talking === "calling"
+                ? `Đang gọi ${view.userName}…`
+                : userSpeaking ? "AI đang nghe bạn" : aiSpeaking ? "AI đang trả lời" : "Micro đang mở · bạn có thể nói"}
+          </b>
+          {aiLive && <small>Bạn đang nói riêng với Guardian AI. Thông tin hỗ trợ được tổng hợp cho {view.userName}.</small>}
+          {aiLive && micLabel && <small>{micLabel}</small>}
+          <div className="rx-lines">
+            {lines.map((l, n) => (
+              <p key={n}>
+                <span>{l.speaker}</span>
+                {l.text}
               </p>
-              <div className="actions">
-                {view.mode !== "TEAM" && (
-                  <button disabled={busy} onClick={setLocation}>
-                    <MapPin size={17} />
-                    {m!.location
-                      ? t("Cập nhật vị trí điểm", "Update venue location")
-                      : t("Đặt vị trí điểm hỗ trợ", "Set venue location")}
-                  </button>
-                )}
-                <button
-                  aria-pressed={m!.onDuty}
-                  disabled={busy}
-                  onClick={() =>
-                    void run(() => api({ action: "duty", enabled: !m!.onDuty }))
-                  }
-                >
-                  {m!.onDuty
-                    ? t("Đang trực · tắt trực", "On duty · go off duty")
-                    : t("Bật đang trực", "Go on duty")}
-                </button>
-              </div>
-            </div>
-          )}
-          {!i ? (
-            <div className="receiver-empty">
-              <ShieldCheck size={35} />
-              <h2>
-                {t("Đã sẵn sàng nhận yêu cầu.", "Ready to receive a request.")}
-              </h2>
-              <p>
-                {t(
-                  "Bạn chưa nhận yêu cầu nào. Giữ trang này mở để trạng thái được cập nhật.",
-                  "No request yet. Keep this page open for updates.",
-                )}
-              </p>
-            </div>
-          ) : (
+            ))}
+          </div>
+          <button className="rx-decline" onClick={() => (talking ? endTalk() : endAI())}>
+            <PhoneOff size={16} /> Kết thúc
+          </button>
+        </section>
+      )}
+      {m!.joined && !inc && (
+        <section className="rx-idle">
+          <span className="pulse-dot" />
+          {isPartner
+            ? m!.onDuty
+              ? "Đang trực · chờ cuộc gọi"
+              : "Đang nghỉ · không nhận cuộc gọi"
+            : `Đang chờ · bạn sẽ được báo khi ${view.userName} cần`}
+        </section>
+      )}
+      {partnerInc && (
+        <section className="rx-card">
+          {!partnerInc.closed && ["RINGING", "CONNECTED", "CONFIRMED"].includes(partnerInc.call.status) && <>
+            <h3>Trao đổi điều kiện tiếp nhận</h3>
+            {partnerInc.questions.map((q,n) => <p key={n}>{q}</p>)}
+            <p>{partnerInc.support?.missing.join("; ")}</p>
+            <label>Phản hồi của bạn (quyết định, loại hỗ trợ, cửa vào, điều kiện, thời hạn nếu có)
+              <textarea value={partnerText} onChange={e => setPartnerText(e.target.value)} placeholder="Tôi đồng ý tiếp nhận, có chỗ chờ. Cửa vào: … Điều kiện: …" />
+            </label>
+            <button disabled={!partnerText.trim()} onClick={() => void run(() => post(base + "/reply", { callId: partnerInc.call.id, generation: partnerInc.call.generation, text: partnerText }))}>Gửi phản hồi / cập nhật</button>
+            {partnerInc.planId && <button onClick={() => void run(() => post(base + "/handoff", { callId: partnerInc.call.id, planId: partnerInc.planId }))}>Đã tiếp nhận người dùng</button>}
+          </>}
+          <div className="rx-status">
+            <span className={"place-status " + partnerInc.call.status}>{partnerInc.call.status}</span>
+            <small>Cuộc gọi lúc {clock(partnerInc.call.startedAt)}</small>
+          </div>
+          {partnerInc.closed ? (
             <>
-              <h2>
-                {ended
-                  ? t("Phiên đã kết thúc", "Session ended")
-                  : t("Có người đang cần bạn.", "Someone is counting on you.")}
-              </h2>
-              <p role="status">
-                <span>
-                  {i.mode === "TEAM"
-                    ? t(
-                        "Team nhập vai · vị trí mô phỏng",
-                        "Team roleplay · simulated location",
-                      )
-                    : i.mode === "DEMO"
-                      ? t("Mô phỏng", "Simulation")
-                      : t("Phiên dùng thật", "Live session")}
-                </span>
-                <br />
-
-                {states[i.status] ? choose(states[i.status], locale) : i.status}
-              </p>
-              {i.calls
-                ?.filter((c) =>
-                  ["CALLING", "RINGING", "CONNECTED", "CONVERSING"].includes(
-                    c.state,
-                  ),
-                )
-                .map((c) => (
-                  <RecipientCall
-                    key={c.id}
-                    call={c}
-                    busy={busy}
-                    api={async (body) => {
-                      return await run(() => api(body));
-                    }}
-                  />
-                ))}
-              {i.location ? (
-                <div className="shared-location">
-                  <MapPin size={20} />
-                  <div>
-                    <b>{t("Vị trí báo lần cuối", "Last reported location")}</b>
-                    <p>
-                      {i.location.lat.toFixed(5)}, {i.location.lng.toFixed(5)}
-                    </p>
-                    <small>
-                      {new Date(i.location.at).toLocaleString(locale)}
-                    </small>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`https://www.google.com/maps?q=${i.location.lat},${i.location.lng}`}
-                    >
-                      {t("Mở bản đồ ngoài", "Open external map")}
-                    </a>
-                  </div>
-                </div>
-              ) : (
-                <p className="privacy-note">
-                  {t(
-                    "Vị trí chính xác chỉ hiện sau khi bạn đồng ý nhận giúp.",
-                    "Exact location appears only after you agree to help.",
-                  )}
+              <h2>Sự cố đã kết thúc</h2>
+              <p>Cảm ơn bạn đã tham gia mạng lưới Guardian.</p>
+              {["CONFIRMED", "CONNECTED", "DECLINED"].includes(partnerInc.call.status) && (
+                <button
+                  disabled={partnerInc.call.falseAlarm}
+                  onClick={() => void run(() => post(base + "/false-alarm", { callId: partnerInc.call.id }))}
+                >
+                  <TriangleAlert size={14} />
+                  {partnerInc.call.falseAlarm ? "Đã báo cáo báo động giả" : "Báo cáo báo động giả"}
+                </button>
+              )}
+            </>
+          ) : partnerInc.call.status === "CONFIRMED" ? (
+            <>
+              <h2>{partnerInc.selectedHere ? "Người cần hỗ trợ đang tới chỗ bạn" : "Bạn là phương án dự phòng"}</h2>
+              <p>Mức hỗ trợ {partnerInc.riskLevel}/4 · cách {partnerInc.distance} m</p>
+              {partnerInc.appearance && (
+                <p className="rx-id-card">
+                  <b>Nhận diện:</b> {partnerInc.appearance}
                 </p>
               )}
-              {i.plan && (
-                <div className="receiver-plan">
-                  <b>{t("Điểm hẹn đề xuất", "Proposed meeting place")}</b>
-                  <h3>{i.plan.destination}</h3>
-                  <p>
-                    {i.plan.acceptedAt
-                      ? t("Người dùng đã chấp nhận", "The user accepted")
-                      : t(
-                          "Người dùng chưa chấp nhận",
-                          "The user has not accepted yet",
-                        )}
-                  </p>
-                </div>
+              {partnerInc.where && (
+                <p className="rx-where">
+                  <MapPin size={14} /> Đang ở {partnerInc.where}
+                </p>
               )}
-              {!ended && (
-                <>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      void run(() => reply(text));
-                    }}
-                  >
-                    <label>
-                      {t("Bạn có thể giúp bằng cách nào?", "How can you help?")}
-                      <textarea
-                        required
-                        value={text}
-                        maxLength={1000}
-                        onChange={(e) => setText(e.target.value)}
-                        placeholder={
-                          m!.role === "PARTNER"
-                            ? t(
-                                "Đồng ý. Có chỗ chờ và nhân viên ở cửa chính.",
-                                "I accept. You can wait here; staff are at the main entrance.",
-                              )
-                            : t(
-                                "Tôi đang đến, khoảng 10 phút.",
-                                "I am on my way, about 10 minutes.",
-                              )
-                        }
-                      />
-                    </label>
-                    <button className="primary" disabled={busy || !text.trim()}>
-                      {t("Gửi lời phản hồi", "Send response")}
-                    </button>
-                  </form>
-                  {m!.role === "CONTACT" && (
-                    <div className="quick-replies">
-                      <label>
-                        {t(
-                          "Thời gian bạn dự kiến đến (phút)",
-                          "Your expected arrival (minutes)",
-                        )}
-                        <input
-                          type="number"
-                          min={1}
-                          max={240}
-                          value={minutes}
-                          onChange={(e) => setMinutes(Number(e.target.value))}
-                        />
-                      </label>
-                      <div className="actions">
-                        <button
-                          disabled={busy}
-                          onClick={() =>
-                            void run(() =>
-                              reply(
-                                t(
-                                  `Tôi đang đến, ${minutes} phút nữa tới.`,
-                                  `I am on my way, ${minutes} minutes.`,
-                                ),
-                              ),
-                            )
-                          }
-                        >
-                          {t("Tôi đang đến", "I am on my way")}
-                        </button>
-                        <button
-                          disabled={busy}
-                          onClick={() =>
-                            void run(() =>
-                              reply(
-                                t(
-                                  "Tôi sẽ giữ liên lạc.",
-                                  "I will stay in touch.",
-                                ),
-                              ),
-                            )
-                          }
-                        >
-                          {t("Tôi giữ liên lạc", "I will stay in touch")}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  <button
-                    disabled={busy}
-                    onClick={() =>
-                      void run(() =>
-                        reply(
-                          t(
-                            "Tôi không thể nhận giúp lúc này.",
-                            "I cannot help right now.",
-                          ),
-                        ),
-                      )
-                    }
-                  >
-                    {t("Tôi không thể giúp lúc này", "I cannot help right now")}
-                  </button>
-                  {m!.role === "PARTNER" &&
-                    i.plan?.acceptedAt &&
-                    i.plan.replyId === i.reply.id && (
-                      <button
-                        className="primary"
-                        disabled={busy}
-                        onClick={() =>
-                          void run(() =>
-                            api({ action: "handoff", incidentId: i.id }),
-                          )
-                        }
-                      >
-                        <Check size={17} />
-                        {t("Đã gặp người cần giúp", "I have met the person")}
-                      </button>
-                    )}
-                  <details>
-                    <summary>
-                      {t(
-                        "Trả lời bằng giọng nói với AI",
-                        "Respond by voice with AI",
-                      )}
-                    </summary>
-                    <label className="check">
-                      <input
-                        type="checkbox"
-                        checked={consent}
-                        onChange={(e) => setConsent(e.target.checked)}
-                      />
-                      {t(
-                        "Đồng ý gửi giọng nói tới OpenAI để ghi nhận lời đề nghị",
-                        "Consent to send voice to OpenAI to capture my offer",
-                      )}
-                    </label>
-                    <button
-                      disabled={
-                        busy || !view.config.ai || (!consent && !talking)
-                      }
-                      onClick={() => void run(startVoice)}
-                    >
-                      <Mic size={17} />
-                      {talking
-                        ? t("Dừng thoại", "End voice")
-                        : t("Nói với AI", "Talk with AI")}
-                    </button>
-                    {!view.config.ai && (
-                      <p>
-                        {t(
-                          "Người khởi tạo chưa bật AI; dùng phản hồi chữ.",
-                          "The session owner has not enabled AI; use a text response.",
-                        )}
-                      </p>
-                    )}
-                  </details>
-                </>
-              )}
-              {i.shared && (
-                <a
-                  className="button primary"
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/api/join/${token}/record?lang=${locale}`}
-                >
-                  <FileText size={17} />
-                  {t("Mở hồ sơ được chia sẻ", "Open shared record")}
+              {partnerInc.location && (
+                <a className="rx-link" href={maps(partnerInc.location.lat, partnerInc.location.lng)} target="_blank" rel="noreferrer">
+                  <Navigation size={14} /> Xem vị trí trên bản đồ ({clock(partnerInc.location.observedAt)})
                 </a>
               )}
-              <div className="your-promise">
-                <h3>{t("Phản hồi đang ghi nhận", "Your recorded response")}</h3>
-                <b>
-                  {choose(
-                    states[i.reply.state] || ["Đang chờ", "Waiting"],
-                    locale,
-                  )}
-                </b>
-                <q>
-                  {i.reply.quote ||
-                    t("Chưa có lời phản hồi.", "No response yet.")}
-                </q>
-              </div>
+              <p className="rx-fine">Chỉ cần cho vào chỗ sáng, có người. Gọi 113 nếu thấy nguy hiểm.</p>
+              <button onClick={() => void run(() => post(base + "/decide", { callId: partnerInc.call.id, accept: false, note: "Không còn tiếp nhận được" }))}>
+                Không thể tiếp nhận nữa
+              </button>
             </>
+          ) : ["RINGING", "CONNECTED"].includes(partnerInc.call.status) ? (
+            <>
+              <h2>Có người cần nơi chờ an toàn</h2>
+              <p>
+                Cách {partnerInc.distance} m · mức hỗ trợ {partnerInc.riskLevel}/4
+                {partnerInc.appearance ? ` · ${partnerInc.appearance}` : ""}
+              </p>
+              {partnerInc.call.status === "CONNECTED" && (
+                <div className="rx-actions">
+                  <button className="primary" onClick={() => void run(() => post(base + "/decide", { callId: partnerInc.call.id, accept: true }))}>
+                    <Check size={15} /> Tiếp nhận
+                  </button>
+                  <button onClick={() => void run(() => post(base + "/decide", { callId: partnerInc.call.id, accept: false }))}>
+                    Không thể
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <p>Cuộc gọi đã kết thúc ({partnerInc.call.status}).</p>
           )}
         </section>
       )}
-      <footer>
-        {t(
-          "Guardian AI hỗ trợ phối hợp, không bảo đảm cứu hộ.",
-          "Guardian AI supports coordination, not guaranteed rescue.",
-        )}
+      {contactInc && (
+        <section className="rx-card">
+          {!contactInc.closed && <div className="rx-actions">
+            <label>Thời gian đến do bạn tự cung cấp (phút)<input type="number" min="0" max="1440" value={arrivalMinutes} onChange={e => setArrivalMinutes(e.target.value)} /></label>
+            <button onClick={() => void run(() => post(base + "/contact", { action: "KEEP_CONTACT" }))}>Có thể giữ liên lạc</button>
+            <button onClick={() => void run(() => post(base + "/contact", { action: "ON_THE_WAY", ...(arrivalMinutes !== "" ? { arrivalMinutes: Number(arrivalMinutes) } : {}) }))}>Có thể đi đón</button>
+            <button onClick={() => void run(() => post(base + "/contact", { action: "CANNOT_HELP" }))}>Không thể giúp</button>
+          </div>}
+          {contactInc.covert && !contactInc.closed && (
+            <p className="rx-covert">
+              <TriangleAlert size={14} /> SOS BÍ MẬT · đừng gọi điện thoại trực tiếp, chỉ theo dõi
+            </p>
+          )}
+          <h2>
+            {contactInc.trip?.status === "ARRIVED"
+              ? `✅ ${view.userName} đã về tới ${contactInc.trip.label} an toàn`
+              : contactInc.closed
+                ? `${view.userName} đã kết thúc sự cố`
+                : contactInc.sos
+                  ? `${view.userName} đang cần hỗ trợ`
+                  : contactInc.sharing
+                    ? `${view.userName} đang chia sẻ vị trí, nhờ bạn để ý`
+                    : `${view.userName} đang được Guardian đồng hành`}
+          </h2>
+          {contactInc.trip && contactInc.trip.status !== "ARRIVED" && (
+            <p>
+              Chuyến về {contactInc.trip.label} · {contactInc.trip.status}
+              {contactInc.trip.checkinReason ? ` · ${contactInc.trip.checkinReason}` : ""} · dự kiến{" "}
+              {clock(contactInc.trip.expectedBy)}
+            </p>
+          )}
+          {contactInc.evidence && (
+            <p className="rx-dest">
+              <ShieldCheck size={15} /> {view.userName} đã mất liên lạc. Hồ sơ bằng chứng (vị trí cuối, lời khai, đường đi) đã được niêm phong ·{" "}
+              <a href={`${base}/evidence`} target="_blank" rel="noreferrer">Mở hồ sơ</a> · mã {contactInc.evidence.hash}
+            </p>
+          )}
+          {contactInc.destination && (
+            <p className="rx-dest">
+              <ShieldCheck size={15} /> Đang tới <b>{contactInc.destination.name}</b> (đã xác nhận tiếp
+              nhận · kế hoạch v{contactInc.destination.revision})
+            </p>
+          )}
+          {contactInc.where && (
+            <p className="rx-where">
+              <MapPin size={14} /> {contactInc.where}
+              {contactInc.nav && !contactInc.nav.arrived && contactInc.nav.remaining !== null
+                ? ` · còn ${contactInc.nav.remaining} m tới ${contactInc.nav.target}`
+                : contactInc.nav?.arrived
+                  ? ` · đã tới ${contactInc.nav.target}`
+                  : ""}
+              {contactInc.nav?.offRoute ? " · ĐANG ĐI LỆCH TUYẾN" : ""}
+            </p>
+          )}
+          {contactInc.appearance && <p className="rx-id-card">Nhận diện: {contactInc.appearance}</p>}
+          <a className="rx-link" href={maps(contactInc.location.lat, contactInc.location.lng)} target="_blank" rel="noreferrer">
+            <MapPin size={14} /> Vị trí {contactInc.location.kind === "MOCK" ? "mô phỏng" : "GPS"} lúc{" "}
+            {clock(contactInc.location.observedAt)}
+            {contactInc.location.stale ? " · ĐÃ CŨ" : ""}
+          </a>
+          {(contactInc.sos || contactInc.sharing) && !contactInc.closed && (
+            <details>
+              <summary>Liên lạc trực tiếp (tùy chọn)</summary>
+              <p className="rx-fine">Cuộc gọi này nói trực tiếp với {view.userName} và sẽ kết thúc cuộc thoại AI của bạn. Để AI thu thập khả năng hỗ trợ, dùng Nói với Guardian AI ở trên.</p>
+              <button disabled={!!talking} onClick={talk}>
+                <Phone size={15} /> Gọi trực tiếp cho {view.userName}
+              </button>
+            </details>
+          )}
+          <div className="rx-feed">
+            {contactInc.events.map((e) => (
+              <p key={e.id}>
+                <time>{clock(e.time)}</time> {e.summary}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
+      <footer className="rx-fine">
+        Guardian là công cụ hỗ trợ, không thay thế 113. Link này là khóa riêng của bạn, đừng chia sẻ.
       </footer>
     </main>
   );
