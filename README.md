@@ -8,16 +8,9 @@ Guardian AI is a web application that helps people walking alone seek support wh
 
 **Guardian AI placed in the Top 5 at the Sea x OpenAI Regional Codex Hackathon – Vietnam.**
 
-The organizers' congratulatory message recognized the Guardian AI team as one of the competition's **Top 5 teams**. The team was awarded **one year of ChatGPT Pro for each team member**.
+The organizers' congratulatory message recognized the Guardian AI team as one of the competition's **Top 5 teams**.
 
 This marks a memorable milestone in Guardian AI's development. We thank the Sea x OpenAI organizers and everyone who supported, tried, and shared feedback on the project.
-
-<details>
-<summary>View the organizers' announcement</summary>
-
-![Organizers' congratulatory message confirming a Top 5 placement at the Sea x OpenAI Regional Codex Hackathon – Vietnam](docs/assets/top-5-hackathon-notification.png)
-
-</details>
 
 ## Overview
 
